@@ -11,7 +11,7 @@ public void onEnable(){
 	getCommand("accommands").setExecutor(new acCommandExecutor(this));
 	getCommand("trainme").setExecutor(new acCommandExecutor(this));
 	getCommand("news").setExecutor(new acCommandExecutor(this));
-getLogger().info("AmazarCraft plugin is enabled");	
+getLogger().info("AmazarCraft plugin is enabled");	//Tell teh console it is enabled
 }
 
 public void onDisable(){
