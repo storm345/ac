@@ -1,0 +1,28 @@
+name: AmazarCraft
+main: com.amazar.plugin.ac
+version: 1
+commands:
+   who:
+      description: This displays who is online on AmazarCraft
+      usage: /<command>
+      permission: ac.who
+      permission-message: You don't have <permission>
+      default: true
+   trainme:
+      description: Operates the Amazar training system. 
+      usage: /<command> [Skill]
+      permission: ac.trainme
+      permission-message: You don't have <permission>
+      default: true
+   accommands:
+      description: This lists all Amazar Craft commands.
+      usage: /<command> [Page number]
+      permission: ac.accommands
+      permission-message: You don't have <permission>
+      default: true
+   news:
+      description: This shows the news currently on AmazarCraft
+      usage: /<command> [Article]
+      permissions: ac.news
+      permission-message: You don't have access to this command
+      default: true     
