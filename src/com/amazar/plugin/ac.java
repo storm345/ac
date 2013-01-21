@@ -21,6 +21,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.amazar.utils.ListStore;
 
 public class ac extends JavaPlugin {
+	//Main class
 	@SuppressWarnings("unchecked")
 	public static HashMap<String, String> loadHashMapString(String path)
 	{
