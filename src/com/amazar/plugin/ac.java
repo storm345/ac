@@ -65,6 +65,7 @@ public class ac extends JavaPlugin {
 	public static HashMap<String, String> clanInvites = new HashMap<String, String>();
 	public static FileConfiguration config;
 public void onEnable(){
+	//Now on github!
 	bukkit = this;
 	plugin = bukkit;
 	PluginDescriptionFile pldesc = plugin.getDescription();
