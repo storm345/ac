@@ -1,0 +1,120 @@
+name: AmazarCraft
+main: com.amazar.plugin.ac
+version: 1
+commands:
+   who:
+      description: This displays who is online on AmazarCraft
+      usage: /<command>
+      permission: ac.who
+      permission-message: You don't have access to this command <permission>
+      default: true
+   vote:
+      description: This displays voting information
+      usage: /<command>
+      permission: ac.vote
+      permission-message: You don't have access to this command <permission>
+      default: true
+   c:
+      description: This manages clans
+      aliases: [clan]
+      usage: /<command> [create] [delete] [join] [leave] [list] [view] [Invite] [Accept]
+      permission: ac.clan
+      permission-message: You don't have access to this command <permission>
+      default: true
+   trainme:
+      description: Operates the Amazar training system. 
+      usage: /<command> [Skill]
+      permission: ac.trainme
+      permission-message: You don't have access to this command <permission>
+      default: true
+   accommands:
+      description: This lists all Amazar Craft commands.
+      usage: /<command> [Page number]
+      permission: ac.accommands
+      permission-message: You don't have access to this command <permission>
+      default: true
+   firework:
+      description: This gives the player a firework of the desired specification.
+      usage: /<command> [Height (1/2/3)] [Color 1] [Color 2] [Fade color 1] [Fade color 2] [Type] [Twinkle (true/false)] [Trail (true/false)] [Amount]
+      permission: ac.firework
+      permission-message: You don't have access to this command <permission>
+      default: op
+   news:
+      description: This shows the news currently on AmazarCraft or the specific article
+      usage: /<command> ([Article])
+      permission: ac.news
+      permission-message: You don't have access to this command <permission>
+      default: true
+   createnews:
+      description: This makes news on amazarCraft
+      usage: /<command> [Article] [News]
+      permission: ac.createnews
+      permission-message: You don't have access to this command <permission>
+      default: op
+   acupdate:
+      description: This updates the plugin
+      usage: /<command>
+      permission: ac.acupdate
+      permission-message: You don't have access to this command <permission>
+      default: op
+   deletenews:
+      description: This deletes news on amazarCraft
+      usage: /<command> [Article]
+      permission: ac.deletenews
+      permission-message: You don't have access to this command <permission>
+      default: op
+   warn:
+      description: This warns a player.
+      aliases: [warning]
+      usage: /<command> [Player] [Message]
+      permission: ac.warn.warn
+      permission-message: You don't have access to this command <permission>
+      default: op
+   delete-warns:
+      description: This delete's a players warning's.
+      aliases: [cwarns, c-warns, dwarns, d-warns]
+      usage: /<command> [Player]
+      permission: ac.warn.delwarns
+      permission-message: You don't have access to this command <permission>
+      default: op
+   view-warns:
+      description: This views's a players warning's.
+      aliases: [warns]
+      usage: /<command> [Player]
+      permission: ac.warn.viewwarns
+      permission-message: You don't have access to this command <permission>
+      default: op
+   warnslog:
+      description: This shows the server's warning's log.
+      aliases: [warnings, warningslog, warns-log]
+      usage: /<command> (clear)
+      permission: ac.warn.warnslog
+      permission-message: You don't have access to this command <permission>
+      default: op
+     
+permissions:
+    ac.*:
+        description: Gives access to all ac commands
+        children:
+            ac.acupdate: true
+            ac.who: true
+            ac.vote: true
+            ac.clan: true
+            ac.trainme: true
+            ac.accommands: true
+            ac.firework: true
+            ac.news: true
+            ac.createnews: true
+            ac.acupdate: true
+            ac.deletenews: true
+            ac.warn.*: true
+            ac.delwarns: true
+            ac.viewwarns: true
+            ac.warnslog: true
+    ac.warn.*:
+        description: Gives access to all acwarns commands
+        children:
+            ac.warn.warnslog: true
+            ac.warn.viewwarns: true
+            ac.warn.delwarns: true
+            ac.warn.warn: true
