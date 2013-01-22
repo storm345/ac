@@ -8,6 +8,12 @@ commands:
       permission: ac.who
       permission-message: You don't have access to this command <permission>
       default: true
+   logchat:
+      description: Logs a command to chat
+      usage: /<command> [Message]
+      permission: ac.logchat
+      permission-message: You don't have access to this command <permission>
+      default: op
    vote:
       description: This displays voting information
       usage: /<command>
@@ -19,6 +25,13 @@ commands:
       aliases: [clan]
       usage: /<command> [create] [delete] [join] [leave] [list] [view] [Invite] [Accept]
       permission: ac.clan
+      permission-message: You don't have access to this command <permission>
+      default: true
+   package:
+      description: This shows package info
+      aliases: [pack, pinfo, packageinfo]
+      usage: /<command> [Name]
+      permission: ac.package
       permission-message: You don't have access to this command <permission>
       default: true
    trainme:

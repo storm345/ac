@@ -323,6 +323,68 @@ public acCommandExecutor(ac plugin) {
 			}
 			return false;
 		}
+		else if (cmd.getName().equalsIgnoreCase("package")){
+			Object[] packages = ac.packages.values.toArray();
+			if(args.length < 1){
+				sender.sendMessage("Usage: /" + cmdname + " [Name]");
+				sender.sendMessage(ChatColor.RED + "Valid packages are:");
+				for(int i = 0;i<packages.length;i++){
+					String info = (String) packages[i];
+					String[] parts = info.split(":");
+					if(parts.length < 1){
+						return true;
+					}
+					String thePackageName = parts[0];
+					sender.sendMessage(ChatColor.GOLD + thePackageName);
+				}
+				return true;
+			}
+			String packageName = args[0];
+			boolean found = false;
+			for(int i = 0; i<packages.length; i++){
+				String line = (String) packages[i];
+				//String[] parts = line.split(":", 1);
+				if(line.toLowerCase().startsWith(packageName.toLowerCase())){
+					found = true;
+					sender.sendMessage(ChatColor.YELLOW + "" + ChatColor.BOLD + "Package info for the " + packageName +" package:");
+					line = line.replaceFirst("(?i)"+packageName + ":", "");
+					line = StringColors.colorise(line);
+					String[] lines = line.split("%n");
+					for(int z = 0; z<lines.length;z++){
+						sender.sendMessage(lines[z]);
+					}
+				}
+			}
+			if(!found){
+				sender.sendMessage(ChatColor.RED + "Valid packages are:");
+				for(int i = 0;i<packages.length;i++){
+					String info = (String) packages[i];
+					String[] parts = info.split(":");
+					if(parts.length < 1){
+						return true;
+					}
+					String thePackageName = parts[0];
+					sender.sendMessage(ChatColor.GOLD + thePackageName);
+				}
+				return true;
+			}
+			return true;
+		}
+		else if(cmd.getName().equalsIgnoreCase("logchat")){
+			if(args.length<1){
+				return false;
+			}
+			String msg = "";
+			for(int i=0;i<args.length;i++){
+				msg = msg + args[i] + " ";
+			}
+			msg = StringColors.colorise(msg);
+			String[] lines = msg.split("%n");
+			for(int i=0;i<lines.length;i++){
+				Bukkit.broadcastMessage(lines[i]);
+			}
+			return true;
+		}
 	else if (cmd.getName().equalsIgnoreCase("accommands")){ // If the player typed /setlevel then do the following...
 			  PluginDescriptionFile desc = plugin.getDescription();
 			  Map<String, Map<String, Object>> cmds = desc.getCommands();

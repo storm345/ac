@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +24,20 @@ import com.amazar.utils.ListStore;
 
 public class ac extends JavaPlugin {
 	//Main class
+	private void copy(InputStream in, File file) {
+	    try {
+	        OutputStream out = new FileOutputStream(file);
+	        byte[] buf = new byte[1024];
+	        int len;
+	        while((len=in.read(buf))>0){
+	            out.write(buf,0,len);
+	        }
+	        out.close();
+	        in.close();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	}
 	@SuppressWarnings("unchecked")
 	public static HashMap<String, String> loadHashMapString(String path)
 	{
@@ -58,6 +74,7 @@ public class ac extends JavaPlugin {
 	public static Plugin bukkit;
 	public Plugin plugin;
 	public static ListStore news;
+	public static ListStore packages;
 	public static ListStore vote;
 	public static ListStore clans;
 	public static ListStore warns;
@@ -92,6 +109,22 @@ public void onEnable(){
 	}
     news = new ListStore(newsFile);
 	news.load();
+	File packageFile = new File(this.getDataFolder().getAbsolutePath() + File.separator + "packages.txt");
+    packageFile.getParentFile().mkdirs();
+    //newsFile.mkdirs();
+    if(packageFile.exists() == false || packageFile.length() < 1){
+    	try {
+    		packageFile.createNewFile();
+    	} catch (IOException e) {
+    	}
+    	copy(getResource("packages.txt"), packageFile);
+    }
+    try {
+		packageFile.createNewFile();
+	} catch (IOException e) {
+	}
+    packages = new ListStore(packageFile);
+	packages.load();
 	config = getConfig();
 	try{
 		config.load(this.getDataFolder().getAbsolutePath() + File.separator + "config.yml");
