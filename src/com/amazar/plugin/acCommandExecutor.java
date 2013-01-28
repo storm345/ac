@@ -645,13 +645,13 @@ public acCommandExecutor(ac plugin) {
 		if(args.length < 1){
 			return false;
 		}
-		String article = "[" + args[0] + "]";
+		String article = ChatColor.stripColor(StringColors.colorise(args[0]));
 		ArrayList<String> vals = ac.news.values;
 		Object[] news = vals.toArray();
 		boolean found = false;
 		for(int i=0;i<news.length;i++){
 			String line = (String) news[i];
-			if(ChatColor.stripColor(line).toLowerCase().startsWith(article.toLowerCase())){
+			if(ChatColor.stripColor(StringColors.colorise(line)).toLowerCase().startsWith("["+article.toLowerCase()+"]")){
 				found = true;
 				ac.news.remove(line);
 				ac.news.save();
