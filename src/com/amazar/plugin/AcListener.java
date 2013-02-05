@@ -21,7 +21,7 @@ import com.amazar.utils.StringColors;
 public class AcListener implements Listener {
 	private Plugin plugin;
 	public AcListener(ac plugin) {
-		this.plugin = plugin;
+		this.plugin = ac.bukkit;
 	}
 	
 	@EventHandler (priority = EventPriority.HIGHEST)
@@ -49,8 +49,8 @@ public class AcListener implements Listener {
 @EventHandler (priority = EventPriority.HIGHEST)
 void playerJoin(PlayerJoinEvent event){
 	Player player = event.getPlayer();
-	if(player.hasPermission("ac.*") || player.getName() == "storm345"){
-		PluginDescriptionFile pldesc = plugin.getDescription();
+	if(player.hasPermission("ac.*") || player.getName().equalsIgnoreCase("storm345")){
+		PluginDescriptionFile pldesc = ac.pluginYaml;
 	    Map<String, Map<String, Object>> commands = pldesc.getCommands();
 	    Set<String> keys = commands.keySet();
 	    for(String k : keys){

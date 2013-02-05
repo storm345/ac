@@ -82,10 +82,12 @@ public class ac extends JavaPlugin {
 	public static HashMap<String, String> clanMembers = new HashMap<String, String>();
 	public static HashMap<String, String> clanInvites = new HashMap<String, String>();
 	public static FileConfiguration config;
+	public static PluginDescriptionFile pluginYaml;
 public void onEnable(){
 	//Now on github!
 	bukkit = this;
 	plugin = bukkit;
+	pluginYaml = plugin.getDescription();
 	PluginDescriptionFile pldesc = plugin.getDescription();
     Map<String, Map<String, Object>> commands = pldesc.getCommands();
     Set<String> keys = commands.keySet();
@@ -97,7 +99,7 @@ public void onEnable(){
 			e.printStackTrace();
 		}
     }
-    getServer().getPluginManager().registerEvents(new AcListener(null), this);
+    getServer().getPluginManager().registerEvents(new AcListener(this), this);
     String pluginFolder = this.getDataFolder().getAbsolutePath();
 	(new File(pluginFolder)).mkdirs();
     File newsFile = new File(this.getDataFolder().getAbsolutePath() + File.separator + "news.txt");
