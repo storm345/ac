@@ -385,6 +385,27 @@ public acCommandExecutor(ac plugin) {
 			}
 			return true;
 		}
+		else if(cmd.getName().equalsIgnoreCase("logchatp")){
+			if(args.length<2){
+				return false;
+			}
+			String playername = args[0];
+			Player p = plugin.getServer().getPlayer(playername);
+			if(p == null){
+				sender.sendMessage(ChatColor.RED + "Unable to find player " + playername);
+				return true;
+			}
+			String msg = "";
+			for(int i=1;i<args.length;i++){
+				msg = msg + args[i] + " ";
+			}
+			msg = StringColors.colorise(msg);
+			String[] lines = msg.split("%n");
+			for(int i=0;i<lines.length;i++){
+				p.sendMessage(lines[i]);
+			}
+			return true;
+		}
 	else if (cmd.getName().equalsIgnoreCase("accommands")){ // If the player typed /setlevel then do the following...
 			  PluginDescriptionFile desc = plugin.getDescription();
 			  Map<String, Map<String, Object>> cmds = desc.getCommands();

