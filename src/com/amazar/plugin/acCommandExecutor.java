@@ -404,6 +404,7 @@ public acCommandExecutor(ac plugin) {
 			for(int i=0;i<lines.length;i++){
 				p.sendMessage(lines[i]);
 			}
+			sender.sendMessage(ChatColor.RED + "Send to " + ChatColor.GOLD + p.getName());
 			return true;
 		}
 	else if (cmd.getName().equalsIgnoreCase("accommands")){ // If the player typed /setlevel then do the following...
