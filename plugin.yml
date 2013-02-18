@@ -22,7 +22,7 @@ commands:
       permission-message: You don't have access to this command <permission>
       default: op
    spend:
-      description: This spends [Amount] of reward points on [Type]
+      description: This spends [amount] of reward points on [Type]
       usage: /<command> [Type] [Amount]
       permission: ac.spend
       permission-message: You don't have access to this command <permission>

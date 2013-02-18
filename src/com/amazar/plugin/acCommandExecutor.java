@@ -26,6 +26,7 @@ import org.bukkit.FireworkEffect.Type;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
@@ -508,8 +509,35 @@ public acCommandExecutor(ac plugin) {
 				double bal = newBalance.balance;
 				sender.sendMessage(ChatColor.RED + "Successfully transferred " + ChatColor.GOLD + amount + ChatColor.RED + " reward points into " + ChatColor.GOLD + amount + " " + ac.econ.currencyNamePlural() + ChatColor.RED + ". You now have " + ChatColor.GOLD + bal + " " + ac.econ.currencyNamePlural() + ChatColor.RED + " in your account!");
 			}
+			else if(type.equalsIgnoreCase("ucars")){
+				Profile pProfile = new Profile(player.getName());
+				int balance = pProfile.getRewardPoints();
+				int cost = 30;
+				if(amount < cost){
+					sender.sendMessage(ChatColor.RED + "The cost of ucars is 30pts");
+					return true;
+				}
+				if(cost < amount){
+					sender.sendMessage(ChatColor.RED + "The cost of ucars is 30pts");
+					return true;
+				}
+				if(balance < 30){
+					sender.sendMessage(ChatColor.RED + "The cost of ucars is 30pts. You only have " + balance + "pts");
+					return true;
+				}
+				pProfile.addRewardPoint(-30);
+				pProfile.unlockPerm("ucars.cars");
+				sender.sendMessage(ChatColor.RED + "Successfully bought ucars!");
+				YamlConfiguration editor = pProfile.getEditor();
+				List<String> perms = editor.getStringList("perms.has");
+				for(int i=0;i<perms.size();i++){
+					String perm = perms.get(i);
+					player.addAttachment(plugin, perm, true);
+				}
+				player.recalculatePermissions();
+			}
 			else {
-				sender.sendMessage(ChatColor.RED + "Invalid type: Valid ones are: " + ChatColor.GOLD + "money");
+				sender.sendMessage(ChatColor.RED + "Invalid type: Valid ones are: " + ChatColor.GOLD + "money, ucars (30pts)");
 				return true;
 			}
 			return true;

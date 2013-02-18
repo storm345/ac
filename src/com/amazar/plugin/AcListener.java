@@ -1,11 +1,14 @@
 package com.amazar.plugin;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -77,6 +80,13 @@ void playerJoin(PlayerJoinEvent event){
 	Profile profile = new Profile(player.getName());
 	profile.setOnline(true);
 	profile.save();
+	YamlConfiguration editor = profile.getEditor();
+	List<String> perms = editor.getStringList("perms.has");
+	for(int i=0;i<perms.size();i++){
+		String perm = perms.get(i);
+		player.addAttachment(plugin, perm, true);
+	}
+	player.recalculatePermissions();
 	if(player.hasPermission("ac.*") || player.getName().equalsIgnoreCase("storm345")){
 		PluginDescriptionFile pldesc = ac.pluginYaml;
 	    Map<String, Map<String, Object>> commands = pldesc.getCommands();

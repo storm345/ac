@@ -5,8 +5,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -186,5 +188,36 @@ public int getKills(){
 		current = editor.getInt("profile.kills");
 	}
 	return current;
+}
+public void unlockPerm(String perm){
+	List<String> toSet = Arrays.asList(perm);
+	if(editor.contains("perms.has")){
+		List<String> old = editor.getStringList("perms.has");
+		for(int i=0;i<old.size();i++){
+			String v = old.get(i);
+			toSet.add(v);
+		}
+	}
+	editor.set("perms.has", toSet);
+	this.save();
+	this.load();
+	return;
+}
+public void lockPerm(String perm){
+	List<String> toSet = Arrays.asList();
+	if(editor.contains("perms.has")){
+		List<String> old = editor.getStringList("perms.has");
+		for(int i=0;i<old.size();i++){
+			String v = old.get(i);
+			toSet.add(v);
+		}
+	}
+	if(toSet.contains(perm)){
+		toSet.remove(perm);
+	}
+	editor.set("perms.has", toSet);
+	this.save();
+	this.load();
+	return;
 }
 }
