@@ -5,18 +5,42 @@ import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.enchantment.EnchantItemEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerEggThrowEvent;
+import org.bukkit.event.player.PlayerEvent;
+import org.bukkit.event.player.PlayerExpChangeEvent;
+import org.bukkit.event.player.PlayerFishEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLevelChangeEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerShearEntityEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerToggleSprintEvent;
+import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.util.Vector;
 
+import com.amazar.utils.Profile;
 import com.amazar.utils.StringColors;
 
 public class AcListener implements Listener {
@@ -50,6 +74,9 @@ public class AcListener implements Listener {
 @EventHandler (priority = EventPriority.HIGHEST)
 void playerJoin(PlayerJoinEvent event){
 	Player player = event.getPlayer();
+	Profile profile = new Profile(player.getName());
+	profile.setOnline(true);
+	profile.save();
 	if(player.hasPermission("ac.*") || player.getName().equalsIgnoreCase("storm345")){
 		PluginDescriptionFile pldesc = ac.pluginYaml;
 	    Map<String, Map<String, Object>> commands = pldesc.getCommands();
@@ -89,10 +116,242 @@ void playerJoin(PlayerJoinEvent event){
 	event.setJoinMessage(msg);
 	return;
 }
+@EventHandler
+void kills(EntityDeathEvent event){
+	Entity dead = event.getEntity();
+	EntityDamageEvent cause = dead.getLastDamageCause();
+	DamageCause reason = cause.getCause();
+	if(reason == DamageCause.ENTITY_ATTACK){
+		if(cause instanceof EntityDamageByEntityEvent){
+			EntityDamageByEntityEvent kill = (EntityDamageByEntityEvent) cause;
+			if(kill.getDamager() instanceof Player){
+				Player p = (Player) kill.getDamager();
+				int rand = 1 + (int)(Math.random() * ((50 - 1) + 1));
+				if(rand < 5){
+					Profile pProfile = new Profile(p.getName());
+					int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
+					pProfile.addRewardPoint(amount);
+					p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
+				}
+			}
+		}
+	}
+	return;
+}
 @EventHandler (priority = EventPriority.HIGHEST)
 void playerexit(PlayerQuitEvent event){
+	Profile profile = new Profile(event.getPlayer().getName());
+	profile.setOnline(false);
+	profile.setOnlineTime();
+	profile.save();
 	String msg = StringColors.colorise(ac.config.getString("general.quitmsg")).replaceAll("%name%", event.getPlayer().getName());
 	event.setQuitMessage(msg);
 return;	
+}
+@EventHandler
+void rewarder(PlayerEggThrowEvent event){
+	Player p = event.getPlayer();
+	int rand = 1 + (int)(Math.random() * ((100 - 1) + 1));
+	if(rand < 5){
+		Profile pProfile = new Profile(p.getName());
+		int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
+		pProfile.addRewardPoint(amount);
+		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
+	}
+	return;
+}
+@EventHandler
+void rewarder2(PlayerExpChangeEvent event){
+	Player p = event.getPlayer();
+	int rand = 1 + (int)(Math.random() * ((100 - 1) + 1));
+	if(rand < 5){
+		Profile pProfile = new Profile(p.getName());
+		int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
+		pProfile.addRewardPoint(amount);
+		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
+	}
+	return;
+}
+@EventHandler
+void rewarder3(PlayerFishEvent event){
+	Player p = event.getPlayer();
+	int rand = 1 + (int)(Math.random() * ((400 - 1) + 1));
+	if(rand < 5){
+		Profile pProfile = new Profile(p.getName());
+		int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
+		pProfile.addRewardPoint(amount);
+		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
+	}
+	return;
+}
+@EventHandler
+void rewarder4(PlayerInteractEntityEvent event){
+	Player p = event.getPlayer();
+	int rand = 1 + (int)(Math.random() * ((100 - 1) + 1));
+	if(rand < 5){
+		Profile pProfile = new Profile(p.getName());
+		int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
+		pProfile.addRewardPoint(amount);
+		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
+	}
+	return;
+}
+@EventHandler
+void rewarder5(PlayerLevelChangeEvent event){
+	Player p = event.getPlayer();
+	int rand = 1 + (int)(Math.random() * ((10 - 1) + 1));
+	if(rand < 5){
+		Profile pProfile = new Profile(p.getName());
+		int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
+		pProfile.addRewardPoint(amount);
+		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
+	}
+	return;
+}
+@EventHandler
+void rewarder6(PlayerPortalEvent event){
+	Player p = event.getPlayer();
+	int rand = 1 + (int)(Math.random() * ((50 - 1) + 1));
+	if(rand < 5){
+		Profile pProfile = new Profile(p.getName());
+		int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
+		pProfile.addRewardPoint(amount);
+		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
+	}
+	return;
+}
+@EventHandler
+void rewarder7(PlayerTeleportEvent event){
+	Player p = event.getPlayer();
+	int rand = 1 + (int)(Math.random() * ((150 - 1) + 1));
+	if(rand < 5){
+		Profile pProfile = new Profile(p.getName());
+		int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
+		pProfile.addRewardPoint(amount);
+		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
+	}
+	return;
+}
+@EventHandler
+void rewarder8(PlayerRespawnEvent event){
+	Player p = event.getPlayer();
+	int rand = 1 + (int)(Math.random() * ((100 - 1) + 1));
+	if(rand < 5){
+		Profile pProfile = new Profile(p.getName());
+		int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
+		pProfile.addRewardPoint(amount);
+		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
+	}
+	return;
+}
+@EventHandler
+void rewarder9(PlayerShearEntityEvent event){
+	Player p = event.getPlayer();
+	int rand = 1 + (int)(Math.random() * ((50 - 1) + 1));
+	if(rand < 5){
+		Profile pProfile = new Profile(p.getName());
+		int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
+		pProfile.addRewardPoint(amount);
+		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
+	}
+	return;
+}
+@EventHandler
+void rewarder10(PlayerToggleSprintEvent event){
+	Player p = event.getPlayer();
+	int rand = 1 + (int)(Math.random() * ((200 - 1) + 1));
+	if(rand < 5){
+		Profile pProfile = new Profile(p.getName());
+		int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
+		pProfile.addRewardPoint(amount);
+		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
+	}
+	return;
+}
+@EventHandler
+void rewarder11(BlockPlaceEvent event){
+	Player p = event.getPlayer();
+	int rand = 1 + (int)(Math.random() * ((350 - 1) + 1));
+	if(rand < 5){
+		Profile pProfile = new Profile(p.getName());
+		int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
+		pProfile.addRewardPoint(amount);
+		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
+	}
+	return;
+}
+@EventHandler
+void rewarder11(BlockBreakEvent event){
+	Player p = event.getPlayer();
+	int rand = 1 + (int)(Math.random() * ((350 - 1) + 1));
+	if(rand < 5){
+		Profile pProfile = new Profile(p.getName());
+		int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
+		pProfile.addRewardPoint(amount);
+		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
+	}
+	return;
+}
+@EventHandler
+void rewarder12(EnchantItemEvent event){
+	Player p = event.getEnchanter();
+	int rand = 1 + (int)(Math.random() * ((10 - 1) + 1));
+	if(rand < 5){
+		Profile pProfile = new Profile(p.getName());
+		int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
+		pProfile.addRewardPoint(amount);
+		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
+	}
+	return;
+}
+@EventHandler
+void rewarder13(EntityDamageByEntityEvent event){
+	if(!(event.getDamager() instanceof Player)){
+		return;
+	}
+	Player p = (Player) event.getDamager();
+	int rand = 1 + (int)(Math.random() * ((350 - 1) + 1));
+	if(rand < 5){
+		Profile pProfile = new Profile(p.getName());
+		int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
+		pProfile.addRewardPoint(amount);
+		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
+	}
+	return;
+}
+@EventHandler
+void rewarder14(VehicleEnterEvent event){
+	if(!(event.getEntered() instanceof Player)){
+		return;
+	}
+	Player p = (Player) event.getEntered();
+	int rand = 1 + (int)(Math.random() * ((100 - 1) + 1));
+	if(rand < 5){
+		Profile pProfile = new Profile(p.getName());
+		int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
+		pProfile.addRewardPoint(amount);
+		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
+	}
+	return;
+}
+@EventHandler (priority = EventPriority.MONITOR)
+void rewarder15(PlayerMoveEvent event){
+	Location from = event.getFrom();
+	Location to = event.getTo();
+	double dist = from.distance(to);
+	Player player = (Player) event.getPlayer();
+	Vector vel = player.getVelocity();
+	double distance = (vel.getX() + vel.getY() + vel.getZ())/3;
+	if(dist > 1.5 || distance > 0.02 || distance < -0.035){
+		Player p = (Player) event.getPlayer();
+		int rand = 1 + (int)(Math.random() * ((400 - 1) + 1));
+		if(rand < 5){
+			Profile pProfile = new Profile(p.getName());
+			int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
+			pProfile.addRewardPoint(amount);
+			p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
+		}
+	}
+	return;
 }
 }

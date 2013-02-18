@@ -14,10 +14,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
+import net.milkbowl.vault.chat.Chat;
+import net.milkbowl.vault.economy.Economy;
+import net.milkbowl.vault.economy.EconomyResponse;
+import net.milkbowl.vault.permission.Permission;
+
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.amazar.utils.ListStore;
@@ -72,7 +78,7 @@ public class ac extends JavaPlugin {
 		}
 	}
 	public static Plugin bukkit;
-	public Plugin plugin;
+	public static ac plugin;
 	public static ListStore news;
 	public static ListStore packages;
 	public static ListStore vote;
@@ -83,10 +89,12 @@ public class ac extends JavaPlugin {
 	public static HashMap<String, String> clanInvites = new HashMap<String, String>();
 	public static FileConfiguration config;
 	public static PluginDescriptionFile pluginYaml;
+	public static Economy econ = null;
+    public static Permission perms = null;
 public void onEnable(){
 	//Now on github!
 	bukkit = this;
-	plugin = bukkit;
+	plugin = this;
 	pluginYaml = plugin.getDescription();
 	PluginDescriptionFile pldesc = plugin.getDescription();
     Map<String, Map<String, Object>> commands = pldesc.getCommands();
@@ -208,9 +216,32 @@ public void onEnable(){
 	}
 	warns = new ListStore(warnsLogFile);
 	warns.load();
+	if (!setupEconomy() ) {
+        getLogger().severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
+        getServer().getPluginManager().disablePlugin(this);
+        return;
+    }
+    setupPermissions();
 	getLogger().info("AmazarCraft plugin is enabled :)");	//Tell teh console it is enabled
 }
+private boolean setupEconomy() {
+    if (getServer().getPluginManager().getPlugin("Vault") == null) {
+    	getLogger().info("No vault");
+        return false;
+    }
+    RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+    if (rsp == null) {
+        return false;
+    }
+    econ = rsp.getProvider();
+    return econ != null;
+}
 
+private boolean setupPermissions() {
+    RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
+    perms = rsp.getProvider();
+    return perms != null;
+}
 public void onDisable(){
 	getLogger().info("AmazarCraft plugin is disabled");
 }

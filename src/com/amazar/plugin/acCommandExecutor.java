@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.milkbowl.vault.economy.EconomyResponse;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -407,6 +409,112 @@ public acCommandExecutor(ac plugin) {
 			sender.sendMessage(ChatColor.RED + "Send to " + ChatColor.GOLD + p.getName());
 			return true;
 		}
+		else if(cmd.getName().equalsIgnoreCase("profile")){
+			if(args.length<1){
+				return false;
+			}
+			String name = args[0];
+			OfflinePlayer[] players = plugin.getServer().getOfflinePlayers();
+			for(int i=0;i<players.length;i++){
+				if(players[i].getName().equalsIgnoreCase(name)){
+					name = players[i].getName();
+				}
+			}
+			String filename = name+".yml";
+			File file = new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "profiles" + File.separator + filename);
+			if(file.length() < 1 || !file.exists()){
+				sender.sendMessage(ChatColor.RED + "No profile exists for "+name);
+				return true;
+			}
+			Profile pProfile = new Profile(name);
+	        int warns = pProfile.getWarns();
+	        boolean isOnline = pProfile.getOnline();
+	        String online = "";
+	        if(isOnline){
+	        	online = "Online now!";
+	        }
+	        else{
+	        	online = pProfile.getOnlineTime();
+	        }
+	        String clan = pProfile.getClan();
+	        int points = pProfile.getRewardPoints();
+	        int kills = pProfile.getKills();
+	        sender.sendMessage(ChatColor.DARK_RED + "" + ChatColor.BOLD + "Profile for: " + ChatColor.GOLD + name);
+	        sender.sendMessage(ChatColor.RED + "Warns: " + ChatColor.GOLD + warns);
+	        sender.sendMessage(ChatColor.RED + "Last online: " + ChatColor.GOLD + online);
+	        sender.sendMessage(ChatColor.RED + "Clan: " + ChatColor.GOLD + clan);
+	        sender.sendMessage(ChatColor.RED + "Reward Points: " + ChatColor.GOLD + points);
+	        sender.sendMessage(ChatColor.RED + "Kills: " + ChatColor.GOLD + kills);
+	        pProfile.save();
+			return true;
+		}
+		else if(cmd.getName().equalsIgnoreCase("spend")){
+			if(!(sender instanceof Player)){
+				sender.sendMessage(ChatColor.RED + "Must be a player to spend reward points!");
+				return true;
+			}
+			if(args.length < 2){
+				return false;
+			}
+			String type = args[0];
+			int amount = 0;
+			try {
+				amount = Integer.parseInt(args[1]);
+			} catch (NumberFormatException e) {
+				sender.sendMessage(ChatColor.RED + "Invalid amount");
+				return true;
+			}
+			if(type.equalsIgnoreCase("money")){
+				/*
+				if(!(ac.econ.hasAccount(player.getName()))){
+					sender.sendMessage(ChatColor.RED + "You don't have a bank account!");
+					return true;
+				}
+				*/
+				Profile pProfile = new Profile(player.getName());
+				int balance = pProfile.getRewardPoints();
+				if(balance - amount < 0){
+					sender.sendMessage(ChatColor.RED + "Not enough reward points. You have " + ChatColor.GOLD + balance + ChatColor.RED + " reward points");
+				    return true;
+				}
+				pProfile.addRewardPoint(-amount);
+				pProfile.save();
+				ac.econ.bankDeposit(player.getName(), amount);
+				EconomyResponse newBalance = ac.econ.bankBalance(player.getName());
+				double bal = newBalance.balance;
+				sender.sendMessage(ChatColor.RED + "Successfully transferred " + ChatColor.GOLD + amount + ChatColor.RED + " reward points into " + ChatColor.GOLD + amount + " " + ac.econ.currencyNamePlural() + ChatColor.RED + ". You now have " + ChatColor.GOLD + bal + " " + ac.econ.currencyNamePlural() + ChatColor.RED + " in your account!");
+			}
+			else {
+				sender.sendMessage(ChatColor.RED + "Invalid type: Valid ones are: " + ChatColor.GOLD + "money");
+				return true;
+			}
+			return true;
+		}
+		else if(cmd.getName().equalsIgnoreCase("reward")){
+			if(args.length < 2){
+				return false;
+			}
+			String name = args[0];
+			OfflinePlayer[] players = plugin.getServer().getOfflinePlayers();
+			for(int i=0;i<players.length;i++){
+				if(name.equalsIgnoreCase(players[i].getName())){
+					name = players[i].getName();
+				}
+			}
+			String amount = args[1];
+			int num = 0;
+			try {
+				num = Integer.parseInt(amount);
+			} catch (NumberFormatException e) {
+				sender.sendMessage(ChatColor.RED + "Invalid amount");
+				return false;
+			}
+			Profile pProfile = new Profile(name);
+			pProfile.addRewardPoint(num);
+			pProfile.save();
+			sender.sendMessage(ChatColor.RED + "Allocated " + ChatColor.GOLD + num + ChatColor.RED + " reward points to " + ChatColor.GOLD + name);
+			return true;
+		}
 	else if (cmd.getName().equalsIgnoreCase("accommands")){ // If the player typed /setlevel then do the following...
 			  PluginDescriptionFile desc = plugin.getDescription();
 			  Map<String, Map<String, Object>> cmds = desc.getCommands();
@@ -737,8 +845,9 @@ public acCommandExecutor(ac plugin) {
 		        // For instance, if the command was "/ignite notch", then the player would be just "notch".
 		        // Note: The first argument starts with [0], not [1]. So arg[0] will get the player typed.
 		        if(check != null){
-
-		        	
+                Profile pProfile = new Profile(target.getName());
+		        pProfile.addWarn();
+		        pProfile.save();
 		        target.sendMessage(ChatColor.RED + "You have been warned " + ChatColor.GOLD + "for" + warnmsg);
 		        plugin.getLogger().info(target.getName() + " has been warned "+"for" + warnmsg);
 		        sender.sendMessage("Warning sent!");
@@ -798,6 +907,9 @@ public acCommandExecutor(ac plugin) {
 					if(playerFile.exists() && playerFile.length() > 1){
 					playerFile.delete();
 					}
+					Profile pProfile = new Profile(playerName);
+			        pProfile.clearWarns();
+			        pProfile.save();
 					sender.sendMessage(ChatColor.RED + playerName + "'s warning's have been deleted.");
 		        	}
 				}

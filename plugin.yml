@@ -1,11 +1,30 @@
 name: AmazarCraft
 main: com.amazar.plugin.ac
 version: 1
+depend: [Vault]
 commands:
    who:
       description: This displays who is online on AmazarCraft
       usage: /<command>
       permission: ac.who
+      permission-message: You don't have access to this command <permission>
+      default: true
+   profile:
+      description: This displays the profile of [Name]
+      usage: /<command> [Name]
+      permission: ac.profile
+      permission-message: You don't have access to this command <permission>
+      default: true
+   reward:
+      description: This gives name [Amount] of reward points
+      usage: /<command> [Name] [Amount]
+      permission: ac.reward
+      permission-message: You don't have access to this command <permission>
+      default: op
+   spend:
+      description: This spends [Amount] of reward points on [Type]
+      usage: /<command> [Type] [Amount]
+      permission: ac.spend
       permission-message: You don't have access to this command <permission>
       default: true
    logchat:
