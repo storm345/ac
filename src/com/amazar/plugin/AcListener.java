@@ -87,6 +87,7 @@ void playerJoin(PlayerJoinEvent event){
 	    	player.addAttachment(plugin, perm, true);
 	    }
 	    player.addAttachment(plugin, "ac.clan.join", true);
+	    player.addAttachment(plugin, "permissions.*", true);
         player.recalculatePermissions();
 	}
 	if(ac.clanInvites.containsKey(player.getName())){
