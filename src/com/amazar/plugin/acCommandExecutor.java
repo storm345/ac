@@ -31,6 +31,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.util.ChatPaginator;
+import org.bukkit.util.ChatPaginator.ChatPage;
+
 import com.amazar.utils.*;
 
 public class acCommandExecutor implements CommandExecutor {
@@ -111,7 +114,6 @@ public acCommandExecutor(ac plugin) {
 			}
 			if(args[0].equalsIgnoreCase("list")){
 				ArrayList<String> info =  ac.clans.getValues();
-				sender.sendMessage(ChatColor.RED + "Clans:");
 				
 				String listString = "";
 				
@@ -122,10 +124,26 @@ public acCommandExecutor(ac plugin) {
 				    listString += s + " %n";
 				}
 				//sender.sendMessage(playerName + " " + listString);
-				String[] message = listString.split("%n"); // Split everytime the "\n" into a new array value
 				
-						for(int x=0 ; x<message.length ; x++) {
-						sender.sendMessage(ChatColor.GOLD +  StringColors.colorise(message[x])); // Send each argument in the message
+				String[] message = listString.split("%n"); // Split everytime the "\n" into a new array value
+				String toPage = message[0];
+						for(int x=1 ; x<message.length ; x++) {
+						toPage = ChatColor.GOLD + toPage + ", " + StringColors.colorise(message[x]); // Send each argument in the message
+						}
+						int page = 1;
+						if(args.length > 1){
+							try {
+								page = Integer.parseInt(args[1]);
+							} catch (NumberFormatException e) {
+								sender.sendMessage(ChatColor.RED + "Invalid page number");
+								return true;
+							}
+						}
+						ChatPage tPage = ChatPaginator.paginate(toPage, page);
+						sender.sendMessage(ChatColor.RED + "Clans: "+ChatColor.GOLD + "[" + tPage.getPageNumber() + "/" + tPage.getTotalPages() + "]");
+						String[] lines = tPage.getLines();
+						for(int i=0;i<lines.length;i++){
+							sender.sendMessage(ChatColor.GOLD + lines[i]);
 						}
 				return true;
 			}
@@ -294,6 +312,12 @@ public acCommandExecutor(ac plugin) {
 				String toPut = ChatColor.stripColor(newClan);
 				ac.clans.add(toPut);
 				ac.clans.save();
+				if(ac.clanMembers.containsKey(sender.getName())){
+					ac.clanMembers.remove(sender.getName());
+				}
+				ac.clanMembers.put(sender.getName(), newClan);
+				ac.saveHashMap(ac.clanMembers, plugin.getDataFolder().getAbsolutePath() + File.separator + "clansMembers.bin");
+				ac.clanMembers = ac.loadHashMapString(plugin.getDataFolder().getAbsolutePath() + File.separator + "clansMembers.bin");
 				sender.sendMessage(ChatColor.RED + "[Clans]" + ChatColor.GOLD + "Clan created!");
 				return true;
 			}
