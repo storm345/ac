@@ -489,6 +489,17 @@ public acCommandExecutor(ac plugin) {
 				sender.sendMessage(ChatColor.RED + "Invalid amount");
 				return true;
 			}
+			ArrayList<String> spendables = ac.spends.values;
+			Boolean contains = false;
+			int iterator = 0;
+			for(int i=0;i<spendables.size();i++){
+				String[] parts = spendables.get(i).split(":");
+				String name = parts[0];
+				if(name.equalsIgnoreCase(type)){
+					iterator = i;
+					contains = true;
+				}
+			}
 			if(type.equalsIgnoreCase("money")){
 				/*
 				if(!(ac.econ.hasAccount(player.getName()))){
@@ -509,35 +520,48 @@ public acCommandExecutor(ac plugin) {
 				double bal = newBalance.balance;
 				sender.sendMessage(ChatColor.RED + "Successfully transferred " + ChatColor.GOLD + amount + ChatColor.RED + " reward points into " + ChatColor.GOLD + amount + " " + ac.econ.currencyNamePlural() + ChatColor.RED + ". You now have " + ChatColor.GOLD + bal + " " + ac.econ.currencyNamePlural() + ChatColor.RED + " in your account!");
 			}
-			else if(type.equalsIgnoreCase("ucars")){
+			else if(contains){
+				//TODO buy them
+				String data = spendables.get(iterator);
+				String[] parts = data.split(":");
+				String name = parts[0];
+				String perm = parts[1];
 				Profile pProfile = new Profile(player.getName());
 				int balance = pProfile.getRewardPoints();
-				int cost = 30;
+				int cost = Integer.parseInt(parts[2]);
 				if(amount < cost){
-					sender.sendMessage(ChatColor.RED + "The cost of ucars is 30pts");
+					sender.sendMessage(ChatColor.RED + "The cost of "+name+" is "+cost+"pts");
 					return true;
 				}
 				if(cost < amount){
-					sender.sendMessage(ChatColor.RED + "The cost of ucars is 30pts");
+					sender.sendMessage(ChatColor.RED + "The cost of "+name+" is "+cost+"pts");
 					return true;
 				}
 				if(balance < 30){
-					sender.sendMessage(ChatColor.RED + "The cost of ucars is 30pts. You only have " + balance + "pts");
+					sender.sendMessage(ChatColor.RED + "The cost of "+name+" is "+cost+"pts. You only have " + balance + "pts");
 					return true;
 				}
-				pProfile.addRewardPoint(-30);
-				pProfile.unlockPerm("ucars.cars");
-				sender.sendMessage(ChatColor.RED + "Successfully bought ucars!");
+				pProfile.addRewardPoint(-cost);
+				pProfile.unlockPerm(perm);
+				sender.sendMessage(ChatColor.RED + "Successfully bought "+name+"!");
 				YamlConfiguration editor = pProfile.getEditor();
 				List<String> perms = editor.getStringList("perms.has");
 				for(int i=0;i<perms.size();i++){
-					String perm = perms.get(i);
-					player.addAttachment(plugin, perm, true);
+					String tperm = perms.get(i);
+					player.addAttachment(plugin, tperm, true);
 				}
 				player.recalculatePermissions();
 			}
 			else {
-				sender.sendMessage(ChatColor.RED + "Invalid type: Valid ones are: " + ChatColor.GOLD + "money, ucars (30pts)");
+				String toSend = ChatColor.RED + "Invalid type: Valid ones are: " + ChatColor.GOLD + "money, ";
+				for(int i=0;i<spendables.size();i++){
+					String v = spendables.get(i);
+					String[] parts = v.split(":");
+					String name = parts[0];
+					String cost = parts[2];
+					toSend = toSend+ChatColor.stripColor(name + " (" + cost + "pts), ");
+				}
+				sender.sendMessage(toSend);
 				return true;
 			}
 			return true;

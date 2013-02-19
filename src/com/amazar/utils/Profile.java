@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -190,7 +191,8 @@ public int getKills(){
 	return current;
 }
 public void unlockPerm(String perm){
-	List<String> toSet = Arrays.asList(perm);
+	List<String> toSet = new ArrayList<String>();
+	toSet.add(perm);
 	if(editor.contains("perms.has")){
 		List<String> old = editor.getStringList("perms.has");
 		for(int i=0;i<old.size();i++){

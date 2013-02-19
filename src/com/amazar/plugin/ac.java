@@ -81,6 +81,7 @@ public class ac extends JavaPlugin {
 	public static ac plugin;
 	public static ListStore news;
 	public static ListStore packages;
+	public static ListStore spends;
 	public static ListStore vote;
 	public static ListStore clans;
 	public static ListStore warns;
@@ -135,6 +136,22 @@ public void onEnable(){
 	}
     packages = new ListStore(packageFile);
 	packages.load();
+	File spendsFile = new File(this.getDataFolder().getAbsolutePath() + File.separator + "spends.txt");
+    spendsFile.getParentFile().mkdirs();
+    //newsFile.mkdirs();
+    if(spendsFile.exists() == false || spendsFile.length() < 1){
+    	try {
+    		packageFile.createNewFile();
+    	} catch (IOException e) {
+    	}
+    	copy(getResource("spends.txt"), spendsFile);
+    }
+    try {
+		spendsFile.createNewFile();
+	} catch (IOException e) {
+	}
+    spends = new ListStore(spendsFile);
+	spends.load();
 	config = getConfig();
 	try{
 		config.load(this.getDataFolder().getAbsolutePath() + File.separator + "config.yml");
