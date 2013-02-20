@@ -353,9 +353,9 @@ void rewarder15(PlayerMoveEvent event){
 	Player player = (Player) event.getPlayer();
 	Vector vel = player.getVelocity();
 	double distance = (vel.getX() + vel.getY() + vel.getZ())/3;
-	if(dist > 1.5 || distance > 0.02 || distance < -0.035){
+	if(dist > 1.5 || distance > 0.02 || distance < -0.035){ //If quicker than gravity (Acrobatics)
 		Player p = (Player) event.getPlayer();
-		int rand = 1 + (int)(Math.random() * ((400 - 1) + 1));
+		int rand = 1 + (int)(Math.random() * ((800 - 1) + 1));
 		if(rand < 5){
 			Profile pProfile = new Profile(p.getName());
 			int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
