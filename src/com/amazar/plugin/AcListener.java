@@ -7,6 +7,7 @@ import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.TravelAgent;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
@@ -220,18 +221,6 @@ void rewarder5(PlayerLevelChangeEvent event){
 	return;
 }
 @EventHandler
-void rewarder6(PlayerPortalEvent event){
-	Player p = event.getPlayer();
-	int rand = 1 + (int)(Math.random() * ((50 - 1) + 1));
-	if(rand < 5){
-		Profile pProfile = new Profile(p.getName());
-		int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
-		pProfile.addRewardPoint(amount);
-		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
-	}
-	return;
-}
-@EventHandler
 void rewarder7(PlayerTeleportEvent event){
 	Player p = event.getPlayer();
 	int rand = 1 + (int)(Math.random() * ((150 - 1) + 1));
@@ -321,6 +310,13 @@ void rewarder13(EntityDamageByEntityEvent event){
 		return;
 	}
 	Player p = (Player) event.getDamager();
+	Entity damaged = event.getEntity();
+	if(damaged instanceof Player){
+		Player d = (Player) event.getEntity();
+		if(p.equals(d)){
+			return;
+		}
+	}
 	int rand = 1 + (int)(Math.random() * ((350 - 1) + 1));
 	if(rand < 5){
 		Profile pProfile = new Profile(p.getName());
@@ -342,26 +338,6 @@ void rewarder14(VehicleEnterEvent event){
 		int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
 		pProfile.addRewardPoint(amount);
 		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
-	}
-	return;
-}
-@EventHandler (priority = EventPriority.MONITOR)
-void rewarder15(PlayerMoveEvent event){
-	Location from = event.getFrom();
-	Location to = event.getTo();
-	double dist = from.distance(to);
-	Player player = (Player) event.getPlayer();
-	Vector vel = player.getVelocity();
-	double distance = (vel.getX() + vel.getY() + vel.getZ())/3;
-	if(dist > 1.5 || distance > 0.02 || distance < -0.035){ //If quicker than gravity (Acrobatics)
-		Player p = (Player) event.getPlayer();
-		int rand = 1 + (int)(Math.random() * ((800 - 1) + 1));
-		if(rand < 5){
-			Profile pProfile = new Profile(p.getName());
-			int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
-			pProfile.addRewardPoint(amount);
-			p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
-		}
 	}
 	return;
 }
