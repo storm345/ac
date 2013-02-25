@@ -97,6 +97,7 @@ public void onEnable(){
 	bukkit = this;
 	plugin = this;
 	pluginYaml = plugin.getDescription();
+	//START HERE
 	PluginDescriptionFile pldesc = plugin.getDescription();
     Map<String, Map<String, Object>> commands = pldesc.getCommands();
     Set<String> keys = commands.keySet();
@@ -108,6 +109,7 @@ public void onEnable(){
 			e.printStackTrace();
 		}
     }
+    //END HERE
     getServer().getPluginManager().registerEvents(new AcListener(this), this);
     String pluginFolder = this.getDataFolder().getAbsolutePath();
 	(new File(pluginFolder)).mkdirs();
