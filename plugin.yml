@@ -1,4 +1,4 @@
-name: AmazarCraft
+name: MCMG
 main: com.amazar.plugin.ac
 version: 1
 depend: [Vault]
