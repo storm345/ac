@@ -158,10 +158,10 @@ public void onEnable(){
 	try{
 		config.load(this.getDataFolder().getAbsolutePath() + File.separator + "config.yml");
 		if(!config.contains("general.loginmsg")){
-			config.set("general.loginmsg", "&c[Amazar Craft]&a %name% &6has joined &cAmazar craft&6!");
+			config.set("general.loginmsg", "&6%name% &2joined the game");
 		}
 		if(!config.contains("general.quitmsg")){
-			config.set("general.quitmsg", "&c[Amazar Craft]&a %name% &6has left &cAmazar craft&6!");
+			config.set("general.quitmsg", "&6%name% &4left the game");
 		}
 	}
 	catch (Exception e){
