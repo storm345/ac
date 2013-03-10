@@ -422,7 +422,7 @@ public acCommandExecutor(ac plugin) {
 				sender.sendMessage(ChatColor.RED + "Unable to find player " + playername);
 				return true;
 			}
-			String msg = "";
+			String msg = "";//lol
 			for(int i=1;i<args.length;i++){
 				msg = msg + args[i] + " ";
 			}
