@@ -1115,6 +1115,9 @@ public acCommandExecutor(ac plugin) {
 			}
 			ac.config.set("general.maintenance.enable", true);
 			String msg = "&6"+args[1];
+			for(int i=2;i<args.length;i++){
+				msg = msg + " "+args[i];
+			}
 			ac.config.set("general.maintenance.msg", msg);
 			plugin.saveConfig();
 			sender.sendMessage(ChatColor.GOLD+"Enabled maintenance with the msg: "+StringColors.colorise(msg));
