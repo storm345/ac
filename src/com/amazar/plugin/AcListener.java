@@ -78,6 +78,16 @@ public class AcListener implements Listener {
 @EventHandler (priority = EventPriority.HIGHEST)
 void playerJoin(PlayerJoinEvent event){
 	Player player = event.getPlayer();
+	if(ac.config.getBoolean("general.maintenance.enable")){
+		String perm = ac.config.getString("general.maintenance.permission");
+		if(!player.hasPermission(perm)){
+			String msg = StringColors.colorise(ac.config.getString("general.maintenance.msg"));
+			player.kickPlayer(msg);
+			plugin.getServer().getLogger().info(player.getName()+" was disconnected due to maintenance!");
+			return;
+		}
+		player.sendMessage(ChatColor.RED + "Alert: "+ChatColor.GOLD+"Maintenance currently in progress!");
+	}
 	Profile profile = new Profile(player.getName());
 	profile.setOnline(true);
 	profile.save();

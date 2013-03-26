@@ -163,6 +163,15 @@ public void onEnable(){
 		if(!config.contains("general.quitmsg")){
 			config.set("general.quitmsg", "&6%name% &4left the game");
 		}
+		if(!config.contains("general.maintenance.enable")){
+			config.set("general.maintenance.enable", false);
+		}
+		if(!config.contains("general.maintenance.msg")){
+			config.set("general.maintenance.msg", "&6Maintenance in progress!");
+		}
+		if(!config.contains("general.maintenance.permission")){
+			config.set("general.maintenance.permission", "ac.worker");
+		}
 	}
 	catch (Exception e){
 		//error

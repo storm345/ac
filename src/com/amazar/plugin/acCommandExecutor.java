@@ -1098,6 +1098,32 @@ public acCommandExecutor(ac plugin) {
 		
 		return true;
 	}
+	else if(cmd.getName().equalsIgnoreCase("maintenance")){
+		if(args.length < 1){
+			return false;
+		}
+		String action = args[0];
+		if(action.equalsIgnoreCase("off")){
+			ac.config.set("general.maintenance.enable", false);
+			plugin.saveConfig();
+			sender.sendMessage(ChatColor.GOLD+"Disabled maintenance!");
+			return true;
+		}
+		else if(action.equalsIgnoreCase("on")){
+			if(args.length < 2){
+				return false;
+			}
+			ac.config.set("general.maintenance.enable", true);
+			String msg = "&6"+args[1];
+			ac.config.set("general.maintenance.msg", msg);
+			plugin.saveConfig();
+			sender.sendMessage(ChatColor.GOLD+"Enabled maintenance with the msg: "+StringColors.colorise(msg));
+		    return true;
+		}
+		else{
+			return false;
+		}
+	}
 		return false;
 	}
 }

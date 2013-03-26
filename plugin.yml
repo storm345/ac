@@ -52,6 +52,12 @@ commands:
       permission: ac.clan
       permission-message: You don't have access to this command <permission>
       default: true
+   maintenance:
+      description: This manages maintenance kicking
+      usage: /<command> [On <Msg>], [Off]
+      permission: ac.maintenance
+      permission-message: You don't have access to this command <permission>
+      default: op
    package:
       description: This shows package info
       aliases: [pack, pinfo, packageinfo]
