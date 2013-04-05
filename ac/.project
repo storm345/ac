@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-<<<<<<< HEAD
-	<name>AmazarCraftPlugin</name>
+	<name>Myplugin</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -14,14 +13,5 @@
 	</buildSpec>
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
-=======
-	<name>ac</name>
-	<comment></comment>
-	<projects>
-	</projects>
-	<buildSpec>
-	</buildSpec>
-	<natures>
->>>>>>> branch 'master' of ssh://git@github.com/storm345/ac.git
 	</natures>
 </projectDescription>
