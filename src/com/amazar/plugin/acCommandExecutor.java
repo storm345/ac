@@ -20,9 +20,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.FireworkEffect.Type;
+import org.bukkit.block.BlockFace;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -60,6 +62,10 @@ public acCommandExecutor(ac plugin) {
 				msg = msg + " " + name + ",";
 			}
 			sender.sendMessage(ChatColor.GOLD + msg);
+			return true;
+		}
+		else if(cmd.getName().equalsIgnoreCase("test")){
+ 
 			return true;
 		}
 		else if(cmd.getName().equalsIgnoreCase("trainme")){

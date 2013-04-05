@@ -9,6 +9,12 @@ commands:
       permission: ac.who
       permission-message: You don't have access to this command <permission>
       default: true
+   test:
+      description: This tests development commands
+      usage: /<command>
+      permission: ac.test
+      permission-message: You don't have access to this command <permission>
+      default: op
    profile:
       description: This displays the profile of [Name]
       usage: /<command> [Name]
