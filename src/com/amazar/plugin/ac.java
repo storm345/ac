@@ -29,6 +29,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.amazar.utils.Arena;
 import com.amazar.utils.Arenas;
+import com.amazar.utils.GameScheduler;
 import com.amazar.utils.ListStore;
 import com.amazar.utils.SerializableLocation;
 
@@ -132,6 +133,7 @@ public class ac extends JavaPlugin {
 	public static Economy econ = null;
     public static Permission perms = null;
     public Arenas minigamesArenas = null;
+    public GameScheduler gameScheduler = null;
 public void onEnable(){
 	//Now on github!
 	bukkit = this;
@@ -219,6 +221,7 @@ public void onEnable(){
 		//error
 	}
 	saveConfig();
+	this.gameScheduler = new GameScheduler();
 	File voteFile = new File(this.getDataFolder().getAbsolutePath() + File.separator + "voteInfo.txt");
     voteFile.getParentFile().mkdirs();
     //newsFile.mkdirs();

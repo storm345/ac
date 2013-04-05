@@ -7,6 +7,7 @@ import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.TravelAgent;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -44,13 +45,16 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.util.Vector;
 
+import com.amazar.utils.Minigame;
+import com.amazar.utils.MinigameFinishEvent;
+import com.amazar.utils.MinigameStartEvent;
 import com.amazar.utils.Profile;
 import com.amazar.utils.StringColors;
 
 public class AcListener implements Listener {
-	private Plugin plugin;
+	private ac plugin;
 	public AcListener(ac plugin) {
-		this.plugin = ac.bukkit;
+		this.plugin = ac.plugin;
 	}
 	
 	@EventHandler (priority = EventPriority.HIGHEST)
@@ -73,6 +77,41 @@ public class AcListener implements Listener {
 			player.setDisplayName(ChatColor.RED + "[" + ChatColor.GOLD + StringColors.colorise(ac.clanMembers.get(player.getName())) + ChatColor.RED + "]" + ChatColor.RESET + "" + ChatColor.DARK_GRAY + player.getName() + ChatColor.RESET);
 			}
 		}
+		return;
+	}
+	@EventHandler (priority = EventPriority.HIGHEST)
+	void miniGameEnd(MinigameFinishEvent event){
+		Minigame game = event.getGame();
+		if(plugin.gameScheduler.arenaInUse(game.getArenaName())){
+			plugin.gameScheduler.removeArena(game.getArenaName());
+		}
+		List<String> players = game.getPlayers();
+		for(String playername:players){
+				Player player = plugin.getServer().getPlayer(playername);
+				player.setCustomName(ChatColor.stripColor(player.getCustomName()));
+				player.setCustomNameVisible(false);
+				player.teleport(player.getLocation().getWorld().getSpawnLocation());
+				if(player.isOnline()){
+					player.sendMessage(ChatColor.GOLD+game.getWinner() + " won the game!");
+				}
+		}
+		plugin.gameScheduler.reCalculateQues();
+		return;
+	}
+	@EventHandler (priority = EventPriority.HIGHEST)
+	void miniGameStart(MinigameStartEvent event){
+		Minigame game = event.getGame();
+		List<String> blue = game.getBlue();
+		List<String> red = game.getRed();
+		for(String name:blue){
+			Player p = plugin.getServer().getPlayer(name);
+			p.setCustomName(ChatColor.BLUE+p.getName());
+		}
+		for(String name:red){
+			Player p = plugin.getServer().getPlayer(name);
+			p.setCustomName(ChatColor.RED+p.getName());
+		}
+		plugin.gameScheduler.reCalculateQues();
 		return;
 	}
 @EventHandler (priority = EventPriority.HIGHEST)
