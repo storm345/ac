@@ -16,6 +16,12 @@ public void setArena(String name, Arena toAdd){
 	return;
 }
 public void removeArena(String name){
+	Set<String> keys = getArenas();
+	for(String key:keys){
+		if(key.equalsIgnoreCase(name)){
+			name = key;
+		}
+	}
 	plugin.arenas.remove(name);
 	this.saveArenas();
 	return;
@@ -24,7 +30,13 @@ public Arena getArena(String name){
 	return plugin.arenas.get(name);
 }
 public Boolean arenaExists(String name){
-		return plugin.arenas.containsKey(name);
+		Set<String> keys = getArenas();
+		for(String key:keys){
+			if(key.equalsIgnoreCase(name)){
+				return true;
+			}
+		}
+		return false;
 }
 public void saveArenas(){
 	ac.saveHashMapArena(plugin.arenas, plugin.getDataFolder().getAbsolutePath() + File.separator + "arenas.bin");

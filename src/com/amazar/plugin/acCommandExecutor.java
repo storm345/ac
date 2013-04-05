@@ -183,13 +183,35 @@ public acCommandExecutor(ac plugin) {
 				}
 			}
 			else if(method.equalsIgnoreCase("remove")){
-				
+				if(args.length < 2){
+					return false;
+				}
+				String arenaName = args[1];
+				if(!plugin.minigamesArenas.arenaExists(arenaName)){
+					sender.sendMessage(ChatColor.RED+"Arena doesn't exist!");
+					return true;
+				}
+				plugin.minigamesArenas.removeArena(arenaName);
+				sender.sendMessage(ChatColor.GREEN+"Successfully removed the arena!");
+				return true;
 			}
 			else if(method.equalsIgnoreCase("set")){
 				
 			}
 			else if(method.equalsIgnoreCase("view")){
-				
+				if(args.length < 2){
+					return false;
+				}
+				String arenaName = args[1];
+				if(!plugin.minigamesArenas.arenaExists(arenaName)){
+					sender.sendMessage(ChatColor.RED+"Arena doesn't exist!");
+					return true;
+				}
+				Arena arena = plugin.minigamesArenas.getArena(arenaName);
+				sender.sendMessage(ChatColor.RED + "[Type:] "+ChatColor.GOLD+arena.getType().toString().toLowerCase());
+				sender.sendMessage(ChatColor.RED + "[Max players:] "+ChatColor.GOLD+arena.getPlayerLimit());
+				sender.sendMessage(ChatColor.RED + "[Shape:] "+ChatColor.GOLD+arena.getShape().toString().toLowerCase());
+				sender.sendMessage(ChatColor.RED + "[Valid (setup):] "+ChatColor.GOLD+arena.isValid());
 			}
 			else{
 				return false;
@@ -221,21 +243,25 @@ public acCommandExecutor(ac plugin) {
 				arenaInfo.add(toAdd);
 			}
 			int displayed = 0;
-			double totalPagesunrounded = arenaInfo.size() / 5;
+			double totalPagesunrounded = arenaInfo.size() / 5d;
 			NumberFormat fmt = NumberFormat.getNumberInstance();
 			fmt.setMaximumFractionDigits(0);
 			fmt.setRoundingMode(RoundingMode.UP);
 			String value = fmt.format(totalPagesunrounded);
 			int totalPages = Integer.parseInt(value);
+			if(totalPages == 0){
+				totalPages = 1;
+			}
+			page -= 1;
 			if(page > totalPages){
 				page = totalPages;
 			}
-			page -= 1;
+			
 			if(page < 0){
 				page = 0;
 			}
 			int startpoint = page * 5;
-			sender.sendMessage(ChatColor.DARK_RED+"Arenas: Page: ["+page+"/"+totalPages+"]");
+			sender.sendMessage(ChatColor.DARK_RED+"Arenas: Page: ["+(page+1)+"/"+(totalPages)+"]");
 			for(int i=startpoint;i<arenaInfo.size()&&displayed<5;i++){
 				sender.sendMessage(StringColors.colorise(arenaInfo.get(i)));
 				displayed++;
