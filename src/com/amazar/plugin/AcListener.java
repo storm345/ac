@@ -7,6 +7,7 @@ import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.TravelAgent;
 import org.bukkit.configuration.ConfigurationSection;
@@ -23,6 +24,8 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.ExplosionPrimeEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerEggThrowEvent;
 import org.bukkit.event.player.PlayerEvent;
@@ -39,6 +42,7 @@ import org.bukkit.event.player.PlayerShearEntityEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
@@ -46,7 +50,9 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.util.Vector;
 
 import com.amazar.utils.Arena;
+import com.amazar.utils.ArenaTntori;
 import com.amazar.utils.ArenaType;
+import com.amazar.utils.ItemStackFromId;
 import com.amazar.utils.Minigame;
 import com.amazar.utils.MinigameFinishEvent;
 import com.amazar.utils.MinigameStartEvent;
@@ -100,6 +106,16 @@ public class AcListener implements Listener {
 				player.setCustomNameVisible(false);
 				player.teleport(player.getLocation().getWorld().getSpawnLocation());
 				if(player.isOnline()){
+					if(!inplayers.contains(playername)){
+						Profile pProfile = new Profile(playername);
+						pProfile.addRewardPoint(3);
+						player.sendMessage(ChatColor.RED+"+3 reward points!");
+					}
+					else{
+						Profile pProfile = new Profile(playername);
+						pProfile.addRewardPoint(10);
+						player.sendMessage(ChatColor.RED+"+10 reward points!");
+					}
 					player.sendMessage(ChatColor.GOLD+game.getWinner() + " won the game!");
 					player.sendMessage(ChatColor.GREEN+"Winner(s): "+in);
 				}
@@ -107,11 +123,73 @@ public class AcListener implements Listener {
 		plugin.gameScheduler.reCalculateQues();
 		return;
 	}
+	@EventHandler void tntoriProtect(ExplosionPrimeEvent event){
+		//TODO work out how the hell to do it
+		return;
+	}
+	@EventHandler void mgDie(PlayerDeathEvent event){
+		if(plugin.mgMethods.inAGame(((Player)event.getEntity()).getName()) == null){
+			return;
+		}
+		Player player = event.getEntity();
+		Minigame game = plugin.mgMethods.inAGame(player.getName());
+		if(game.getGameType() == ArenaType.TNTORI){
+			ArenaTntori gameArena = (ArenaTntori) game.getArena();
+			int totalLives = gameArena.getLives();
+			int lives = totalLives;
+			if(game.lives.containsKey(player.getName())){
+				lives = game.lives.get(player.getName());
+			}
+			lives -= 1;
+			List<String> blue = game.getBlue();
+			List<String> red = game.getRed();
+			List<String> players = game.getPlayers();
+			List<String> inplayers = game.getInPlayers();
+			if(!inplayers.contains(player.getName())){
+				return;
+			}
+			if(lives < 0){
+				//they r out
+				ChatColor team_color = ChatColor.WHITE;
+				if(blue.contains(player.getName())){
+					blue.remove(player.getName());
+					team_color = ChatColor.BLUE;
+				}
+				else if(red.contains(player.getName())){
+					red.remove(player.getName());
+					team_color = ChatColor.RED;
+				}
+				game.playerOut(player.getName());
+				for(String pname:players){
+					plugin.getServer().getPlayer(pname).sendMessage(team_color+player.getName()+"Died and is out!");
+				}
+			}else{
+				ChatColor team_color = ChatColor.WHITE;
+				if(blue.contains(player.getName())){
+					player.setBedSpawnLocation(gameArena.getPlayerBlueSpawn(), false);
+					team_color = ChatColor.BLUE;
+				}
+				else if(red.contains(player.getName())){
+					player.setBedSpawnLocation(gameArena.getPlayerRedSpawn(), false);
+					team_color = ChatColor.RED;
+				}
+				for(String pname:players){
+					plugin.getServer().getPlayer(pname).sendMessage(team_color+player.getName()+"Died and has "+lives+" left!");
+				}
+			}
+			plugin.gameScheduler.updateGame(game);
+			return;
+		}
+		
+		
+		return;
+	}
 	@EventHandler (priority = EventPriority.HIGHEST)
 	void miniGameStart(MinigameStartEvent event){
 		Minigame game = event.getGame();
 		List<String> blue = game.getBlue();
 		List<String> red = game.getRed();
+		List<String> players = game.getPlayers();
 		for(String name:blue){
 			Player p = plugin.getServer().getPlayer(name);
 			p.setCustomName(ChatColor.BLUE+p.getName());
@@ -119,6 +197,21 @@ public class AcListener implements Listener {
 		for(String name:red){
 			Player p = plugin.getServer().getPlayer(name);
 			p.setCustomName(ChatColor.RED+p.getName());
+		}
+		//TODO give items and stuffs
+		if(game.getGameType() == ArenaType.TNTORI){
+			ArenaTntori gameArena = (ArenaTntori) game.getArena();
+			String[] items = gameArena.getItems();
+			for(String raw:items){
+				ItemStack item = ItemStackFromId.get(raw);
+				for(String pname:players){
+					plugin.getServer().getPlayer(pname).getInventory().addItem(item);
+				}
+			}
+			for(String pname:players){
+				plugin.getServer().getPlayer(pname).getInventory().addItem(new ItemStack(Material.TNT, 64));
+				plugin.getServer().getPlayer(pname).getInventory().addItem(new ItemStack(Material.TNT, 64));
+			}
 		}
 		plugin.gameScheduler.reCalculateQues();
 		return;
@@ -132,7 +225,7 @@ public class AcListener implements Listener {
 			return;
 		}
 		Arena arena = game.getArena();
-		String arenaName = game.getArenaName();
+		//String arenaName = game.getArenaName();
 		ArenaType type = game.getGameType();
 		if(type == ArenaType.TNTORI){
 			List<String> inplayers = game.getInPlayers();

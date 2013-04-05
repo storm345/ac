@@ -31,6 +31,7 @@ import com.amazar.utils.Arena;
 import com.amazar.utils.Arenas;
 import com.amazar.utils.GameScheduler;
 import com.amazar.utils.ListStore;
+import com.amazar.utils.MinigameMethods;
 import com.amazar.utils.SerializableLocation;
 
 public class ac extends JavaPlugin {
@@ -134,6 +135,7 @@ public class ac extends JavaPlugin {
     public static Permission perms = null;
     public Arenas minigamesArenas = null;
     public GameScheduler gameScheduler = null;
+    public MinigameMethods mgMethods = null;
 public void onEnable(){
 	//Now on github!
 	bukkit = this;
@@ -222,6 +224,7 @@ public void onEnable(){
 	}
 	saveConfig();
 	this.gameScheduler = new GameScheduler();
+	this.mgMethods = new MinigameMethods();
 	File voteFile = new File(this.getDataFolder().getAbsolutePath() + File.separator + "voteInfo.txt");
     voteFile.getParentFile().mkdirs();
     //newsFile.mkdirs();

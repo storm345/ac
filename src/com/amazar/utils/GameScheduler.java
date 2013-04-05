@@ -248,4 +248,7 @@ public class GameScheduler {
     	}
     	return false;
     }
+    public HashMap<String, Minigame> getGames(){
+    	return this.games;
+    }
 }

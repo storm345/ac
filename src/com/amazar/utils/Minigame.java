@@ -1,6 +1,7 @@
 package com.amazar.utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.bukkit.scheduler.BukkitTask;
@@ -19,6 +20,7 @@ public class Minigame {
 	private String winner = "Unknown";
 	private Boolean running = false;
 	private BukkitTask task = null;
+	public HashMap<String, Integer> lives = new HashMap<String, Integer>();
 	public Minigame(Arena arena, String arenaName){
 		this.gameId = UniqueString.generate();
 		this.arena = arena;
