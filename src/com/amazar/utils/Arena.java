@@ -150,6 +150,10 @@ public Boolean isLocInArena(Location check){
 	}
 	return false;
 }
+public void setPlayerLimit(int limit){
+	this.playerLimit = limit;
+	return;
+}
 public void markArena(Material marker){
 	Location center = this.center.getLocation(ac.plugin.getServer());
 	if(this.shape == ArenaShape.CIRCLE){

@@ -196,6 +196,534 @@ public acCommandExecutor(ac plugin) {
 				return true;
 			}
 			else if(method.equalsIgnoreCase("set")){
+				if(player == null){
+					sender.sendMessage(ChatColor.RED+"Players only.");
+					return true;
+				}
+				if(args.length < 3){
+					return false;
+				}
+				String arenaName = args[1];
+				String setting = args[2];
+				if(!plugin.minigamesArenas.arenaExists(arenaName)){
+					sender.sendMessage(ChatColor.RED+"Arena doesn't exist!");
+					return true;
+				}
+				//TODO code for setup and modification fo arenas
+				Arena arena = plugin.minigamesArenas.getArena(arenaName);
+				if(setting.equalsIgnoreCase("setCenter")){
+					arena.setCenter(player.getLocation());
+					plugin.minigamesArenas.setArena(arenaName, arena);
+					sender.sendMessage(ChatColor.GREEN+"Arena center set to your feet!");
+					return true;
+				}
+				else if(setting.equalsIgnoreCase("setRadius")){
+					if(args.length < 4){
+						sender.sendMessage(ChatColor.GOLD+"Usage: /arena set [Name] setRadius [Radius]");
+						return true;
+					}
+					String radius = args[3];
+					int radi = 0;
+					try {
+						radi = Integer.parseInt(radius);
+					} catch (NumberFormatException e) {
+						sender.sendMessage(ChatColor.RED+"Invalid radius");
+						return true;
+					}
+					arena.setRadius(radi);
+					plugin.minigamesArenas.setArena(arenaName, arena);
+					sender.sendMessage(ChatColor.GREEN+"Successfully set the radius for this arena.");
+					return true;
+				}
+				else if(setting.equalsIgnoreCase("show")){
+					arena.markArena(Material.CLAY);
+					sender.sendMessage(ChatColor.GREEN+"Arena zone marked out with clay.");
+					return true;
+				}
+				else if(setting.equalsIgnoreCase("setShape")){
+					if(args.length < 4){
+						sender.sendMessage(ChatColor.GOLD+"Usage: /arena set [Name] setShape [square/circle]");
+						return true;
+					}
+					String shapeName = args[3];
+					ArenaShape shape = ArenaShape.INVALID;
+					if(shapeName.equalsIgnoreCase("circle")){
+						shape = ArenaShape.CIRCLE;
+					}
+					else if(shapeName.equalsIgnoreCase("square")){
+						shape = ArenaShape.SQUARE;
+					}
+					else{
+						sender.sendMessage(ChatColor.RED+"Invalid shape! Valid: circle, square!");
+						return true;
+					}
+					arena.setShape(shape);
+					plugin.minigamesArenas.setArena(shapeName, arena);
+					sender.sendMessage(ChatColor.GREEN+"Successfully set the arena shape!");
+					return true;
+				}
+				else if(setting.equalsIgnoreCase("setType")){
+					if(args.length < 4){
+						sender.sendMessage(ChatColor.GOLD+"Usage: /arena set [Name] setType [Type]");
+						return true;
+					}
+					String typeName = args[3];
+					ArenaType type = ArenaType.INAVLID;
+					if(typeName.equalsIgnoreCase("pvp")){
+						type = ArenaType.PVP;
+					}
+					else if(typeName.equalsIgnoreCase("ctf")){
+						type = ArenaType.CTF;
+					}
+					else if(typeName.equalsIgnoreCase("push")){
+						type = ArenaType.PUSH;
+					}
+					else if(typeName.equalsIgnoreCase("survival")){
+						type = ArenaType.SURVIVAL;
+					}
+					else if(typeName.equalsIgnoreCase("teams")){
+						type = ArenaType.TEAMS;
+					}
+					else if(typeName.equalsIgnoreCase("tntori")){
+						type = ArenaType.TNTORI;
+					}
+					else{
+						sender.sendMessage(ChatColor.RED+"Invalid type! Valid: ctf, pvp, push, survival, teams, tntori");
+						return true;
+					}
+					arena.setType(type);
+					plugin.minigamesArenas.setArena(arenaName, arena);
+					sender.sendMessage(ChatColor.GREEN+"Successfully set arena type!");
+					return true;
+				}
+				else if(setting.equalsIgnoreCase("inArena")){
+					Boolean inArena = arena.isLocInArena(player.getLocation());
+					sender.sendMessage(ChatColor.GREEN + "You are in the arena: "+inArena);
+					return true;
+				}
+				else if(setting.equalsIgnoreCase("setPlayerLimit")){
+					if(args.length < 4){
+						sender.sendMessage(ChatColor.RED+"Usage: /arena set [Name] setPlayerLimit [Limit]");
+						return true;
+					}
+					int limit = 2;
+					try {
+						limit = Integer.parseInt(args[3]);
+					} catch (NumberFormatException e) {
+                    sender.sendMessage(ChatColor.RED+"Limit must be a number!");
+                    return true;
+					}
+					arena.setPlayerLimit(limit);
+					plugin.minigamesArenas.setArena(arenaName, arena);
+					sender.sendMessage(ChatColor.GREEN+"Successfully set player limit!");
+					return true;
+				}
+				if(arena.getType() == ArenaType.CTF){
+					ArenaCtf ctf = (ArenaCtf) arena;
+					if(setting.equalsIgnoreCase("setItems")){
+						if(args.length < 4){
+							sender.sendMessage(ChatColor.RED+"Usage: /arena set setItems id:data id:data etc..");
+							return true;
+						}
+						List<String> raws = new ArrayList<String>();
+						for(int i=3;i<args.length;i++){
+							raws.add(args[i]);
+						}
+						Object[] array = (Object[]) raws.toArray();
+						ctf.setItems((String[]) array);
+						plugin.minigamesArenas.setArena(arenaName, ctf);
+						sender.sendMessage(ChatColor.GREEN+"Successfully set items given to players!");
+						return true;
+					}
+					else if(setting.equalsIgnoreCase("setBlueSpawn")){
+						ctf.setBlueSpawn(player.getLocation());
+						plugin.minigamesArenas.setArena(arenaName, ctf);
+						sender.sendMessage(ChatColor.GREEN+"Set blue team spawnpoint to where you are standing!");
+						return true;
+					}
+					else if(setting.equalsIgnoreCase("setRedSpawn")){
+						ctf.setRedSpawn(player.getLocation());
+						plugin.minigamesArenas.setArena(arenaName, ctf);
+						sender.sendMessage(ChatColor.GREEN+"Set the red team spawnpoint to where you are standing!");
+						return true;
+					}
+					else if(setting.equalsIgnoreCase("setBlueFlag")){
+						ctf.setBlueFlag(player.getLocation());
+						plugin.minigamesArenas.setArena(arenaName, ctf);
+						sender.sendMessage(ChatColor.GREEN+"The the blue team flag has been set to where you are standing!");
+						return true;
+					}
+					else if(setting.equalsIgnoreCase("setRedFlag")){
+						ctf.setRedFlag(player.getLocation());
+						plugin.minigamesArenas.setArena(arenaName, ctf);
+						sender.sendMessage(ChatColor.GREEN+"The red team flag has been set to where you are standing!");
+						return true;
+					}
+				}
+				else if(arena.getType() == ArenaType.PUSH){
+					ArenaPush push = (ArenaPush) arena; 
+					if(setting.equalsIgnoreCase("setBlueSpawn")){
+						push.setPlayerBlueSpawn(player.getLocation());
+						plugin.minigamesArenas.setArena(arenaName, push);
+						sender.sendMessage(ChatColor.GREEN+"The blue player spawnpoint has been set to where you are standing!");
+					    return true;
+					}
+					else if(setting.equalsIgnoreCase("setRedSpawn")){
+						push.setPlayerRedSpawn(player.getLocation());
+						plugin.minigamesArenas.setArena(arenaName, push);
+						sender.sendMessage(ChatColor.GREEN+"The red player spawnpoint has been set to where you are standing!");
+						return true;
+					}
+					else if(setting.equalsIgnoreCase("doCountdown")){
+						if(args.length < 4){
+							sender.sendMessage(ChatColor.RED+"Usage: /arena set [Name] doCountdown [true/false]");
+						}
+						Boolean doCountdown = false;
+						if(args[3].equalsIgnoreCase("true")){
+							doCountdown = true;
+						}
+						else if(args[3].equalsIgnoreCase("false")){
+							doCountdown = false;
+						}
+						else{
+							sender.sendMessage(ChatColor.RED+"Valid values: true/false");
+							return true;
+						}
+						push.setDoCountdown(doCountdown);
+						plugin.minigamesArenas.setArena(arenaName, push);
+						sender.sendMessage(ChatColor.GREEN+"Countdown set!");
+						return true;
+					}
+					else if(setting.equalsIgnoreCase("Countdown")){
+						if(args.length < 4){
+							sender.sendMessage(ChatColor.RED+"Usage: /arena set [Name] countdown [Number]");
+						}
+						int number = 0;
+						try {
+							number = Integer.parseInt(args[3]);
+						} catch (NumberFormatException e) {
+                        sender.sendMessage(ChatColor.RED+"Invalid number!");
+                        return true;
+						}
+						push.setCountdown(number);
+						plugin.minigamesArenas.setArena(arenaName, push);
+						sender.sendMessage(ChatColor.GREEN+"Countdown set!");
+						return true;
+					}
+					else if(setting.equalsIgnoreCase("setLives")){
+						if(args.length < 4){
+							sender.sendMessage(ChatColor.RED+"Usage: /arena set [Name] setLives [Number]");
+						}
+						int number = 0;
+						try {
+							number = Integer.parseInt(args[3]);
+						} catch (NumberFormatException e) {
+                        sender.sendMessage(ChatColor.RED+"Invalid number!");
+                        return true;
+						}
+						push.setLives(number);
+						plugin.minigamesArenas.setArena(arenaName, push);
+						sender.sendMessage(ChatColor.GREEN+"Lives set!");
+						return true;
+					}
+					else if(setting.equalsIgnoreCase("setItems")){
+						if(args.length < 4){
+							sender.sendMessage(ChatColor.RED+"Usage: /arena set setItems id:data id:data etc..");
+							return true;
+						}
+						List<String> raws = new ArrayList<String>();
+						for(int i=3;i<args.length;i++){
+							raws.add(args[i]);
+						}
+						Object[] array = (Object[]) raws.toArray();
+						push.setItems((String[]) array);
+						plugin.minigamesArenas.setArena(arenaName, push);
+						sender.sendMessage(ChatColor.GREEN+"Successfully set items given to players!");
+						return true;
+					}
+					
+				}
+				else if(arena.getType() == ArenaType.TEAMS){
+					ArenaTeams teams = (ArenaTeams) arena;
+					if(setting.equalsIgnoreCase("setItems")){
+						if(args.length < 4){
+							sender.sendMessage(ChatColor.RED+"Usage: /arena set setItems id:data id:data etc..");
+							return true;
+						}
+						List<String> raws = new ArrayList<String>();
+						for(int i=3;i<args.length;i++){
+							raws.add(args[i]);
+						}
+						Object[] array = (Object[]) raws.toArray();
+						teams.setItems((String[]) array);
+						plugin.minigamesArenas.setArena(arenaName, teams);
+						sender.sendMessage(ChatColor.GREEN+"Successfully set items given to players!");
+						return true;
+					}
+					else if(setting.equalsIgnoreCase("setBlueSpawnpoint")){
+						teams.setBlueSpawn(player.getLocation());
+						plugin.minigamesArenas.setArena(arenaName, teams);
+						sender.sendMessage(ChatColor.GREEN+"Successfully set blue team spawnpoint to where you are standing!");
+						return true;
+					}
+					else if(setting.equalsIgnoreCase("setRedSpawnpoint")){
+						teams.setRedSpawn(player.getLocation());
+						plugin.minigamesArenas.setArena(arenaName, teams);
+						sender.sendMessage(ChatColor.GREEN+"Successfully set red team spawnpoint to where you are standing!");
+						return true;
+					}
+				}
+				else if(arena.getType() == ArenaType.PVP){
+					ArenaPvp pvp = (ArenaPvp) arena;
+					if(setting.equalsIgnoreCase("setRedSpawnpoint")){
+						pvp.setPlayerRedSpawn(player.getLocation());
+						plugin.minigamesArenas.setArena(arenaName, pvp);
+						sender.sendMessage(ChatColor.GREEN+"Successfully set red player spawnpoint to where you are standing!");
+						return true;
+					}
+					else if(setting.equalsIgnoreCase("setBlueSpawnpoint")){
+						pvp.setPlayerBlueSpawn(player.getLocation());
+						plugin.minigamesArenas.setArena(arenaName, pvp);
+						sender.sendMessage(ChatColor.GREEN+"Successfully set blue player spawnpoint to where you are standing!");
+						return true;
+					}
+					else if(setting.equalsIgnoreCase("setLives")){
+						if(args.length < 4){
+							sender.sendMessage(ChatColor.RED+"Usage: /arena set [Name] setLives [Number]");
+						}
+						int number = 0;
+						try {
+							number = Integer.parseInt(args[3]);
+						} catch (NumberFormatException e) {
+                        sender.sendMessage(ChatColor.RED+"Invalid number!");
+                        return true;
+						}
+						pvp.setLives(number);
+						plugin.minigamesArenas.setArena(arenaName, pvp);
+						sender.sendMessage(ChatColor.GREEN+"Lives set!");
+						return true;
+					}
+				}
+				else if(arena.getType() == ArenaType.SURVIVAL){
+					ArenaSurvival survival = (ArenaSurvival) arena;
+					if(setting.equalsIgnoreCase("doCountdown")){
+						if(args.length < 4){
+							sender.sendMessage(ChatColor.RED+"Usage: /arena set [Name] doCountdown [true/false]");
+						}
+						Boolean doCountdown = false;
+						if(args[3].equalsIgnoreCase("true")){
+							doCountdown = true;
+						}
+						else if(args[3].equalsIgnoreCase("false")){
+							doCountdown = false;
+						}
+						else{
+							sender.sendMessage(ChatColor.RED+"Valid values: true/false");
+							return true;
+						}
+						survival.setDoCountdown(doCountdown);
+						plugin.minigamesArenas.setArena(arenaName, survival);
+						sender.sendMessage(ChatColor.GREEN+"Countdown set!");
+						return true;
+					}
+					else if(setting.equalsIgnoreCase("Countdown")){
+						if(args.length < 4){
+							sender.sendMessage(ChatColor.RED+"Usage: /arena set [Name] countdown [Number]");
+						}
+						int number = 0;
+						try {
+							number = Integer.parseInt(args[3]);
+						} catch (NumberFormatException e) {
+                        sender.sendMessage(ChatColor.RED+"Invalid number!");
+                        return true;
+						}
+						survival.setCountdown(number);
+						plugin.minigamesArenas.setArena(arenaName, survival);
+						sender.sendMessage(ChatColor.GREEN+"Countdown set!");
+						return true;
+					}
+					else if(setting.equalsIgnoreCase("setItems")){
+						if(args.length < 4){
+							sender.sendMessage(ChatColor.RED+"Usage: /arena set setItems id:data id:data etc..");
+							return true;
+						}
+						List<String> raws = new ArrayList<String>();
+						for(int i=3;i<args.length;i++){
+							raws.add(args[i]);
+						}
+						Object[] array = (Object[]) raws.toArray();
+						survival.setItems((String[]) array);
+						plugin.minigamesArenas.setArena(arenaName, survival);
+						sender.sendMessage(ChatColor.GREEN+"Successfully set items given to players!");
+						return true;
+					}
+					else if(setting.equalsIgnoreCase("setPlayerSpawn")){
+						survival.setPlayerSpawn(player.getLocation());
+						plugin.minigamesArenas.setArena(arenaName, survival);
+						sender.sendMessage(ChatColor.GREEN+"Successfully set the player spawn location to where you are standing!");
+						return true;
+					}
+					else if(setting.equalsIgnoreCase("setEnemySpawn")){
+						survival.setEnemySpawn(player.getLocation());
+						plugin.minigamesArenas.setArena(arenaName, survival);
+						sender.sendMessage(ChatColor.GREEN+"Successfully set the enemy spawn location to where you are standing!");
+						return true;
+					}
+				}
+				else if(arena.getType() == ArenaType.TNTORI){
+					ArenaTntori tntori = (ArenaTntori) arena;
+					if(setting.equalsIgnoreCase("setProtect")){
+						if(args.length < 4){
+							sender.sendMessage(ChatColor.RED+"Usage: /arena set [Name] setProtect [true/false]");
+							return true;
+						}
+						Boolean protect = false;
+						if(args[3].equalsIgnoreCase("true")){
+							protect = true;
+						}
+						else if(args[3].equalsIgnoreCase("false")){
+							protect = false;
+						}
+						else{
+							sender.sendMessage(ChatColor.RED+"Valid values: true, false");
+							return true;
+						}
+						tntori.setProtect(protect);
+						plugin.minigamesArenas.setArena(arenaName, tntori);
+						sender.sendMessage(ChatColor.GREEN + "Successfully set protect!");
+						return true;
+					}
+					else if(setting.equalsIgnoreCase("doCountdown")){
+						if(args.length < 4){
+							sender.sendMessage(ChatColor.RED+"Usage: /arena set [Name] doCountdown [true/false]");
+						}
+						Boolean doCountdown = false;
+						if(args[3].equalsIgnoreCase("true")){
+							doCountdown = true;
+						}
+						else if(args[3].equalsIgnoreCase("false")){
+							doCountdown = false;
+						}
+						else{
+							sender.sendMessage(ChatColor.RED+"Valid values: true/false");
+							return true;
+						}
+						tntori.setDoCountdown(doCountdown);
+						plugin.minigamesArenas.setArena(arenaName, tntori);
+						sender.sendMessage(ChatColor.GREEN+"Countdown set!");
+						return true;
+					}
+					else if(setting.equalsIgnoreCase("Countdown")){
+						if(args.length < 4){
+							sender.sendMessage(ChatColor.RED+"Usage: /arena set [Name] countdown [Number]");
+						}
+						int number = 0;
+						try {
+							number = Integer.parseInt(args[3]);
+						} catch (NumberFormatException e) {
+                        sender.sendMessage(ChatColor.RED+"Invalid number!");
+                        return true;
+						}
+						tntori.setCountdown(number);
+						plugin.minigamesArenas.setArena(arenaName, tntori);
+						sender.sendMessage(ChatColor.GREEN+"Countdown set!");
+						return true;
+					}
+					else if(setting.equalsIgnoreCase("setItems")){
+						if(args.length < 4){
+							sender.sendMessage(ChatColor.RED+"Usage: /arena set setItems id:data id:data etc..");
+							return true;
+						}
+						List<String> raws = new ArrayList<String>();
+						for(int i=3;i<args.length;i++){
+							raws.add(args[i]);
+						}
+						Object[] array = (Object[]) raws.toArray();
+						tntori.setItems((String[]) array);
+						plugin.minigamesArenas.setArena(arenaName, tntori);
+						sender.sendMessage(ChatColor.GREEN+"Successfully set items given to players!");
+						return true;
+					}
+					else if(setting.equalsIgnoreCase("setRedSpawnpoint")){
+						tntori.setPlayerRedSpawn(player.getLocation());
+						plugin.minigamesArenas.setArena(arenaName, tntori);
+						sender.sendMessage(ChatColor.GREEN+"Successfully set red player spawnpoint to where you are standing!");
+						return true;
+					}
+					else if(setting.equalsIgnoreCase("setBlueSpawnpoint")){
+						tntori.setPlayerBlueSpawn(player.getLocation());
+						plugin.minigamesArenas.setArena(arenaName, tntori);
+						sender.sendMessage(ChatColor.GREEN+"Successfully set blue player spawnpoint to where you are standing!");
+						return true;
+					}
+					else if(setting.equalsIgnoreCase("setLives")){
+						if(args.length < 4){
+							sender.sendMessage(ChatColor.RED+"Usage: /arena set [Name] setLives [Number]");
+						}
+						int number = 0;
+						try {
+							number = Integer.parseInt(args[3]);
+						} catch (NumberFormatException e) {
+                        sender.sendMessage(ChatColor.RED+"Invalid number!");
+                        return true;
+						}
+						tntori.setLives(number);
+						plugin.minigamesArenas.setArena(arenaName, tntori);
+						sender.sendMessage(ChatColor.GREEN+"Lives set!");
+						return true;
+					}
+					
+				}
+				sender.sendMessage(ChatColor.DARK_RED+"Valid settings for selected arena:");
+				sender.sendMessage(ChatColor.GOLD+"setCenter - Sets the center of the arena zone.");
+				sender.sendMessage(ChatColor.GOLD+"setRadius [Radius] - Sets the radius of the arena zone.");
+				sender.sendMessage(ChatColor.GOLD+"show - Shows the arena zone.");
+				sender.sendMessage(ChatColor.GOLD+"setShape [circle/square] - Sets arena shape.");
+				sender.sendMessage(ChatColor.GOLD+"setType [Type] - Sets the type of arena.");
+				sender.sendMessage(ChatColor.GOLD+"inArena - Says if you are in the arena zone.");
+				sender.sendMessage(ChatColor.GOLD+"setPlayerLimit [Limit] - Sets the player limit.");
+				if(arena.getType() == ArenaType.CTF){
+					sender.sendMessage(ChatColor.GOLD+"setItems id:data id:data etc... - Sets the items given to the player.");
+					sender.sendMessage(ChatColor.GOLD+"setBlueSpawn - Sets the spawn area for the blue team.");
+					sender.sendMessage(ChatColor.GOLD+"setRedSpawn - Sets the spawn area for the red team.");
+					sender.sendMessage(ChatColor.GOLD+"setBlueFlag - Sets the flag for the blue team to capture.");
+					sender.sendMessage(ChatColor.GOLD+"setRedFlag - Sets the flag for the red team to capture.");
+				}
+				else if(arena.getType() == ArenaType.PUSH){
+					sender.sendMessage(ChatColor.GOLD+"setBlueSpawn - Sets where the blue player spawns.");
+					sender.sendMessage(ChatColor.GOLD+"setRedSpawn - Sets where the red player spawns.");
+					sender.sendMessage(ChatColor.GOLD+"doCountdown [true/false] - Sets the countdown on/off.");
+					sender.sendMessage(ChatColor.GOLD+"countdown [Number] - Sets how long the countdown is.");
+					sender.sendMessage(ChatColor.GOLD+"setLives [Lives] - Sets how many lives per player.");
+					sender.sendMessage(ChatColor.GOLD+"setItems id:data id:data etc... - Sets the items given to the player.");
+				}
+				else if(arena.getType() == ArenaType.PVP){
+					sender.sendMessage(ChatColor.GOLD+"setRedSpawnpoint - Sets the spawnpoint for the blue player.");
+					sender.sendMessage(ChatColor.GOLD+"setBlueSpawnpoint - Sets the spawnpoint for the blue player.");
+					sender.sendMessage(ChatColor.GOLD+"setLives [Lives] - Sets how many lives per player.");
+				}
+				else if(arena.getType() == ArenaType.SURVIVAL){
+					sender.sendMessage(ChatColor.GOLD+"doCountdown [true/false] - Sets the countdown on/off.");
+					sender.sendMessage(ChatColor.GOLD+"countdown [Number] - Sets how long the countdown is.");
+					sender.sendMessage(ChatColor.GOLD+"setItems id:data id:data etc... - Sets the items given to the player.");
+					sender.sendMessage(ChatColor.GOLD+"setPlayerSpawn - Sets where the players spawn.");
+					sender.sendMessage(ChatColor.GOLD+"setEnemySpawn - Sets where the enemies spawn.");
+				}
+				else if(arena.getType() == ArenaType.TEAMS){
+					sender.sendMessage(ChatColor.GOLD+"setBlueSpawnpoint - Sets the spawnpoint for the blue team.");
+					sender.sendMessage(ChatColor.GOLD+"setRedSpawnpoint - Sets the spawnpoint for the red team.");
+				}
+				else if(arena.getType() == ArenaType.TNTORI){
+					sender.sendMessage(ChatColor.GOLD+"setProtect - Sets if the arena is protected(true) or generated(false).");
+					sender.sendMessage(ChatColor.GOLD+"doCountdown [true/false] - Sets the countdown on/off.");
+					sender.sendMessage(ChatColor.GOLD+"countdown [Number] - Sets how long the countdown is.");
+					sender.sendMessage(ChatColor.GOLD+"setLives [Lives] - Sets how many lives per player.");
+					sender.sendMessage(ChatColor.GOLD+"setItems id:data id:data etc... - Sets the items given to the player.");
+					sender.sendMessage(ChatColor.GOLD+"setRedSpawnpoint - Sets the spawnpoint for the blue player.");
+					sender.sendMessage(ChatColor.GOLD+"setBlueSpawnpoint - Sets the spawnpoint for the blue player.");
+				}
+				//TODO all the valid settings
+					return true;
 				
 			}
 			else if(method.equalsIgnoreCase("view")){
@@ -275,7 +803,6 @@ public acCommandExecutor(ac plugin) {
 			}
 			String skill = args[0];
 			if(skill.equalsIgnoreCase("worldguard")){
-				//TODO worldguard help
                 sender.sendMessage(ChatColor.GRAY + "Type //wand to get the wooden axe cuboid selection tool. You select the corners of the cuboid area" +
                 		" you wish to protect. You now do /region define [Region name] [Player],[Player],...    For more info do /help worldguard");//Line 1
 				return true;
