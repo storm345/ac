@@ -191,7 +191,7 @@ public void onEnable(){
 	}
     spends = new ListStore(spendsFile);
 	spends.load();
-	minigamesArenas = new Arenas(this);
+	minigamesArenas = new Arenas(this); //the arenas management
 	config = getConfig();
 	try{
 		config.load(this.getDataFolder().getAbsolutePath() + File.separator + "config.yml");
