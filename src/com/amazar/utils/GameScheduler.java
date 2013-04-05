@@ -1,10 +1,15 @@
 package com.amazar.utils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
 
 import com.amazar.plugin.ac;
 
@@ -78,6 +83,123 @@ public class GameScheduler {
 	}
 	public void startGame(Arena arena, String arenaName, Minigame game){
 		this.games.put(game.getGameId(), game);
+		final List<String> players = game.getPlayers();
+		List<String> blue = new ArrayList<String>();
+		List<String> red = new ArrayList<String>();
+		if(game.getGameType() == ArenaType.CTF || game.getGameType() == ArenaType.PUSH || game.getGameType() == ArenaType.TEAMS || game.getGameType() == ArenaType.TNTORI){
+			for(String player:players){
+				if(blue.size() > red.size()){
+					red.add(player);
+				}
+				else if(red.size() > blue.size()){
+					blue.add(player);
+				}
+				else{
+					int rand = 1 + (int)(Math.random() * ((2 - 1) + 1));
+					if(rand > 1){
+						blue.add(player);
+					}
+					else{
+						red.add(player);
+					}
+				}
+			}
+		}
+		game.setBlue(blue);
+		game.setRed(red);
+		//allocated to teams
+		final ArenaType type = game.getGameType();
+		if(type == ArenaType.CTF){
+			ArenaCtf ctf = (ArenaCtf) game.getArena();
+			for(String name:blue){
+				plugin.getServer().getPlayer(name).teleport(ctf.getBlueSpawnpoint());
+			}
+			for(String name:red){
+				plugin.getServer().getPlayer(name).teleport(ctf.getRedSpawnpoint());
+			}
+		}
+		else if(type == ArenaType.PUSH){
+			ArenaPush gameArena = (ArenaPush) game.getArena();
+			for(String name:blue){
+				plugin.getServer().getPlayer(name).teleport(gameArena.getPlayerBlueSpawn());
+			}
+			for(String name:red){
+				plugin.getServer().getPlayer(name).teleport(gameArena.getPlayerRedSpawn());
+			}
+		}
+		else if(type == ArenaType.TEAMS){
+			ArenaTeams gameArena = (ArenaTeams) game.getArena();
+			for(String name:blue){
+				plugin.getServer().getPlayer(name).teleport(gameArena.getBlueSpawnpoint());
+			}
+			for(String name:red){
+				plugin.getServer().getPlayer(name).teleport(gameArena.getRedSpawnpoint());
+			}
+		}
+		else if(type == ArenaType.TNTORI){
+			ArenaTntori gameArena = (ArenaTntori) game.getArena();
+			if(!gameArena.isProtected()){
+				gameArena.markArena(Material.SANDSTONE);
+			}
+			for(String name:blue){
+				plugin.getServer().getPlayer(name).teleport(gameArena.getPlayerBlueSpawn());
+			}
+			for(String name:red){
+				plugin.getServer().getPlayer(name).teleport(gameArena.getPlayerRedSpawn());
+			}
+		}
+		else if(type == ArenaType.PVP){
+			ArenaPvp gameArena = (ArenaPvp) game.getArena();
+			for(String name:blue){
+				plugin.getServer().getPlayer(name).teleport(gameArena.getPlayerBlueSpawn());
+			}
+			for(String name:red){
+				plugin.getServer().getPlayer(name).teleport(gameArena.getPlayerRedSpawn());
+			}
+		}
+		else if(type == ArenaType.SURVIVAL){
+			ArenaSurvival gameArena = (ArenaSurvival) game.getArena();
+			for(String name:players){
+				plugin.getServer().getPlayer(name).teleport(gameArena.getPlayerSpawnpoint());
+			}
+		}
+		else{
+			for(String name:players){
+				plugin.getServer().getPlayer(name).teleport(arena.getCenter());
+			}
+		}
+		final Map<String, Location> locations = new HashMap<String, Location>();
+		for(String name:players){
+			plugin.getServer().getPlayer(name).setWalkSpeed(0);
+			locations.put(name, plugin.getServer().getPlayer(name).getLocation());
+			plugin.getServer().getPlayer(name).sendMessage(ChatColor.GOLD+"Game preparing...");
+		}
+		final MinigameStartEvent start = new MinigameStartEvent(game);
+		
+		plugin.getServer().getScheduler().runTaskAsynchronously(plugin, new Runnable(){
+
+			@Override
+			public void run() {
+				for(String name:players){
+					Player p=plugin.getServer().getPlayer(name);
+					p.sendMessage(ChatColor.GOLD+type.toString().toLowerCase()+" beginning in...");
+				}
+				for(int i=10;i>0;i--){
+				for(String name:players){
+				Player p=plugin.getServer().getPlayer(name);
+				p.sendMessage(ChatColor.GOLD+""+i);
+				p.teleport(locations.get(name));
+				}
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+				}
+				}
+				plugin.getServer().getPluginManager().callEvent(start);
+				return;
+			}});
+		
+		return;
 	}
 	public void stopGame(Arena arena, String arenaName){
 		if(!arenaInUse(arenaName)){

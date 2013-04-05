@@ -3,6 +3,8 @@ package com.amazar.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.scheduler.BukkitTask;
+
 import com.amazar.plugin.ac;
 
 public class Minigame {
@@ -15,6 +17,7 @@ public class Minigame {
 	private String arenaName = "";
 	private String winner = "Unknown";
 	private Boolean running = false;
+	private BukkitTask task = null;
 	public Minigame(Arena arena, String arenaName){
 		this.gameId = UniqueString.generate();
 		this.arena = arena;
@@ -27,6 +30,14 @@ public class Minigame {
 	}
 	public void joinRed(String name){
 		this.red.add(name);
+		return;
+	}
+	public void setBlue(List<String> blue){
+		this.blue = blue;
+		return;
+	}
+	public void setRed(List<String> red){
+		this.red = red;
 		return;
 	}
     public List<String> getBlue(){
@@ -81,10 +92,21 @@ public class Minigame {
     }
     public void start(){
     	this.running = true;
+    	final Minigame game = this;
+    	this.task = ac.plugin.getServer().getScheduler().runTaskTimer(ac.plugin, new Runnable(){
+
+			@Override
+			public void run() {
+				MinigameStartEvent event = new MinigameStartEvent(game);
+				ac.plugin.getServer().getPluginManager().callEvent(event);
+			}}, 30l, 30l);
     	ac.plugin.getServer().getPluginManager().callEvent(new MinigameStartEvent(this));
     }
     public void end(){
     	this.running = false;
+    	if(task != null){
+    		task.cancel();
+    	}
     	ac.plugin.getServer().getPluginManager().callEvent(new MinigameFinishEvent(this));
     }
 }
