@@ -17,5 +17,8 @@ public class MinigameUpdateEvent extends Event {
 	public HandlerList getHandlers() {
 		return handlers;
 	}
+	public HandlerList getHandlerList(){
+		return handlers;
+	}
 
 }

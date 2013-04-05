@@ -155,7 +155,6 @@ public void onEnable(){
 		}
     }
     //END HERE
-    getServer().getPluginManager().registerEvents(new AcListener(this), this);
     String pluginFolder = this.getDataFolder().getAbsolutePath();
 	(new File(pluginFolder)).mkdirs();
     File newsFile = new File(this.getDataFolder().getAbsolutePath() + File.separator + "news.txt");
@@ -308,6 +307,7 @@ public void onEnable(){
         return;
     }
     setupPermissions();
+    getServer().getPluginManager().registerEvents(new AcListener(this), this);
 	getLogger().info("AmazarCraft plugin is enabled :)");	//Tell teh console it is enabled
 }
 private boolean setupEconomy() {

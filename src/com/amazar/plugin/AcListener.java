@@ -1,5 +1,6 @@
 package com.amazar.plugin;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -10,6 +11,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.TravelAgent;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
@@ -24,6 +26,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
@@ -62,7 +65,8 @@ import com.amazar.utils.StringColors;
 
 public class AcListener implements Listener {
 	private ac plugin;
-	public AcListener(ac plugin) {
+	
+	public AcListener(ac plugin){
 		this.plugin = ac.plugin;
 	}
 	
@@ -123,8 +127,21 @@ public class AcListener implements Listener {
 		plugin.gameScheduler.reCalculateQues();
 		return;
 	}
-	@EventHandler void tntoriProtect(ExplosionPrimeEvent event){
-		//TODO work out how the hell to do it
+	@EventHandler void tntoriProtect(EntityExplodeEvent event){
+		List<Block> toDamage = new ArrayList<Block>();
+		toDamage.addAll(event.blockList());
+		for(Block bl:toDamage){
+			if(plugin.mgMethods.isArena(bl.getLocation()) == null){
+				return;
+			}
+			Arena arena = plugin.minigamesArenas.getArena(plugin.mgMethods.isArena(bl.getLocation()));
+			if(arena.getType() == ArenaType.TNTORI){
+				ArenaTntori arenaGame = (ArenaTntori) arena;
+				if(arenaGame.isProtected()){
+					event.blockList().remove(bl);
+				}
+			}
+		}
 		return;
 	}
 	@EventHandler void mgDie(PlayerDeathEvent event){
@@ -135,49 +152,7 @@ public class AcListener implements Listener {
 		Minigame game = plugin.mgMethods.inAGame(player.getName());
 		if(game.getGameType() == ArenaType.TNTORI){
 			ArenaTntori gameArena = (ArenaTntori) game.getArena();
-			int totalLives = gameArena.getLives();
-			int lives = totalLives;
-			if(game.lives.containsKey(player.getName())){
-				lives = game.lives.get(player.getName());
-			}
-			lives -= 1;
-			List<String> blue = game.getBlue();
-			List<String> red = game.getRed();
-			List<String> players = game.getPlayers();
-			List<String> inplayers = game.getInPlayers();
-			if(!inplayers.contains(player.getName())){
-				return;
-			}
-			if(lives < 0){
-				//they r out
-				ChatColor team_color = ChatColor.WHITE;
-				if(blue.contains(player.getName())){
-					blue.remove(player.getName());
-					team_color = ChatColor.BLUE;
-				}
-				else if(red.contains(player.getName())){
-					red.remove(player.getName());
-					team_color = ChatColor.RED;
-				}
-				game.playerOut(player.getName());
-				for(String pname:players){
-					plugin.getServer().getPlayer(pname).sendMessage(team_color+player.getName()+"Died and is out!");
-				}
-			}else{
-				ChatColor team_color = ChatColor.WHITE;
-				if(blue.contains(player.getName())){
-					player.setBedSpawnLocation(gameArena.getPlayerBlueSpawn(), false);
-					team_color = ChatColor.BLUE;
-				}
-				else if(red.contains(player.getName())){
-					player.setBedSpawnLocation(gameArena.getPlayerRedSpawn(), false);
-					team_color = ChatColor.RED;
-				}
-				for(String pname:players){
-					plugin.getServer().getPlayer(pname).sendMessage(team_color+player.getName()+"Died and has "+lives+" left!");
-				}
-			}
-			plugin.gameScheduler.updateGame(game);
+			player.setBedSpawnLocation(gameArena.getCenter(), false);
 			return;
 		}
 		
@@ -228,6 +203,7 @@ public class AcListener implements Listener {
 		//String arenaName = game.getArenaName();
 		ArenaType type = game.getGameType();
 		if(type == ArenaType.TNTORI){
+			ArenaTntori gameArena = (ArenaTntori) arena;
 			List<String> inplayers = game.getInPlayers();
 			List<String> players = game.getPlayers();
 			List<String> blue = game.getBlue();
@@ -236,6 +212,14 @@ public class AcListener implements Listener {
 			for(String pname:players){
 				Player p = plugin.getServer().getPlayer(pname);
 				if(!arena.isLocInArena(p.getLocation())){
+					int totalLives = gameArena.getLives();
+					int lives = totalLives;
+					if(game.lives.containsKey(p.getName())){
+						lives = game.lives.get(p.getName());
+					}
+					lives -= 1;
+					game.lives.put(pname, lives);
+					if(lives < 0){
 					//they lose
 					if(blue.contains(pname)){
 						team_color = ChatColor.BLUE;
@@ -249,6 +233,14 @@ public class AcListener implements Listener {
 					for(String player:players){
 						Player pl = plugin.getServer().getPlayer(player);
 						pl.sendMessage(team_color + pname+ " was knocked off and is out!");
+					}
+					}
+					else{
+						p.teleport(arena.getCenter());
+						for(String player:players){
+							Player pl = plugin.getServer().getPlayer(player);
+							pl.sendMessage(team_color + pname+ " was knocked off and now has "+lives+"lives left!");
+						}
 					}
 				}
 			}
