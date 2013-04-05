@@ -10,6 +10,7 @@ import com.amazar.plugin.ac;
 public class Minigame {
 	private ArenaType gameType = ArenaType.INAVLID;
 	private List<String> players = new ArrayList<String>();
+	private List<String> inplayers = new ArrayList<String>();
 	private List<String> blue = new ArrayList<String>();
 	private List<String> red = new ArrayList<String>();
 	private String gameId = "";
@@ -45,6 +46,18 @@ public class Minigame {
     }
     public List<String> getRed(){
     	return this.red;
+    }
+    public List<String> getInPlayers(){
+    	return this.inplayers;
+    }
+    public void setInPlayers(List<String> in){
+    	this.inplayers = in;
+    	return;
+    }
+    public void playerOut(String name){
+    	if(this.inplayers.contains(name)){
+    	this.inplayers.remove(name);
+    	}
     }
 	public Boolean join(String playername){
 		if(players.size() < this.arena.getPlayerLimit()){

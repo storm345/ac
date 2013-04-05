@@ -201,6 +201,10 @@ public class GameScheduler {
 		
 		return;
 	}
+	public void updateGame(Minigame game){
+		this.games.put(game.getGameId(), game);
+		return;
+	}
 	public void stopGame(Arena arena, String arenaName){
 		if(!arenaInUse(arenaName)){
 			return;

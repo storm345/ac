@@ -45,9 +45,12 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.util.Vector;
 
+import com.amazar.utils.Arena;
+import com.amazar.utils.ArenaType;
 import com.amazar.utils.Minigame;
 import com.amazar.utils.MinigameFinishEvent;
 import com.amazar.utils.MinigameStartEvent;
+import com.amazar.utils.MinigameUpdateEvent;
 import com.amazar.utils.Profile;
 import com.amazar.utils.StringColors;
 
@@ -86,6 +89,11 @@ public class AcListener implements Listener {
 			plugin.gameScheduler.removeArena(game.getArenaName());
 		}
 		List<String> players = game.getPlayers();
+		List<String> inplayers = game.getInPlayers();
+		String in = "";
+		for(String inp:inplayers){
+			in = in+" "+inp; 
+		}
 		for(String playername:players){
 				Player player = plugin.getServer().getPlayer(playername);
 				player.setCustomName(ChatColor.stripColor(player.getCustomName()));
@@ -93,6 +101,7 @@ public class AcListener implements Listener {
 				player.teleport(player.getLocation().getWorld().getSpawnLocation());
 				if(player.isOnline()){
 					player.sendMessage(ChatColor.GOLD+game.getWinner() + " won the game!");
+					player.sendMessage(ChatColor.GREEN+"Winner(s): "+in);
 				}
 		}
 		plugin.gameScheduler.reCalculateQues();
@@ -112,6 +121,74 @@ public class AcListener implements Listener {
 			p.setCustomName(ChatColor.RED+p.getName());
 		}
 		plugin.gameScheduler.reCalculateQues();
+		return;
+	}
+	@EventHandler
+	void miniGameHandler(MinigameUpdateEvent event){
+		Minigame game = event.getGame();
+		if(!game.getRunning()){
+			plugin.gameScheduler.stopGame(game.getArena(), game.getArenaName());
+			plugin.gameScheduler.reCalculateQues();
+			return;
+		}
+		Arena arena = game.getArena();
+		String arenaName = game.getArenaName();
+		ArenaType type = game.getGameType();
+		if(type == ArenaType.TNTORI){
+			List<String> inplayers = game.getInPlayers();
+			List<String> players = game.getPlayers();
+			List<String> blue = game.getBlue();
+			List<String> red = game.getRed();
+			ChatColor team_color = ChatColor.WHITE;
+			for(String pname:players){
+				Player p = plugin.getServer().getPlayer(pname);
+				if(!arena.isLocInArena(p.getLocation())){
+					//they lose
+					if(blue.contains(pname)){
+						team_color = ChatColor.BLUE;
+						blue.remove(pname);
+					}
+					if(red.contains(pname)){
+						team_color = ChatColor.RED;
+						red.remove(pname);
+					}
+					game.playerOut(pname);
+					for(String player:players){
+						Player pl = plugin.getServer().getPlayer(player);
+						pl.sendMessage(team_color + pname+ " was knocked off and is out!");
+					}
+				}
+			}
+			game.setInPlayers(inplayers);
+			plugin.gameScheduler.updateGame(game);
+            if(red.size() < 1 && blue.size() < 1){
+            	team_color = ChatColor.GOLD;
+				for(String player:players){
+					Player pl = plugin.getServer().getPlayer(player);
+					pl.sendMessage(team_color + "Game end!");
+				}
+				game.setWinner(team_color+"Nobody");
+				game.end();
+			}
+			if(blue.size() < 1){
+				team_color = ChatColor.RED;
+				for(String player:players){
+					Player pl = plugin.getServer().getPlayer(player);
+					pl.sendMessage(team_color + "Game end!");
+				}
+				game.setWinner(team_color+"Red");
+				game.end();
+			}
+			if(red.size() < 1){
+				team_color = ChatColor.BLUE;
+				for(String player:players){
+					Player pl = plugin.getServer().getPlayer(player);
+					pl.sendMessage(team_color + "Game end!");
+				}
+				game.setWinner(team_color+"Blue");
+				game.end();
+			}
+		}
 		return;
 	}
 @EventHandler (priority = EventPriority.HIGHEST)
