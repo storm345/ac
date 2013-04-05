@@ -1,6 +1,7 @@
 package com.amazar.utils;
 
 import java.io.File;
+import java.util.Set;
 
 import com.amazar.plugin.ac;
 
@@ -23,12 +24,15 @@ public Arena getArena(String name){
 	return plugin.arenas.get(name);
 }
 public Boolean arenaExists(String name){
-	return plugin.arenas.containsKey(name);
+		return plugin.arenas.containsKey(name);
 }
 public void saveArenas(){
 	ac.saveHashMapArena(plugin.arenas, plugin.getDataFolder().getAbsolutePath() + File.separator + "arenas.bin");
 }
 public void reloadArenas(){
 	plugin.arenas = ac.loadHashMapArena(plugin.getDataFolder().getAbsolutePath() + File.separator + "arenas.bin");
+}
+public Set<String> getArenas(){
+	return plugin.arenas.keySet();
 }
 }

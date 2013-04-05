@@ -7,9 +7,9 @@ public class ArenaPush extends ArenaPvp {
 	private Boolean doCountDown = false;
 	public ArenaPush(Location center, int radius, ArenaShape shape,
 			ArenaType type, Location playerRedSpawn, Location playerBlueSpawn,
-			int lives, String[] items, int countDown, Boolean doCountdown) {
+			int lives, String[] items, int countDown, Boolean doCountdown, int playerLimit) {
 		super(center, radius, shape, type, playerRedSpawn, playerBlueSpawn, lives,
-				items);
+				items, playerLimit);
 		this.doCountDown = doCountdown;
 		this.countDown = countDown;
 		

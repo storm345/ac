@@ -8,9 +8,9 @@ public class ArenaTntori extends ArenaPvp {
 	private Boolean doCountDown = false;
 	public ArenaTntori(Location center, int radius, ArenaShape shape,
 			ArenaType type, Location playerRedSpawn, Location playerBlueSpawn,
-			int lives, String[] items, Boolean protect, int countDown, Boolean doCountdown) {
+			int lives, String[] items, Boolean protect, int countDown, Boolean doCountdown, int playerLimit) {
 		super(center, radius, shape, type, playerRedSpawn, playerBlueSpawn, lives,
-				items);
+				items, playerLimit);
 		this.protect = protect;
 		this.doCountDown = doCountdown;
 		this.countDown = countDown;

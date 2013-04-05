@@ -1,5 +1,5 @@
 package com.amazar.utils;
 
 public enum ArenaType {
-PVP,TNT_TORI,SURVIVAL,CTF,TEAMS,PUSH
+PVP,TNTORI,SURVIVAL,CTF,TEAMS,PUSH,INAVLID
 }

@@ -1,5 +1,5 @@
 package com.amazar.utils;
 
 public enum ArenaShape {
-SQUARE,CIRCLE
+SQUARE,CIRCLE,INVALID
 }

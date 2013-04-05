@@ -15,6 +15,18 @@ commands:
       permission: ac.test
       permission-message: You don't have access to this command <permission>
       default: op
+   arena:
+      description: This is the creation and management of arenas
+      usage: /<command> [Create <Name> <Type> <Shape> <Radius> <Playerlimit>], [Remove <Name>], [Set <Name> <Setting> <Value>], [View <Name>]
+      permission: ac.arena
+      permission-message: You don't have access to this command <permission>
+      default: op
+   listArenas:
+      description: This lists valid arenas
+      usage: /<command> [Page]
+      permission: ac.listarenas
+      permission-message: You don't have access to this command <permission>
+      default: true
    profile:
       description: This displays the profile of [Name]
       usage: /<command> [Name]

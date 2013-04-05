@@ -7,8 +7,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.RoundingMode;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +42,7 @@ import org.bukkit.util.ChatPaginator.ChatPage;
 import com.amazar.utils.*;
 
 public class acCommandExecutor implements CommandExecutor {
-private Plugin plugin;
+private ac plugin;
 public acCommandExecutor(ac plugin) {
 	this.plugin = plugin;
 } //test
@@ -66,6 +68,178 @@ public acCommandExecutor(ac plugin) {
 		}
 		else if(cmd.getName().equalsIgnoreCase("test")){
  
+			return true;
+		}
+		else if(cmd.getName().equalsIgnoreCase("arena")){
+			if(args.length < 1){
+				return false;
+			}
+			String method = args[0];
+			if(method.equalsIgnoreCase("create")){
+				if(player == null){
+					sender.sendMessage(ChatColor.RED + "Only players can create arenas!");
+					return true;
+				}
+				if(args.length < 6){
+					return false;
+				}
+				String name = args[1];
+				String type = args[2];
+				String shapeName = args[3];
+				ArenaShape shape = null;
+				if(shapeName.equalsIgnoreCase("square")){
+					shape = ArenaShape.SQUARE;
+				}
+				else if(shapeName.equalsIgnoreCase("circle")){
+					shape = ArenaShape.CIRCLE;
+				}
+				else{
+					sender.sendMessage(ChatColor.RED + "Invalid shape. Valid: square, circle");
+					return true;
+				}
+				String radiusRaw = args[4];
+				int radius = 1;
+				try {
+					radius = Integer.parseInt(radiusRaw);
+				} catch (NumberFormatException e) {
+					sender.sendMessage(ChatColor.RED+"Invalid radius!");
+					return true;
+				}
+				String playerlimitRaw = args[5];
+				int playerlimit = 1;
+				try {
+					playerlimit = Integer.parseInt(playerlimitRaw);
+				} catch (NumberFormatException e) {
+					sender.sendMessage(ChatColor.RED+"Invalid player limit!");
+					return true;
+				}
+				if(radius < 1 || playerlimit < 1){
+					sender.sendMessage(ChatColor.RED + "Radius and player limit must be at least 1!");
+					return true;
+				}
+				if(type.equalsIgnoreCase("pvp")){
+					ArenaPvp arena = new ArenaPvp(player.getLocation(), radius, shape, ArenaType.PVP, null, null, 0, null, playerlimit);
+				    if(plugin.minigamesArenas.arenaExists(name)){
+				    	sender.sendMessage(ChatColor.RED+"Arena already exists!");
+				    	return true;
+				    }
+				    plugin.minigamesArenas.setArena(name, arena);
+					sender.sendMessage(ChatColor.GREEN+"Successfully created a pvp arena! It will need setting up with /arena set");
+				    return true;
+				}
+				else if(type.equalsIgnoreCase("tntori")){
+					ArenaTntori arena = new ArenaTntori(player.getLocation(), radius, shape, ArenaType.PVP, null, null, 0, null, true, 50, false, playerlimit);
+				    if(plugin.minigamesArenas.arenaExists(name)){
+				    	sender.sendMessage(ChatColor.RED+"Arena already exists!");
+				    	return true;
+				    }
+				    plugin.minigamesArenas.setArena(name, arena);
+					sender.sendMessage(ChatColor.GREEN+"Successfully created a pvp arena! It will need setting up with /arena set");
+				    return true;
+				}
+				else if(type.equalsIgnoreCase("survival")){
+					ArenaSurvival arena = new ArenaSurvival(player.getLocation(), radius, shape, ArenaType.SURVIVAL, 500, true, null, null, null, playerlimit);
+				    if(plugin.minigamesArenas.arenaExists(name)){
+				    	sender.sendMessage(ChatColor.RED+"Arena already exists!");
+				    	return true;
+				    }
+				    plugin.minigamesArenas.setArena(name, arena);
+					sender.sendMessage(ChatColor.GREEN+"Successfully created a pvp arena! It will need setting up with /arena set");
+				    return true;
+				}
+				else if(type.equalsIgnoreCase("ctf")){
+					ArenaCtf arena = new ArenaCtf(player.getLocation(), radius, shape, ArenaType.CTF, null, null, null, null, playerlimit, null);
+				    if(plugin.minigamesArenas.arenaExists(name)){
+				    	sender.sendMessage(ChatColor.RED+"Arena already exists!");
+				    	return true;
+				    }
+				    plugin.minigamesArenas.setArena(name, arena);
+					sender.sendMessage(ChatColor.GREEN+"Successfully created a pvp arena! It will need setting up with /arena set");
+				    return true;
+				}
+				else if(type.equalsIgnoreCase("team")||type.equalsIgnoreCase("teams")){
+					ArenaTeams arena = new ArenaTeams(player.getLocation(), radius, shape, ArenaType.TEAMS, null, null, playerlimit, null);
+				    if(plugin.minigamesArenas.arenaExists(name)){
+				    	sender.sendMessage(ChatColor.RED+"Arena already exists!");
+				    	return true;
+				    }
+				    plugin.minigamesArenas.setArena(name, arena);
+					sender.sendMessage(ChatColor.GREEN+"Successfully created a pvp arena! It will need setting up with /arena set");
+				    return true;
+				}
+				else if(type.equalsIgnoreCase("push")){
+					ArenaPush arena = new ArenaPush(player.getLocation(), radius, shape, ArenaType.PUSH, null, null, 2, null, 20, false, playerlimit);
+				    if(plugin.minigamesArenas.arenaExists(name)){
+				    	sender.sendMessage(ChatColor.RED+"Arena already exists!");
+				    	return true;
+				    }
+				    plugin.minigamesArenas.setArena(name, arena);
+					sender.sendMessage(ChatColor.GREEN+"Successfully created a pvp arena! It will need setting up with /arena set");
+				    return true;
+				}
+				else{
+					sender.sendMessage(ChatColor.RED + "Invalid type! Valid ones: Pvp, Tntori, Survival, CTF, Teams, Push");
+					return true;
+				}
+			}
+			else if(method.equalsIgnoreCase("remove")){
+				
+			}
+			else if(method.equalsIgnoreCase("set")){
+				
+			}
+			else if(method.equalsIgnoreCase("view")){
+				
+			}
+			else{
+				return false;
+			}
+			//TODO
+			return true;
+		}
+		else if(cmd.getName().equalsIgnoreCase("listarenas")){
+			if(args.length <1){
+				return false;
+			}
+			int page = 1;
+			try {
+				page = Integer.parseInt(args[0]);
+			} catch (NumberFormatException e) {
+				return false;
+			}
+			if(page < 1){
+				return false;
+			}
+			Set<String> arenas = plugin.minigamesArenas.getArenas();
+			List<String> arenaInfo = new ArrayList<String>();
+			for(String name:arenas){
+				Arena arena = plugin.minigamesArenas.getArena(name);
+				String toAdd = ChatColor.BLUE + "["+name+":] "+ChatColor.GOLD+"Type: "+ChatColor.RED+arena.getType().toString().toLowerCase() + ChatColor.GOLD+"  Players: "+ChatColor.RED+"["+arena.getHowManyPlayers()+"/"+arena.getPlayerLimit()+"]";
+				if(!arena.isValid()){
+					toAdd = toAdd + ChatColor.GRAY + " -Invalid Arena (Not setup yet!)";
+				}
+				arenaInfo.add(toAdd);
+			}
+			int displayed = 0;
+			double totalPagesunrounded = arenaInfo.size() / 5;
+			NumberFormat fmt = NumberFormat.getNumberInstance();
+			fmt.setMaximumFractionDigits(0);
+			fmt.setRoundingMode(RoundingMode.UP);
+			String value = fmt.format(totalPagesunrounded);
+			int totalPages = Integer.parseInt(value);
+			if(page > totalPages){
+				page = totalPages;
+			}
+			page -= 1;
+			if(page < 0){
+				page = 0;
+			}
+			int startpoint = page * 5;
+			sender.sendMessage(ChatColor.DARK_RED+"Arenas: Page: ["+page+"/"+totalPages+"]");
+			for(int i=startpoint;i<arenaInfo.size()&&displayed<5;i++){
+				sender.sendMessage(StringColors.colorise(arenaInfo.get(i)));
+				displayed++;
+			}
 			return true;
 		}
 		else if(cmd.getName().equalsIgnoreCase("trainme")){

@@ -20,6 +20,7 @@ import net.milkbowl.vault.economy.EconomyResponse;
 import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -29,8 +30,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.amazar.utils.Arena;
 import com.amazar.utils.Arenas;
 import com.amazar.utils.ListStore;
+import com.amazar.utils.SerializableLocation;
 
 public class ac extends JavaPlugin {
+	public SerializableLocation invalidLoc;
 	public HashMap<String, Arena> arenas = new HashMap<String, Arena>();
 	//Main class
 	private void copy(InputStream in, File file) {
@@ -135,6 +138,7 @@ public void onEnable(){
 	plugin = this;
 	pluginYaml = plugin.getDescription();
 	//START HERE
+	invalidLoc = new SerializableLocation(new Location(getServer().getWorlds().get(0), 1, 1, 1));
 	PluginDescriptionFile pldesc = plugin.getDescription();
     Map<String, Map<String, Object>> commands = pldesc.getCommands();
     Set<String> keys = commands.keySet();
