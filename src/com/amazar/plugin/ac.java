@@ -138,8 +138,9 @@ public class ac extends JavaPlugin {
     public MinigameMethods mgMethods = null;
 public void onEnable(){
 	//Now on github!
-	bukkit = this;
 	plugin = this;
+	bukkit = this;
+	getServer().getPluginManager().registerEvents(new AcListener(this), this); //TODO this shud be working??
 	pluginYaml = plugin.getDescription();
 	//START HERE
 	invalidLoc = new SerializableLocation(new Location(getServer().getWorlds().get(0), 1, 1, 1));
@@ -307,7 +308,6 @@ public void onEnable(){
         return;
     }
     setupPermissions();
-    getServer().getPluginManager().registerEvents(new AcListener(this), this);
 	getLogger().info("AmazarCraft plugin is enabled :)");	//Tell teh console it is enabled
 }
 private boolean setupEconomy() {

@@ -12,11 +12,10 @@ public class MinigameFinishEvent extends Event {
 	public Minigame getGame(){
 		return this.game;
 	}
-	@Override
 	public HandlerList getHandlers() {
 		return handlers;
 	}
-	public HandlerList getHandlerList(){
+	public static HandlerList getHandlerList(){
 		return handlers;
 	}
 

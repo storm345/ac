@@ -64,9 +64,10 @@ import com.amazar.utils.Profile;
 import com.amazar.utils.StringColors;
 
 public class AcListener implements Listener {
-	private ac plugin;
 	
-	public AcListener(ac plugin){
+	private ac plugin = null;
+	
+	public AcListener(ac instance){
 		this.plugin = ac.plugin;
 	}
 	

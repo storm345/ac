@@ -128,7 +128,7 @@ public acCommandExecutor(ac plugin) {
 				    return true;
 				}
 				else if(type.equalsIgnoreCase("tntori")){
-					ArenaTntori arena = new ArenaTntori(player.getLocation(), radius, shape, ArenaType.PVP, null, null, 0, null, true, 50, false, playerlimit);
+					ArenaTntori arena = new ArenaTntori(player.getLocation(), radius, shape, ArenaType.TNTORI, null, null, 0, null, true, 50, false, playerlimit);
 				    if(plugin.minigamesArenas.arenaExists(name)){
 				    	sender.sendMessage(ChatColor.RED+"Arena already exists!");
 				    	return true;
