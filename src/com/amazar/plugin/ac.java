@@ -26,9 +26,12 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.amazar.utils.Arena;
+import com.amazar.utils.Arenas;
 import com.amazar.utils.ListStore;
 
 public class ac extends JavaPlugin {
+	public HashMap<String, Arena> arenas = new HashMap<String, Arena>();
 	//Main class
 	private void copy(InputStream in, File file) {
 	    try {
@@ -62,7 +65,40 @@ public class ac extends JavaPlugin {
 			return null;
 		}
 	}
+	@SuppressWarnings("unchecked")
+	public static HashMap<String, Arena> loadHashMapArena(String path)
+	{
+		try
+		{
+			System.out.println("Loading information!");
+	        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path));
+	        Object result = ois.readObject();
+	        ois.close();
+			return (HashMap<String, Arena>) result;
+		}
+		catch(Exception e)
+		{
+			System.out.println("Information failed to load error:");
+			e.printStackTrace();
+			return null;
+		}
+	}
 	public static void saveHashMap(HashMap<String, String> map, String path)
+	{
+		try
+		{
+			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(path));
+			oos.writeObject(map);
+			oos.flush();
+			oos.close();
+			//Handle I/O exceptions
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	public static void saveHashMapArena(HashMap<String, Arena> map, String path)
 	{
 		try
 		{
@@ -92,6 +128,7 @@ public class ac extends JavaPlugin {
 	public static PluginDescriptionFile pluginYaml;
 	public static Economy econ = null;
     public static Permission perms = null;
+    public Arenas minigamesArenas = null;
 public void onEnable(){
 	//Now on github!
 	bukkit = this;
@@ -154,6 +191,7 @@ public void onEnable(){
 	}
     spends = new ListStore(spendsFile);
 	spends.load();
+	minigamesArenas = new Arenas(this);
 	config = getConfig();
 	try{
 		config.load(this.getDataFolder().getAbsolutePath() + File.separator + "config.yml");
@@ -211,6 +249,16 @@ public void onEnable(){
 		getLogger().info("Created a new clansMembers.bin!");
 		clanMembers = new HashMap<String, String>();
 		saveHashMap(clanMembers, this.getDataFolder().getAbsolutePath() + File.separator + "clansMembers.bin");
+	}
+	String pathArenas = this.getDataFolder().getAbsolutePath() + File.separator + "arenas.bin";
+	File fileArenas = new File(pathArenas);
+	if(fileArenas.exists() && fileArenas.length() > 1){ // check if file exists before loading to avoid errors!
+		arenas = loadHashMapArena(pathArenas);
+	}
+	else{
+		getLogger().info("Created a new arenas.bin!");
+		arenas = new HashMap<String, Arena>();
+		saveHashMapArena(arenas, this.getDataFolder().getAbsolutePath() + File.separator + "arenas.bin");
 	}
 	File clansInvitesFile = new File(this.getDataFolder().getAbsolutePath() + File.separator + "cinvites.bin");
     clansInvitesFile.getParentFile().mkdirs();
