@@ -236,8 +236,8 @@ public acCommandExecutor(ac plugin) {
 					return true;
 				}
 				else if(setting.equalsIgnoreCase("show")){
-					arena.markArena(Material.CLAY);
-					sender.sendMessage(ChatColor.GREEN+"Arena zone marked out with clay.");
+					arena.markArena(Material.SANDSTONE);
+					sender.sendMessage(ChatColor.GREEN+"Arena zone marked out with sandstone.");
 					return true;
 				}
 				else if(setting.equalsIgnoreCase("setShape")){
