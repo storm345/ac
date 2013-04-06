@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -79,8 +82,34 @@ public class Minigame {
 		return false;
 	}
 	public void leave(String playername){
-		if(this.players.contains(playername)){
-			this.players.remove(playername);
+		
+		this.getPlayers().remove(playername);
+		if(this.getRed().contains(playername)){
+			this.getRed().remove(playername);
+		}
+		if(this.getBlue().contains(playername)){
+			this.getBlue().remove(playername);
+		}
+		Player player = ac.plugin.getServer().getPlayer(playername);
+		if(player != null){
+			player.getInventory().clear();
+		}
+		if(this.getOldInventories().containsKey(playername)){
+			if(player != null){
+		player.getInventory().setContents(this.getOldInventories().get(playername));
+			}
+		this.getOldInventories().remove(playername);
+		}
+		if(player != null){
+			player.setGameMode(GameMode.SURVIVAL);
+			player.teleport(player.getWorld().getSpawnLocation());
+			player.sendMessage(ChatColor.GOLD+"Successfully left the minigame!");
+			}
+		for(String playerName:this.getPlayers()){
+			if(ac.plugin.getServer().getPlayer(playerName) != null && ac.plugin.getServer().getPlayer(playerName).isOnline()){
+				Player p=ac.plugin.getServer().getPlayer(playerName);
+				p.sendMessage(ChatColor.GOLD+playername+" left the minigame!");
+			}
 		}
 		return;
 	}

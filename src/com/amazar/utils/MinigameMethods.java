@@ -1,6 +1,7 @@
 package com.amazar.utils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 import org.bukkit.Location;
@@ -26,6 +27,16 @@ public class MinigameMethods {
     	}
     	if(inAGame){
     	return mgame;
+    	}
+    	return null;
+    }
+    public String inGameQue(String playername){
+    	Set<String> arenaNames = plugin.minigamesArenas.getArenas();
+    	for(String arenaName:arenaNames){
+    		List<String> que = plugin.gameScheduler.getQue(plugin.minigamesArenas.getArena(arenaName));
+    		if(que.contains(playername)){
+    			return arenaName;
+    		}
     	}
     	return null;
     }

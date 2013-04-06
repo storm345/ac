@@ -12,6 +12,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,6 +23,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -64,6 +66,88 @@ public acCommandExecutor(ac plugin) {
 				msg = msg + " " + name + ",";
 			}
 			sender.sendMessage(ChatColor.GOLD + msg);
+			return true;
+		}
+		else if(cmd.getName().equalsIgnoreCase("minigame")){
+			if(player == null){
+				sender.sendMessage(ChatColor.RED+"Players only!");
+				return true;
+			}
+			if(args.length < 1){
+				return true;
+			}
+			String action = args[0];
+			if(action.equalsIgnoreCase("leave")){
+				Minigame game = plugin.mgMethods.inAGame(player.getName());
+				if(game == null){
+					String arenaName = plugin.mgMethods.inGameQue(player.getName());
+					if(arenaName == null){
+						sender.sendMessage(ChatColor.RED+"Not in a game or game que!");
+						return true;
+					}
+					Arena arena = plugin.minigamesArenas.getArena(arenaName);
+					arena.removePlayer(player.getName());
+					plugin.minigamesArenas.setArena(arenaName, arena);
+					sender.sendMessage(ChatColor.GREEN+"Successfully left game que!");
+					return true;
+				}
+				else{
+					game.leave(player.getName());
+					return true;
+			    }
+			}
+			else if(action.equalsIgnoreCase("list")){
+				if(args.length < 2){
+					return false;
+				}
+				String game = args[1];
+				int page = 1;
+				if(args.length > 2){
+					try {
+						page = Integer.parseInt(args[2]);
+					} catch (NumberFormatException e) {
+sender.sendMessage(ChatColor.RED+"Invalid page number!");
+return true;
+					}
+				}
+				ArenaType type = ArenaType.INAVLID;
+				if(game.equalsIgnoreCase("ctf")){
+					type = ArenaType.CTF;
+				}
+				else if(game.equalsIgnoreCase("push")){
+					type = ArenaType.PUSH;
+				}
+				else if(game.equalsIgnoreCase("pvp")){
+					type = ArenaType.PVP;
+				}
+				else if(game.equalsIgnoreCase("survival")){
+					type = ArenaType.SURVIVAL;
+				}
+				else if(game.equalsIgnoreCase("teams")){
+					type = ArenaType.TEAMS;
+				}
+				else if(game.equalsIgnoreCase("tntori")){
+					type = ArenaType.TNTORI;
+				}
+				else{
+					sender.sendMessage(ChatColor.RED+"Invalid minigame. Please do /"+cmd.getLabel()+" games for a list of valid minigames!");
+					return true;
+				}
+				Map<String,Arena> gameArenas = new HashMap<String,Arena>();
+				for(String aname:plugin.minigamesArenas.getArenas()){
+					Arena arena = plugin.minigamesArenas.getArena(aname);
+					if(arena.getType() == type){
+						gameArenas.put(aname,arena);
+					}
+				}
+				//TODO iterate and paginate gameArenas
+			}
+			else if(action.equalsIgnoreCase("games")){
+				//TODO list games
+			}
+			else if(action.equalsIgnoreCase("join")){
+				//TODO Joining of game ques
+			}
 			return true;
 		}
 		else if(cmd.getName().equalsIgnoreCase("test")){
