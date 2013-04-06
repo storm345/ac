@@ -3,7 +3,9 @@ package com.amazar.utils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.amazar.plugin.ac;
@@ -14,6 +16,7 @@ public class Minigame {
 	private List<String> inplayers = new ArrayList<String>();
 	private List<String> blue = new ArrayList<String>();
 	private List<String> red = new ArrayList<String>();
+	private Map<String, ItemStack[]> oldInventories = new HashMap<String,ItemStack[]>();
 	private String gameId = "";
 	private Arena arena = null;
 	private String arenaName = "";
@@ -30,6 +33,13 @@ public class Minigame {
 	public void joinBlue(String name){
 		this.blue.add(name);
 		return;
+	}
+	public void setOldInventories(Map<String, ItemStack[]> inventories){
+		this.oldInventories = inventories;
+		return;
+	}
+	public Map<String, ItemStack[]> getOldInventories(){
+		return this.oldInventories;
 	}
 	public void joinRed(String name){
 		this.red.add(name);

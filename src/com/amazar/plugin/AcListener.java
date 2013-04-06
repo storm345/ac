@@ -119,6 +119,10 @@ public class AcListener implements Listener {
 						Profile pProfile = new Profile(playername);
 						pProfile.addRewardPoint(3);
 						player.sendMessage(ChatColor.RED+"+3 reward points!");
+						player.getInventory().clear();
+						if(game.getOldInventories().containsKey(player.getName())){
+							player.getInventory().setContents(game.getOldInventories().get(player.getName()));
+						}
 					}
 					else{
 						Profile pProfile = new Profile(playername);

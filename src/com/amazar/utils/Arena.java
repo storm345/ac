@@ -133,14 +133,16 @@ public Boolean isLocInArena(Location check){
 	if(this.shape == ArenaShape.CIRCLE){
 		int radius = this.radius;
 		int radiusSquared = radius * radius;
-		 
+		 if(check.getY() < (center.getY() - 2)){
+			 return false;
+		 }
 		for(int x = -radius; x <= radius; x++) {
 		    for(int z = -radius; z <= radius; z++) {
 		        if( (x*x) + (z*z) <= radiusSquared) {
 		            double locX = center.getX() + x;
 		            double locZ = center.getZ() + z;
 		            Location loc = new Location(check.getWorld(), locX, check.getY(), locZ);
-		            if(check.distance(loc) <= 0.7){
+		            if(check.distance(loc) <= 1.1){
 		            	return true;
 		            }
 		        }

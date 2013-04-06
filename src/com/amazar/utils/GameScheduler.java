@@ -7,9 +7,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import com.amazar.plugin.ac;
 
@@ -86,8 +88,13 @@ public class GameScheduler {
 		final List<String> players = game.getPlayers();
 		List<String> blue = new ArrayList<String>();
 		List<String> red = new ArrayList<String>();
+		Map<String, ItemStack[]> oldInv = new HashMap<String,ItemStack[]>();
 		if(game.getGameType() == ArenaType.CTF || game.getGameType() == ArenaType.PUSH || game.getGameType() == ArenaType.TEAMS || game.getGameType() == ArenaType.TNTORI){
 			for(String player:players){
+				Player pl = plugin.getServer().getPlayer(player);
+				oldInv.put(player,pl.getInventory().getContents());
+				pl.getInventory().clear();
+				pl.setGameMode(GameMode.SURVIVAL);
 				if(blue.size() > red.size()){
 					red.add(player);
 				}
@@ -107,6 +114,7 @@ public class GameScheduler {
 		}
 		game.setBlue(blue);
 		game.setRed(red);
+		game.setOldInventories(oldInv);
 		//allocated to teams
 		final ArenaType type = game.getGameType();
 		if(type == ArenaType.CTF){
