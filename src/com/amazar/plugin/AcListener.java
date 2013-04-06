@@ -12,13 +12,16 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.TravelAgent;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.enchantment.EnchantItemEvent;
@@ -35,6 +38,7 @@ import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLevelChangeEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -128,19 +132,41 @@ public class AcListener implements Listener {
 		plugin.gameScheduler.reCalculateQues();
 		return;
 	}
-	@EventHandler void tntoriProtect(EntityExplodeEvent event){
-		List<Block> toDamage = new ArrayList<Block>();
-		toDamage.addAll(event.blockList());
-		for(Block bl:toDamage){
-			if(plugin.mgMethods.isArena(bl.getLocation()) == null){
-				return;
-			}
+	@EventHandler void tntAutoLightTori(PlayerInteractEvent event){
+		if(event.getAction() != Action.RIGHT_CLICK_BLOCK){
+			return;
+		}
+		Block floor = event.getClickedBlock();
+		if(plugin.mgMethods.isArena(floor.getLocation()) == null){
+			return;
+		}
+		
+		Arena arena = plugin.minigamesArenas.getArena(plugin.mgMethods.isArena(floor.getLocation()));
+		if(arena.getType() == ArenaType.TNTORI){
+				ItemStack item = event.getPlayer().getItemInHand();
+				if(item.getType() == Material.TNT){
+					Location loc = floor.getRelative(BlockFace.UP).getLocation().add(0,0.5,0);
+					loc.getWorld().spawnEntity(loc, EntityType.PRIMED_TNT);
+					item.setAmount(item.getAmount() - 1);
+					event.getPlayer().setItemInHand(item);
+					event.setCancelled(true);
+				}
+		}
+		return;
+	}
+	@EventHandler (priority = EventPriority.HIGHEST)
+	void tntoriProtect(EntityExplodeEvent event){
+		List<Block> blocks = new ArrayList<Block>();
+		blocks.addAll(event.blockList());
+		for(Block bl:blocks){
+			if(!(plugin.mgMethods.isArena(bl.getLocation()) == null)){
 			Arena arena = plugin.minigamesArenas.getArena(plugin.mgMethods.isArena(bl.getLocation()));
 			if(arena.getType() == ArenaType.TNTORI){
 				ArenaTntori arenaGame = (ArenaTntori) arena;
 				if(arenaGame.isProtected()){
 					event.blockList().remove(bl);
 				}
+			}
 			}
 		}
 		return;
