@@ -172,6 +172,20 @@ public class AcListener implements Listener {
 		}
 		return;
 	}
+	@EventHandler void tntToriDamagePrevent(EntityDamageEvent event){
+		if(!(event.getEntity() instanceof Player)){
+			return;
+		}
+		Player player = (Player) event.getEntity();
+		Minigame minigame = plugin.mgMethods.inAGame(player.getName());
+		if(minigame == null){
+			return;
+		}
+		if(minigame.getGameType() == ArenaType.TNTORI){
+			event.setCancelled(true);
+		}
+		return;
+	}
 	@EventHandler void mgDie(PlayerDeathEvent event){
 		if(plugin.mgMethods.inAGame(((Player)event.getEntity()).getName()) == null){
 			return;
