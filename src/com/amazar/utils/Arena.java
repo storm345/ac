@@ -7,6 +7,7 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 
 import com.amazar.plugin.ac;
 
@@ -130,16 +131,27 @@ public ArenaType getType(){
 public Boolean isLocInArena(Location check){
 	Location center = this.center.getLocation(ac.plugin.getServer());
 	if(this.shape == ArenaShape.CIRCLE){
-	double dist = check.distance(center);
-	if(dist <= this.radius){
-		return true;
-	}
+		int radius = this.radius;
+		int radiusSquared = radius * radius;
+		 
+		for(int x = -radius; x <= radius; x++) {
+		    for(int z = -radius; z <= radius; z++) {
+		        if( (x*x) + (z*z) <= radiusSquared) {
+		            double locX = center.getX() + x;
+		            double locZ = center.getZ() + z;
+		            Location loc = new Location(check.getWorld(), locX, check.getY(), locZ);
+		            if(check.distance(loc) <= 0.7){
+		            	return true;
+		            }
+		        }
+		    }
+		}
 	return false;
 	}
 	else if(this.shape == ArenaShape.SQUARE){
-		double minX = center.getX();
+		double minX = (center.getX()-this.radius)-1;
 		double maxX = center.getX()+this.radius;
-		double minZ = center.getZ();
+		double minZ = (center.getZ()-this.radius)-1;
 		double maxZ = center.getZ()+this.radius;
 		double x = check.getX();
 		double z = check.getZ();

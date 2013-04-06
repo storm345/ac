@@ -31,18 +31,13 @@ public class MinigameMethods {
     }
     public String isArena(Location loc){
     	Set<String> arenaNames = plugin.minigamesArenas.getArenas();
-    	Boolean is = false;
     	String name = null;
     	for(String arenaName:arenaNames){
     	Arena arena = plugin.minigamesArenas.getArena(arenaName);
     	if(arena.isLocInArena(loc)){
-    		is = true;
     		name = arenaName;
     	}
     	}
-    	if(is){
     	return name;
-    	}
-    	return null;
     }
 }

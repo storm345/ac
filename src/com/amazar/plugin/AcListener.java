@@ -140,15 +140,12 @@ public class AcListener implements Listener {
 		if(plugin.mgMethods.isArena(floor.getLocation()) == null){
 			return;
 		}
-		
 		Arena arena = plugin.minigamesArenas.getArena(plugin.mgMethods.isArena(floor.getLocation()));
 		if(arena.getType() == ArenaType.TNTORI){
 				ItemStack item = event.getPlayer().getItemInHand();
 				if(item.getType() == Material.TNT){
 					Location loc = floor.getRelative(BlockFace.UP).getLocation().add(0,0.5,0);
 					loc.getWorld().spawnEntity(loc, EntityType.PRIMED_TNT);
-					item.setAmount(item.getAmount() - 1);
-					event.getPlayer().setItemInHand(item);
 					event.setCancelled(true);
 				}
 		}
@@ -211,8 +208,7 @@ public class AcListener implements Listener {
 				}
 			}
 			for(String pname:players){
-				plugin.getServer().getPlayer(pname).getInventory().addItem(new ItemStack(Material.TNT, 64));
-				plugin.getServer().getPlayer(pname).getInventory().addItem(new ItemStack(Material.TNT, 64));
+				plugin.getServer().getPlayer(pname).getInventory().addItem(new ItemStack(Material.TNT, 1));
 			}
 		}
 		plugin.gameScheduler.reCalculateQues();
