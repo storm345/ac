@@ -74,7 +74,7 @@ public acCommandExecutor(ac plugin) {
 				return true;
 			}
 			if(args.length < 1){
-				return true;
+				return false;
 			}
 			String action = args[0];
 			if(action.equalsIgnoreCase("leave")){
@@ -248,7 +248,7 @@ return true;
 				plugin.gameScheduler.joinGame(player.getName(), arena, arenaName);
 				return true;
 			}
-			return true;
+			return false;
 		}
 		else if(cmd.getName().equalsIgnoreCase("test")){
  

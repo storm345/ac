@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -26,6 +27,9 @@ public class GameScheduler {
 			if(plugin.getServer().getPlayer(playername).isOnline()){
 				arena.addPlayer(playername);
 				List<String> arenaque = arena.getPlayers();
+				if(!arenaque.contains(playername)){
+					arenaque.add(playername);
+				}
 				for(String name:arenaque){
 					if(!(plugin.getServer().getPlayer(name).isOnline() && plugin.getServer().getPlayer(name) != null)){
 						arenaque.remove(name);
@@ -39,19 +43,24 @@ public class GameScheduler {
 						plugin.getServer().getPlayer(name).sendMessage(ChatColor.RED+"["+arenaName+":] "+ChatColor.GOLD+playername+" joined the game que!");
 					}
 				}
+				plugin.minigamesArenas.setArena(arenaName, arena);
 				if(!arenaInUse(arenaName) && arena.getHowManyPlayers() > 1){
 					Minigame game = new Minigame(arena, arenaName);
-					List<String> que = arena.getPlayers();
-					for(String name:que){
-						if(plugin.getServer().getPlayer(name).isOnline() && plugin.getServer().getPlayer(name) != null){
-							game.join(name);
-							arena.removePlayer(name);
-							startGame(arena, arenaName, game);
+					List<String> aquep = new ArrayList<String>();
+					aquep.addAll(arena.getPlayers());
+					for(String pname:aquep){
+						Bukkit.broadcastMessage("Players: "+aquep);
+						if(plugin.getServer().getPlayer(pname).isOnline() && plugin.getServer().getPlayer(pname) != null){
+							game.join(pname);
+							arena.removePlayer(pname);
 						}
 					}
+					plugin.minigamesArenas.setArena(arenaName, arena);
+					startGame(arena, arenaName, game);
 					//TODO start game
 					return true;
 				}
+				
 				plugin.getServer().getPlayer(playername).sendMessage(ChatColor.GREEN+"In arena que!");
 				return true;
 			}
@@ -73,11 +82,11 @@ public class GameScheduler {
 			}
 			if(!arenaInUse(aname) && arena.getHowManyPlayers() > 1){
 				Minigame game = new Minigame(arena, aname);
-				for(String name:arenaque){
+				for(String name:arena.getPlayers()){
 				game.join(name);
 				arena.removePlayer(name);
-				
 				}
+				plugin.minigamesArenas.setArena(aname, arena);
 				startGame(arena, aname, game);
 			}
 		}
@@ -178,7 +187,6 @@ public class GameScheduler {
 		}
 		final Map<String, Location> locations = new HashMap<String, Location>();
 		for(String name:players){
-			plugin.getServer().getPlayer(name).setWalkSpeed(0);
 			locations.put(name, plugin.getServer().getPlayer(name).getLocation());
 			plugin.getServer().getPlayer(name).sendMessage(ChatColor.GOLD+"Game preparing...");
 		}

@@ -150,6 +150,9 @@ public class AcListener implements Listener {
 				if(item.getType() == Material.TNT){
 					Location loc = floor.getRelative(BlockFace.UP).getLocation().add(0,0.5,0);
 					loc.getWorld().spawnEntity(loc, EntityType.PRIMED_TNT);
+					if(plugin.mgMethods.inAGame(event.getPlayer().getName()) != null){
+						event.getPlayer().getInventory().setItemInHand(new ItemStack(Material.TNT));
+					}
 					event.setCancelled(true);
 				}
 		}
@@ -215,15 +218,21 @@ public class AcListener implements Listener {
 			Player p = plugin.getServer().getPlayer(name);
 			p.setCustomName(ChatColor.RED+p.getName());
 		}
-		//TODO give items and stuffs
 		if(game.getGameType() == ArenaType.TNTORI){
 			ArenaTntori gameArena = (ArenaTntori) game.getArena();
 			String[] items = gameArena.getItems();
 			for(String raw:items){
-				ItemStack item = ItemStackFromId.get(raw);
-				for(String pname:players){
-					plugin.getServer().getPlayer(pname).getInventory().addItem(item);
+				if(!(raw.equalsIgnoreCase("0") || raw.equalsIgnoreCase("0:0"))){
+					try {
+						ItemStack item = ItemStackFromId.get(raw);
+						for(String pname:players){
+							plugin.getServer().getPlayer(pname).getInventory().addItem(item);
+						}
+					} catch (IllegalArgumentException e) {
+						
+					}	
 				}
+				
 			}
 			for(String pname:players){
 				plugin.getServer().getPlayer(pname).getInventory().addItem(new ItemStack(Material.TNT, 1));

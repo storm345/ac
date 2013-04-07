@@ -94,7 +94,7 @@ public List<String> getPlayers(){
 }
 public int getHowManyPlayers(){
 	for(String pname:this.players){
-		if(ac.plugin.getServer().getPlayer(pname) == null){
+		if(ac.plugin.getServer().getPlayer(pname) == null && !(ac.plugin.getServer().getPlayer(pname).isOnline())){
 			this.players.remove(pname);
 		}
 	}
