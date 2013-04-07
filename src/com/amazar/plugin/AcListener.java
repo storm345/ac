@@ -259,7 +259,7 @@ public class AcListener implements Listener {
 		}
 		if(minigame.getGameType() == ArenaType.TNTORI){
 			if(event.getCause() == DamageCause.BLOCK_EXPLOSION){
-				player.setNoDamageTicks(60);
+				player.setNoDamageTicks(100);
 			}
 			else{
 			event.setCancelled(true);
@@ -320,6 +320,30 @@ public class AcListener implements Listener {
 			}
 		}
 		plugin.gameScheduler.reCalculateQues();
+		return;
+	}
+	@EventHandler
+	void miniGameChat(AsyncPlayerChatEvent event){
+		Player player = event.getPlayer();
+		Minigame game = plugin.mgMethods.inAGame(player.getName());
+		if(game == null){
+			return;
+		}
+		String msg = StringColors.colorise(event.getMessage());
+		for(String name: game.getPlayers()){
+			Player toSend = plugin.getServer().getPlayer(name);
+			ChatColor teamColor = ChatColor.WHITE;
+			if(game.getBlue().contains(player.getName())){
+				teamColor = ChatColor.BLUE;
+			}
+			if(game.getRed().contains(player.getName())){
+				teamColor = ChatColor.RED;
+			}
+			if(toSend.isOnline() && toSend != null){
+				toSend.sendMessage(ChatColor.RED+"["+game.getArenaName()+"]"+teamColor+"<"+player.getName()+">"+ChatColor.GOLD+msg);
+			}
+		}
+		event.setCancelled(true);
 		return;
 	}
 	@EventHandler
@@ -384,7 +408,7 @@ public class AcListener implements Listener {
 					inplayers.remove(playerOuted.getName());
 					}
 					plugin.gameScheduler.updateGame(game);
-					Block block = arena.getCenter().getBlock().getRelative(BlockFace.UP, 5);
+					Block block = arena.getCenter().getBlock().getRelative(BlockFace.UP, 5).getRelative(BlockFace.NORTH, 10);
 					block.setType(Material.GLASS);
 					block.getRelative(BlockFace.NORTH).setType(Material.GLASS);
 					block.getRelative(BlockFace.NORTH_EAST).setType(Material.GLASS);
