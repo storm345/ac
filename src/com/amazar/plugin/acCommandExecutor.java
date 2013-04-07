@@ -133,20 +133,120 @@ return true;
 					sender.sendMessage(ChatColor.RED+"Invalid minigame. Please do /"+cmd.getLabel()+" games for a list of valid minigames!");
 					return true;
 				}
-				Map<String,Arena> gameArenas = new HashMap<String,Arena>();
+				List<String> gameArenas = new ArrayList<String>();
 				for(String aname:plugin.minigamesArenas.getArenas()){
 					Arena arena = plugin.minigamesArenas.getArena(aname);
 					if(arena.getType() == type){
-						gameArenas.put(aname,arena);
+						gameArenas.add(aname);
 					}
 				}
-				//TODO iterate and paginate gameArenas
+				List<String> arenaInfo = new ArrayList<String>();
+				for(String name:gameArenas){
+					Arena arena = plugin.minigamesArenas.getArena(name);
+					String toAdd = ChatColor.BLUE + "["+name+":] "+ChatColor.GOLD+"Type: "+ChatColor.RED+arena.getType().toString().toLowerCase() + ChatColor.GOLD+"  Players: "+ChatColor.RED+"["+arena.getHowManyPlayers()+"/"+arena.getPlayerLimit()+"]";
+					if(!arena.isValid()){
+						toAdd = toAdd + ChatColor.GRAY + " -Invalid Arena (Not setup yet!)";
+					}
+					arenaInfo.add(toAdd);
+				}
+				int displayed = 0;
+				double totalPagesunrounded = arenaInfo.size() / 5d;
+				NumberFormat fmt = NumberFormat.getNumberInstance();
+				fmt.setMaximumFractionDigits(0);
+				fmt.setRoundingMode(RoundingMode.UP);
+				String value = fmt.format(totalPagesunrounded);
+				int totalPages = Integer.parseInt(value);
+				if(totalPages == 0){
+					totalPages = 1;
+				}
+				page -= 1;
+				if(page > totalPages){
+					page = totalPages;
+				}
+				
+				if(page < 0){
+					page = 0;
+				}
+				int startpoint = page * 5;
+				sender.sendMessage(ChatColor.DARK_RED+"Arenas for "+type.toString().toLowerCase()+": Page: ["+(page+1)+"/"+(totalPages)+"]");
+				for(int i=startpoint;i<arenaInfo.size()&&displayed<5;i++){
+					sender.sendMessage(StringColors.colorise(arenaInfo.get(i)));
+					displayed++;
+				}
+				return true;
 			}
 			else if(action.equalsIgnoreCase("games")){
-				//TODO list games
+				sender.sendMessage(ChatColor.DARK_RED+"Available minigames:");
+				sender.sendMessage(ChatColor.RED+"CTF "+ChatColor.GOLD+"- 2 teams must race to collect their flags and do all they can to stop the other team from doing so first!");
+				sender.sendMessage(ChatColor.RED+"PUSH "+ChatColor.GOLD+"- The players must try to push each other out of the arena. Last person standing wins!");
+				sender.sendMessage(ChatColor.RED+"PVP "+ChatColor.GOLD+"- The players must try to kill each other until one remains and they win!");
+				sender.sendMessage(ChatColor.RED+"SURVIVAL "+ChatColor.GOLD+"- The players must work together to survive attacking mobs until the countdown ends. Players alive at the end win!");
+				sender.sendMessage(ChatColor.RED+"TEAMS "+ChatColor.GOLD+"- The blue team must fight the red team. The winning team wins!");
+				sender.sendMessage(ChatColor.RED+"TNTORI "+ChatColor.GOLD+"- The players must push each other out of the arena using the blast force of tnt!");
+				return true;
 			}
 			else if(action.equalsIgnoreCase("join")){
 				//TODO Joining of game ques
+				if(args.length < 3){
+					return false;
+				}
+				String game = args[1];
+				String arenaName = args[2];
+				if(plugin.mgMethods.inAGame(player.getName()) != null){
+					sender.sendMessage(ChatColor.RED+"Already in a minigame! Please leave it before joining another!");
+					return true;
+				}
+				if(plugin.mgMethods.inGameQue(player.getName()) != null){
+					sender.sendMessage(ChatColor.RED+"Already in a minigame que! Please leave it before joining another!");
+					return true;
+				}
+				ArenaType type = ArenaType.INAVLID;
+				if(game.equalsIgnoreCase("ctf")){
+					type = ArenaType.CTF;
+				}
+				else if(game.equalsIgnoreCase("push")){
+					type = ArenaType.PUSH;
+				}
+				else if(game.equalsIgnoreCase("pvp")){
+					type = ArenaType.PVP;
+				}
+				else if(game.equalsIgnoreCase("survival")){
+					type = ArenaType.SURVIVAL;
+				}
+				else if(game.equalsIgnoreCase("teams")){
+					type = ArenaType.TEAMS;
+				}
+				else if(game.equalsIgnoreCase("tntori")){
+					type = ArenaType.TNTORI;
+				}
+				else{
+					sender.sendMessage(ChatColor.RED+"Invalid minigame. Please do /"+cmd.getLabel()+" games for a list of valid minigames!");
+					return true;
+				}
+				List<String> gameArenas = new ArrayList<String>();
+				for(String aname:plugin.minigamesArenas.getArenas()){
+					Arena arena = plugin.minigamesArenas.getArena(aname);
+					if(arena.getType() == type){
+						gameArenas.add(aname);
+					}
+				}
+				Boolean arenaExists = false;
+				for(String aname:gameArenas){
+					if(aname.equalsIgnoreCase(arenaName)){
+						arenaExists = true;
+						arenaName = aname;
+					}
+				}
+				if(!arenaExists){
+					sender.sendMessage(ChatColor.RED+"Arena doesn't exist! Do /"+cmd.getLabel()+" list "+type.toString().toLowerCase()+" for a valid list of "+type.toString().toLowerCase()+" arenas.");
+					return true;
+				}
+				Arena arena = plugin.minigamesArenas.getArena(arenaName);
+				if(!(arena.getHowManyPlayers() < arena.getPlayerLimit())){
+					sender.sendMessage(ChatColor.RED+"Arena game que full! Please try another arena or again later!");
+				}
+				plugin.gameScheduler.joinGame(player.getName(), arena, arenaName);
+				return true;
 			}
 			return true;
 		}
