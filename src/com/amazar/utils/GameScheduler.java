@@ -13,6 +13,9 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
+import org.fusesource.jansi.Ansi.Color;
 
 import com.amazar.plugin.ac;
 
@@ -94,6 +97,28 @@ public class GameScheduler {
 	}
 	public void startGame(Arena arena, String arenaName, final Minigame game){
 		this.games.put(game.getGameId(), game);
+		Scoreboard teams = game.getTeams();
+		Set<Team> CurrentTeams = teams.getTeams();
+		Boolean hasRed = false;
+		Boolean hasBlue = false;
+		for(Team team:CurrentTeams){
+			if(team.getName() == ("blue"+game.getGameId())){
+				hasBlue = true;
+			}
+			else if(team.getName() == ("red"+game.getGameId())){
+				hasRed = true;
+			}
+		}
+		if(!hasBlue){
+			teams.registerNewTeam("blue"+game.getGameId());
+		}
+		if(!hasRed){
+			teams.registerNewTeam("red"+game.getGameId());
+		}
+		Team blueTeam = teams.getTeam("blue"+game.getGameId());
+		Team redTeam = teams.getTeam("red"+game.getGameId());
+		blueTeam.setPrefix(ChatColor.BLUE+"");
+		redTeam.setPrefix(ChatColor.RED+"");
 		final List<String> players = game.getPlayers();
 		List<String> blue = new ArrayList<String>();
 		List<String> red = new ArrayList<String>();
@@ -106,23 +131,28 @@ public class GameScheduler {
 				pl.setGameMode(GameMode.SURVIVAL);
 				if(blue.size() > red.size()){
 					red.add(player);
+					redTeam.addPlayer(plugin.getServer().getOfflinePlayer(player));
 				}
 				else if(red.size() > blue.size()){
 					blue.add(player);
+					blueTeam.addPlayer(plugin.getServer().getOfflinePlayer(player));
 				}
 				else{
 					int rand = 1 + (int)(Math.random() * ((2 - 1) + 1));
 					if(rand > 1){
 						blue.add(player);
+						blueTeam.addPlayer(plugin.getServer().getOfflinePlayer(player));
 					}
 					else{
 						red.add(player);
+						redTeam.addPlayer(plugin.getServer().getOfflinePlayer(player));
 					}
 				}
 			}
 		}
 		game.setBlue(blue);
 		game.setRed(red);
+		game.setTeamScoreboard(teams);
 		game.setOldInventories(oldInv);
 		//allocated to teams
 		final ArenaType type = game.getGameType();

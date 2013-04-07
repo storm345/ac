@@ -10,6 +10,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Statistic;
 import org.bukkit.TravelAgent;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -55,6 +56,8 @@ import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
 import com.amazar.utils.Arena;
@@ -274,11 +277,23 @@ public class AcListener implements Listener {
 		List<String> players = game.getPlayers();
 		for(String name:blue){
 			Player p = plugin.getServer().getPlayer(name);
-			p.setCustomName(ChatColor.BLUE+p.getName());
+			String pname = p.getName();
+			if(game.getTeams().getTeam("blue"+game.getGameId()).getPlayers().contains(ac.plugin.getServer().getOfflinePlayer(pname))){
+				game.getTeams().getTeam("blue"+game.getGameId()).removePlayer(ac.plugin.getServer().getOfflinePlayer(pname));
+			}
+			if(game.getTeams().getTeam("red"+game.getGameId()).getPlayers().contains(ac.plugin.getServer().getOfflinePlayer(pname))){
+				game.getTeams().getTeam("red"+game.getGameId()).removePlayer(ac.plugin.getServer().getOfflinePlayer(pname));
+			}
 		}
 		for(String name:red){
 			Player p = plugin.getServer().getPlayer(name);
-			p.setCustomName(ChatColor.RED+p.getName());
+			String pname = p.getName();
+			if(game.getTeams().getTeam("blue"+game.getGameId()).getPlayers().contains(ac.plugin.getServer().getOfflinePlayer(pname))){
+				game.getTeams().getTeam("blue"+game.getGameId()).removePlayer(ac.plugin.getServer().getOfflinePlayer(pname));
+			}
+			if(game.getTeams().getTeam("red"+game.getGameId()).getPlayers().contains(ac.plugin.getServer().getOfflinePlayer(pname))){
+				game.getTeams().getTeam("red"+game.getGameId()).removePlayer(ac.plugin.getServer().getOfflinePlayer(pname));
+			}
 		}
 		if(game.getGameType() == ArenaType.TNTORI){
 			ArenaTntori gameArena = (ArenaTntori) game.getArena();
@@ -352,6 +367,12 @@ public class AcListener implements Listener {
 						}
 						if(red.contains(pname)){
 							red.remove(pname);
+						}
+						if(game.getTeams().getTeam("blue"+game.getGameId()).getPlayers().contains(ac.plugin.getServer().getOfflinePlayer(pname))){
+							game.getTeams().getTeam("blue"+game.getGameId()).removePlayer(ac.plugin.getServer().getOfflinePlayer(pname));
+						}
+						if(game.getTeams().getTeam("red"+game.getGameId()).getPlayers().contains(ac.plugin.getServer().getOfflinePlayer(pname))){
+							game.getTeams().getTeam("red"+game.getGameId()).removePlayer(ac.plugin.getServer().getOfflinePlayer(pname));
 						}
 					Player playerOuted = plugin.getServer().getPlayer(pname);
 					game.playerOut(playerOuted.getName());

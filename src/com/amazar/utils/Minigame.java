@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.scoreboard.Scoreboard;
 
 import com.amazar.plugin.ac;
 
@@ -26,12 +29,14 @@ public class Minigame {
 	private String winner = "Unknown";
 	private Boolean running = false;
 	private BukkitTask task = null;
+	private Scoreboard teams = null;
 	public HashMap<String, Integer> lives = new HashMap<String, Integer>();
 	public Minigame(Arena arena, String arenaName){
 		this.gameId = UniqueString.generate();
 		this.arena = arena;
 		this.gameType = arena.getType();
 		this.arenaName = arenaName;
+		this.teams = ac.plugin.getServer().getScoreboardManager().getMainScoreboard();
 	}
 	public void joinBlue(String name){
 		this.blue.add(name);
@@ -46,6 +51,13 @@ public class Minigame {
 	}
 	public void joinRed(String name){
 		this.red.add(name);
+		return;
+	}
+	public Scoreboard getTeams(){
+		return this.teams;
+	}
+	public void setTeamScoreboard(Scoreboard board){
+		this.teams = board;
 		return;
 	}
 	public void setBlue(List<String> blue){
@@ -89,6 +101,12 @@ public class Minigame {
 		}
 		if(this.getBlue().contains(playername)){
 			this.getBlue().remove(playername);
+		}
+		if(this.teams.getTeam("blue"+this.gameId).getPlayers().contains(ac.plugin.getServer().getOfflinePlayer(playername))){
+			this.teams.getTeam("blue"+this.gameId).removePlayer(ac.plugin.getServer().getOfflinePlayer(playername));
+		}
+		if(this.teams.getTeam("red"+this.gameId).getPlayers().contains(ac.plugin.getServer().getOfflinePlayer(playername))){
+			this.teams.getTeam("red"+this.gameId).removePlayer(ac.plugin.getServer().getOfflinePlayer(playername));
 		}
 		this.playerOut(playername);
 		Player player = ac.plugin.getServer().getPlayer(playername);
@@ -163,6 +181,16 @@ public class Minigame {
     	if(task != null){
     		task.cancel();
     	}
+    	Set<OfflinePlayer> bluePlayers = this.teams.getTeam("blue").getPlayers();
+    	for(OfflinePlayer pl:bluePlayers){
+    		this.teams.getTeam("blue").removePlayer(pl);
+    	}
+    	Set<OfflinePlayer> redPlayers = this.teams.getTeam("red").getPlayers();
+    	for(OfflinePlayer pl:redPlayers){
+    		this.teams.getTeam("red").removePlayer(pl);
+    	}
+    	this.teams.getTeam("blue"+this.gameId).unregister();
+    	this.teams.getTeam("red"+this.gameId).unregister();
     	ac.plugin.getServer().getPluginManager().callEvent(new MinigameFinishEvent(this));
     }
 }
