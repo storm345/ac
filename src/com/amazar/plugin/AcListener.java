@@ -118,6 +118,19 @@ public class AcListener implements Listener {
 				Player player = plugin.getServer().getPlayer(playername);
 				player.setCustomName(ChatColor.stripColor(player.getCustomName()));
 				player.setCustomNameVisible(false);
+				String pname = player.getName();
+				try {
+					if(game.getTeams().getTeam("blue"+game.getGameId()).getPlayers().contains(ac.plugin.getServer().getOfflinePlayer(pname))){
+						game.getTeams().getTeam("blue"+game.getGameId()).removePlayer(ac.plugin.getServer().getOfflinePlayer(pname));
+					}
+				} catch (Exception e) {
+				}
+				try {
+					if(game.getTeams().getTeam("red"+game.getGameId()).getPlayers().contains(ac.plugin.getServer().getOfflinePlayer(pname))){
+						game.getTeams().getTeam("red"+game.getGameId()).removePlayer(ac.plugin.getServer().getOfflinePlayer(pname));
+					}
+				} catch (Exception e) {
+				}
 				player.teleport(player.getLocation().getWorld().getSpawnLocation());
 				if(player.isOnline()){
 					if(!inplayers.contains(playername)){
@@ -277,23 +290,13 @@ public class AcListener implements Listener {
 		List<String> players = game.getPlayers();
 		for(String name:blue){
 			Player p = plugin.getServer().getPlayer(name);
-			String pname = p.getName();
-			if(game.getTeams().getTeam("blue"+game.getGameId()).getPlayers().contains(ac.plugin.getServer().getOfflinePlayer(pname))){
-				game.getTeams().getTeam("blue"+game.getGameId()).removePlayer(ac.plugin.getServer().getOfflinePlayer(pname));
-			}
-			if(game.getTeams().getTeam("red"+game.getGameId()).getPlayers().contains(ac.plugin.getServer().getOfflinePlayer(pname))){
-				game.getTeams().getTeam("red"+game.getGameId()).removePlayer(ac.plugin.getServer().getOfflinePlayer(pname));
-			}
+			p.setCustomName(ChatColor.BLUE+p.getName());
+			p.setCustomNameVisible(true);
 		}
 		for(String name:red){
 			Player p = plugin.getServer().getPlayer(name);
-			String pname = p.getName();
-			if(game.getTeams().getTeam("blue"+game.getGameId()).getPlayers().contains(ac.plugin.getServer().getOfflinePlayer(pname))){
-				game.getTeams().getTeam("blue"+game.getGameId()).removePlayer(ac.plugin.getServer().getOfflinePlayer(pname));
-			}
-			if(game.getTeams().getTeam("red"+game.getGameId()).getPlayers().contains(ac.plugin.getServer().getOfflinePlayer(pname))){
-				game.getTeams().getTeam("red"+game.getGameId()).removePlayer(ac.plugin.getServer().getOfflinePlayer(pname));
-			}
+			p.setCustomName(ChatColor.RED+p.getName());
+			p.setCustomNameVisible(true);
 		}
 		if(game.getGameType() == ArenaType.TNTORI){
 			ArenaTntori gameArena = (ArenaTntori) game.getArena();

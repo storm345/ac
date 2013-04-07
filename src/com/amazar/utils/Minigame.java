@@ -181,14 +181,24 @@ public class Minigame {
     	if(task != null){
     		task.cancel();
     	}
-    	Set<OfflinePlayer> bluePlayers = this.teams.getTeam("blue").getPlayers();
-    	for(OfflinePlayer pl:bluePlayers){
-    		this.teams.getTeam("blue").removePlayer(pl);
-    	}
-    	Set<OfflinePlayer> redPlayers = this.teams.getTeam("red").getPlayers();
-    	for(OfflinePlayer pl:redPlayers){
-    		this.teams.getTeam("red").removePlayer(pl);
-    	}
+    	try {
+			Set<OfflinePlayer> bluePlayers = this.teams.getTeam("blue").getPlayers();
+			if(!(bluePlayers == null)){
+				for(OfflinePlayer pl:bluePlayers){
+					this.teams.getTeam("blue").removePlayer(pl);
+				}	
+			}
+		} catch (Exception e) {
+		}
+    	try {
+			Set<OfflinePlayer> redPlayers = this.teams.getTeam("red").getPlayers();
+			if(!(redPlayers == null)){
+				for(OfflinePlayer pl:redPlayers){
+					this.teams.getTeam("red").removePlayer(pl);
+				}	
+			}
+		} catch (Exception e) {
+		}
     	this.teams.getTeam("blue"+this.gameId).unregister();
     	this.teams.getTeam("red"+this.gameId).unregister();
     	ac.plugin.getServer().getPluginManager().callEvent(new MinigameFinishEvent(this));
