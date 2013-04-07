@@ -40,6 +40,7 @@ import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerLevelChangeEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
@@ -103,7 +104,8 @@ public class AcListener implements Listener {
 		if(plugin.gameScheduler.arenaInUse(game.getArenaName())){
 			plugin.gameScheduler.removeArena(game.getArenaName());
 		}
-		List<String> players = game.getPlayers();
+		List<String> players = new ArrayList<String>();
+		players.addAll(game.getPlayers());
 		List<String> inplayers = game.getInPlayers();
 		String in = "";
 		for(String inp:inplayers){
@@ -150,12 +152,67 @@ public class AcListener implements Listener {
 				if(item.getType() == Material.TNT){
 					Location loc = floor.getRelative(BlockFace.UP).getLocation().add(0,0.5,0);
 					loc.getWorld().spawnEntity(loc, EntityType.PRIMED_TNT);
-					if(plugin.mgMethods.inAGame(event.getPlayer().getName()) != null){
-						event.getPlayer().getInventory().setItemInHand(new ItemStack(Material.TNT));
+					Minigame inGame = plugin.mgMethods.inAGame(event.getPlayer().getName());
+					if(inGame != null){
+						ArenaType type = inGame.getGameType();
+						if(type == ArenaType.TNTORI){
+						event.getPlayer().getInventory().addItem(new ItemStack(Material.TNT));
+						}
 					}
 					event.setCancelled(true);
 				}
 		}
+		return;
+	}
+	@EventHandler
+	void gameQuitting(PlayerQuitEvent event){
+		Player player = event.getPlayer();
+		Minigame game = plugin.mgMethods.inAGame(player.getName());
+		if(game == null){
+			String arenaName = plugin.mgMethods.inGameQue(player.getName());
+			if(arenaName == null){
+				return;
+			}
+			Arena arena = plugin.minigamesArenas.getArena(arenaName);
+			arena.removePlayer(player.getName());
+			plugin.minigamesArenas.setArena(arenaName, arena);
+			return;
+		}
+		else{
+			game.leave(player.getName());
+			return;
+	    }
+	}
+	@EventHandler
+	void gameQuitting(PlayerKickEvent event){
+		Player player = event.getPlayer();
+		Minigame game = plugin.mgMethods.inAGame(player.getName());
+		if(game == null){
+			String arenaName = plugin.mgMethods.inGameQue(player.getName());
+			if(arenaName == null){
+				return;
+			}
+			Arena arena = plugin.minigamesArenas.getArena(arenaName);
+			arena.removePlayer(player.getName());
+			plugin.minigamesArenas.setArena(arenaName, arena);
+			return;
+		}
+		else{
+			game.leave(player.getName());
+			return;
+	    }
+	}
+	@EventHandler
+	void arenaLogonLoc(PlayerJoinEvent event){
+		Player player = event.getPlayer();
+		if(plugin.mgMethods.isArena(player.getLocation()) == null){ //Not in arena
+			return;
+		}
+		if(plugin.mgMethods.inAGame(player.getName()) != null){ //Are in a game
+			return;
+		}
+		//Inside an arena but not playing? OUTRAGEOUS!
+		player.teleport(player.getWorld().getSpawnLocation());
 		return;
 	}
 	@EventHandler (priority = EventPriority.HIGHEST)
@@ -185,7 +242,12 @@ public class AcListener implements Listener {
 			return;
 		}
 		if(minigame.getGameType() == ArenaType.TNTORI){
+			if(event.getCause() == DamageCause.BLOCK_EXPLOSION){
+				player.setNoDamageTicks(60);
+			}
+			else{
 			event.setCancelled(true);
+			}
 		}
 		return;
 	}
@@ -197,7 +259,7 @@ public class AcListener implements Listener {
 		Minigame game = plugin.mgMethods.inAGame(player.getName());
 		if(game.getGameType() == ArenaType.TNTORI){
 			ArenaTntori gameArena = (ArenaTntori) game.getArena();
-			player.setBedSpawnLocation(gameArena.getCenter(), false);
+			player.setBedSpawnLocation(gameArena.getCenter().getBlock().getRelative(BlockFace.UP, 2).getLocation(), true);
 			return;
 		}
 		
@@ -259,8 +321,16 @@ public class AcListener implements Listener {
 			List<String> blue = game.getBlue();
 			List<String> red = game.getRed();
 			ChatColor team_color = ChatColor.WHITE;
-			for(String pname:players){
+			List<String> tplayers = new ArrayList<String>();
+			tplayers.addAll(players);
+			for(String pname:tplayers){
 				Player p = plugin.getServer().getPlayer(pname);
+				if(!inplayers.contains(p.getName())){
+					//They are spectating
+					if(p.getLocation().getY() < (arena.getCenter().getY()+5)){
+						p.teleport(arena.getCenter().add(0, 6, 0));
+					}
+				}
 				if(!arena.isLocInArena(p.getLocation())){
 					int totalLives = gameArena.getLives();
 					int lives = totalLives;
@@ -269,59 +339,97 @@ public class AcListener implements Listener {
 					}
 					lives -= 1;
 					game.lives.put(pname, lives);
-					if(lives < 0){
-					//they lose
 					if(blue.contains(pname)){
 						team_color = ChatColor.BLUE;
-						blue.remove(pname);
 					}
 					if(red.contains(pname)){
 						team_color = ChatColor.RED;
-						red.remove(pname);
 					}
-					game.playerOut(pname);
-					for(String player:players){
+					if(lives < 0){
+					//they lose
+						if(blue.contains(pname)){
+							blue.remove(pname);
+						}
+						if(red.contains(pname)){
+							red.remove(pname);
+						}
+					Player playerOuted = plugin.getServer().getPlayer(pname);
+					game.playerOut(playerOuted.getName());
+					if(inplayers.contains(playerOuted.getName())){
+					inplayers.remove(playerOuted.getName());
+					}
+					plugin.gameScheduler.updateGame(game);
+					Block block = arena.getCenter().getBlock().getRelative(BlockFace.UP, 5);
+					block.setType(Material.GLASS);
+					block.getRelative(BlockFace.NORTH).setType(Material.GLASS);
+					block.getRelative(BlockFace.NORTH_EAST).setType(Material.GLASS);
+					block.getRelative(BlockFace.EAST).setType(Material.GLASS);
+					block.getRelative(BlockFace.SOUTH_EAST).setType(Material.GLASS);
+					block.getRelative(BlockFace.SOUTH).setType(Material.GLASS);
+					block.getRelative(BlockFace.SOUTH_WEST).setType(Material.GLASS);
+					block.getRelative(BlockFace.WEST).setType(Material.GLASS);
+					block.getRelative(BlockFace.NORTH_WEST).setType(Material.GLASS);
+					playerOuted.sendMessage(ChatColor.GOLD+"Spectating... To leave (and miss out on reward points) please do /mg leave");
+					playerOuted.teleport(arena.getCenter().add(0, 6, 0));
+					for(String player:tplayers){
 						Player pl = plugin.getServer().getPlayer(player);
 						pl.sendMessage(team_color + pname+ " was knocked off and is out!");
 					}
 					}
 					else{
-						p.teleport(arena.getCenter());
+						p.teleport(arena.getCenter().getBlock().getRelative(BlockFace.UP, 2).getLocation());
 						for(String player:players){
 							Player pl = plugin.getServer().getPlayer(player);
-							pl.sendMessage(team_color + pname+ " was knocked off and now has "+lives+"lives left!");
+							pl.sendMessage(team_color + pname+ " was knocked off and now has "+lives+" lives left!");
 						}
 					}
 				}
 			}
-			game.setInPlayers(inplayers);
+			//game.setInPlayers(inplayers);
+			
 			plugin.gameScheduler.updateGame(game);
-            if(red.size() < 1 && blue.size() < 1){
-            	team_color = ChatColor.GOLD;
-				for(String player:players){
-					Player pl = plugin.getServer().getPlayer(player);
-					pl.sendMessage(team_color + "Game end!");
-				}
-				game.setWinner(team_color+"Nobody");
-				game.end();
-			}
-			if(blue.size() < 1){
-				team_color = ChatColor.RED;
-				for(String player:players){
-					Player pl = plugin.getServer().getPlayer(player);
-					pl.sendMessage(team_color + "Game end!");
-				}
-				game.setWinner(team_color+"Red");
-				game.end();
-			}
-			if(red.size() < 1){
-				team_color = ChatColor.BLUE;
-				for(String player:players){
-					Player pl = plugin.getServer().getPlayer(player);
-					pl.sendMessage(team_color + "Game end!");
-				}
-				game.setWinner(team_color+"Blue");
-				game.end();
+            if(game.getInPlayers().size() < 2){
+            	if(inplayers.size() < 1){
+            		team_color = ChatColor.GOLD;
+    				for(String player:tplayers){
+    					Player pl = plugin.getServer().getPlayer(player);
+    					pl.sendMessage(team_color + "Game end!");
+    				}
+    				game.setWinner(team_color+"Nobody");
+    				game.end();
+    				return;
+            	}
+            	if(inplayers.size() > 0){
+            	Player winner = plugin.getServer().getPlayer(inplayers.get(0));
+            	if(red.contains(winner.getName())){
+    				team_color = ChatColor.RED;
+    				for(String player:tplayers){
+    					Player pl = plugin.getServer().getPlayer(player);
+    					pl.sendMessage(team_color + "Game end!");
+    				}
+    				game.setWinner(team_color+winner.getName());
+    				game.end();
+    			}
+    			if(blue.contains(winner.getName())){
+    				team_color = ChatColor.BLUE;
+    				for(String player:tplayers){
+    					Player pl = plugin.getServer().getPlayer(player);
+    					pl.sendMessage(team_color + "Game end!");
+    				}
+    				game.setWinner(team_color+winner.getName());
+    				game.end();
+    			}	
+            	}
+            	else{
+            		team_color = ChatColor.GOLD;
+    				for(String player:tplayers){
+    					Player pl = plugin.getServer().getPlayer(player);
+    					pl.sendMessage(team_color + "Game end!");
+    				}
+    				game.setWinner(team_color+"Unknown");
+    				game.end();
+            	}
+    			
 			}
 		}
 		return;

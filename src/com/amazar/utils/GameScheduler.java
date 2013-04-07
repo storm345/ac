@@ -49,7 +49,6 @@ public class GameScheduler {
 					List<String> aquep = new ArrayList<String>();
 					aquep.addAll(arena.getPlayers());
 					for(String pname:aquep){
-						Bukkit.broadcastMessage("Players: "+aquep);
 						if(plugin.getServer().getPlayer(pname).isOnline() && plugin.getServer().getPlayer(pname) != null){
 							game.join(pname);
 							arena.removePlayer(pname);
@@ -57,7 +56,6 @@ public class GameScheduler {
 					}
 					plugin.minigamesArenas.setArena(arenaName, arena);
 					startGame(arena, arenaName, game);
-					//TODO start game
 					return true;
 				}
 				
@@ -82,7 +80,9 @@ public class GameScheduler {
 			}
 			if(!arenaInUse(aname) && arena.getHowManyPlayers() > 1){
 				Minigame game = new Minigame(arena, aname);
-				for(String name:arena.getPlayers()){
+				List<String> aquep = new ArrayList<String>();
+				aquep.addAll(arena.getPlayers());
+				for(String name:aquep){
 				game.join(name);
 				arena.removePlayer(name);
 				}
@@ -92,7 +92,7 @@ public class GameScheduler {
 		}
 		return;
 	}
-	public void startGame(Arena arena, String arenaName, Minigame game){
+	public void startGame(Arena arena, String arenaName, final Minigame game){
 		this.games.put(game.getGameId(), game);
 		final List<String> players = game.getPlayers();
 		List<String> blue = new ArrayList<String>();
@@ -190,8 +190,9 @@ public class GameScheduler {
 			locations.put(name, plugin.getServer().getPlayer(name).getLocation());
 			plugin.getServer().getPlayer(name).sendMessage(ChatColor.GOLD+"Game preparing...");
 		}
-		final MinigameStartEvent start = new MinigameStartEvent(game);
-		
+		List<String> gameIn = new ArrayList<String>();
+		gameIn.addAll(game.getPlayers());
+		game.setInPlayers(gameIn);
 		plugin.getServer().getScheduler().runTaskAsynchronously(plugin, new Runnable(){
 
 			@Override
@@ -211,7 +212,7 @@ public class GameScheduler {
 				} catch (InterruptedException e) {
 				}
 				}
-				plugin.getServer().getPluginManager().callEvent(start);
+				game.start();
 				return;
 			}});
 		

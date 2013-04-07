@@ -90,6 +90,7 @@ public class Minigame {
 		if(this.getBlue().contains(playername)){
 			this.getBlue().remove(playername);
 		}
+		this.playerOut(playername);
 		Player player = ac.plugin.getServer().getPlayer(playername);
 		if(player != null){
 			player.getInventory().clear();
@@ -151,8 +152,9 @@ public class Minigame {
 
 			@Override
 			public void run() {
-				MinigameStartEvent event = new MinigameStartEvent(game);
+				MinigameUpdateEvent event = new MinigameUpdateEvent(game);
 				ac.plugin.getServer().getPluginManager().callEvent(event);
+				return;
 			}}, 30l, 30l);
     	ac.plugin.getServer().getPluginManager().callEvent(new MinigameStartEvent(this));
     }
