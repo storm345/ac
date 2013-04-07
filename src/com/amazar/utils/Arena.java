@@ -151,6 +151,9 @@ public Boolean isLocInArena(Location check){
 	return false;
 	}
 	else if(this.shape == ArenaShape.SQUARE){
+		if(check.getY() < (center.getY() - 2)){
+			 return false;
+		 }
 		double minX = (center.getX()-this.radius)-1;
 		double maxX = center.getX()+this.radius;
 		double minZ = (center.getZ()-this.radius)-1;

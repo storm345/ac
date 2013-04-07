@@ -275,6 +275,7 @@ public class AcListener implements Listener {
 		Minigame game = plugin.mgMethods.inAGame(player.getName());
 		if(game.getGameType() == ArenaType.TNTORI){
 			ArenaTntori gameArena = (ArenaTntori) game.getArena();
+			gameArena.getCenter().getBlock().setType(Material.GLOWSTONE);
 			player.setBedSpawnLocation(gameArena.getCenter().getBlock().getRelative(BlockFace.UP, 2).getLocation(), true);
 			return;
 		}
@@ -401,6 +402,7 @@ public class AcListener implements Listener {
 					}
 					}
 					else{
+						gameArena.getCenter().getBlock().setType(Material.GLOWSTONE);
 						p.teleport(arena.getCenter().getBlock().getRelative(BlockFace.UP, 2).getLocation());
 						for(String player:players){
 							Player pl = plugin.getServer().getPlayer(player);
