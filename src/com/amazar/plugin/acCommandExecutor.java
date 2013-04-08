@@ -27,6 +27,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.Chest;
 import org.bukkit.block.Dispenser;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -92,8 +93,8 @@ public acCommandExecutor(ac plugin) {
 			}
 			BlockState orig = new Location(player.getWorld(), 1, 1, 1).getBlock().getState();
 			Block toSet = new Location(player.getWorld(), 1, 1, 1).getBlock();
-			toSet.setType(Material.DISPENSER);
-			Dispenser holder = (Dispenser) toSet.getState();
+			toSet.setType(Material.CHEST);
+			Chest holder = (Chest) toSet.getState();
 			holder.getInventory().clear();
 			ItemStack CTF = getItemMinigame.getItem(ChatColor.RED+"CTF", ChatColor.GOLD+"Collect the flag!", Material.WOOL, (short) 14);
 			ItemStack PUSH = getItemMinigame.getItem(ChatColor.RED+"PUSH", ChatColor.GOLD+"Push the others out!", Material.PISTON_BASE, (short) 0);
