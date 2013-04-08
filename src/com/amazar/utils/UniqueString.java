@@ -6,7 +6,7 @@ public static String generate(){
 	String string = "";
 	long time = System.currentTimeMillis();
 	time = Math.round(time*10)/10;
-	int rand = 1 + (int)(Math.random() * ((10 - 1) + 1));
+	int rand = 1 + (int)(Math.random() * ((9 - 1) + 1));
 	if(rand > 5){
 		string = "F";
 				

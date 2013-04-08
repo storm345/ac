@@ -370,8 +370,9 @@ public class AcListener implements Listener {
 				Player p = plugin.getServer().getPlayer(pname);
 				if(!inplayers.contains(p.getName())){
 					//They are spectating
+					Location spectator = new Location(arena.getCenter().getWorld(), arena.getCenter().getX(), arena.getCenter().getY(), arena.getCenter().getZ());
 					if(p.getLocation().getY() < (arena.getCenter().getY()+5)){
-						p.teleport(arena.getCenter().add(0, 6, 0));
+						p.teleport(spectator.add(0,6,0));
 					}
 				}
 				if(!arena.isLocInArena(p.getLocation())){
@@ -419,7 +420,8 @@ public class AcListener implements Listener {
 					block.getRelative(BlockFace.WEST).setType(Material.GLASS);
 					block.getRelative(BlockFace.NORTH_WEST).setType(Material.GLASS);
 					playerOuted.sendMessage(ChatColor.GOLD+"Spectating... To leave (and miss out on reward points) please do /mg leave");
-					playerOuted.teleport(arena.getCenter().add(0, 6, 0));
+					Location spectator = new Location(arena.getCenter().getWorld(), arena.getCenter().getX(), arena.getCenter().getY(), arena.getCenter().getZ());
+					playerOuted.teleport(spectator.add(0,6,0));
 					for(String player:tplayers){
 						Player pl = plugin.getServer().getPlayer(player);
 						pl.sendMessage(team_color + pname+ " was knocked off and is out!");
