@@ -390,6 +390,9 @@ public class AcListener implements Listener {
 				else if(slot == 5){
 					type = ArenaType.TNTORI;
 				}
+				else if(slot == 6){
+					type = ArenaType.UCARS;
+				}
 				else{
 					event.setCancelled(true);
 					return;

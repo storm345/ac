@@ -140,6 +140,8 @@ public class ac extends JavaPlugin {
     public MinigameMethods mgMethods = null;
     public Lobbies mgLobbies = null;
     public LobbyManager mgLobbyManager = null;
+    public Boolean isUcarsInstalled = false;
+    public com.useful.ucars.ucars ucars = null;
 public void onEnable(){
 	//Now on github!
 	plugin = this;
@@ -323,6 +325,15 @@ public void onEnable(){
         return;
     }
     setupPermissions();
+    if(getServer().getPluginManager().getPlugin("uCars") == null){
+    	getLogger().log(Level.SEVERE, "UCars NOT DETECTED! UCARS MINIGAME UNABLE TO FUNCTION! AAAAAAAH IM FEELING ERRRORS RIGHT NOW.");
+    	this.isUcarsInstalled = false;
+    }
+    else{
+    	this.isUcarsInstalled = true;
+    	this.ucars = (com.useful.ucars.ucars) getServer().getPluginManager().getPlugin("uCars");
+    	getLogger().info("Successfully hooked into ucars!");
+    }
 	getLogger().info("AmazarCraft plugin is enabled :)");	//Tell teh console it is enabled
 }
 private boolean setupEconomy() {

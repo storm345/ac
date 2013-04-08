@@ -14,6 +14,7 @@ public class Lobbies implements Serializable {
 	private SerializableLocation survival;
 	private SerializableLocation teams;
 	private SerializableLocation tntori;
+	private SerializableLocation ucars;
 	public Lobbies(){
 		
 	}
@@ -37,6 +38,9 @@ public class Lobbies implements Serializable {
 		else if(type == ArenaType.TNTORI){
 			this.tntori = newLoc;
 		}
+		else if(type == ArenaType.UCARS){
+			this.ucars = newLoc;
+		}
 		return;
 	}
 	public Location getLobby(ArenaType type){
@@ -58,6 +62,9 @@ public class Lobbies implements Serializable {
 		}
 		else if(type == ArenaType.TNTORI){
 		    loc =this.tntori;
+		}
+		else if(type == ArenaType.UCARS){
+			loc =this.ucars;
 		}
 		if(loc == null){
 			return null;

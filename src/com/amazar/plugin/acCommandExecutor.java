@@ -25,6 +25,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Dispenser;
 import org.bukkit.command.Command;
@@ -55,8 +56,10 @@ import com.amazar.utils.ListStore;
 import com.amazar.utils.Minigame;
 import com.amazar.utils.Profile;
 import com.amazar.utils.StringColors;
+import com.amazar.utils.UCarsArena;
 import com.amazar.utils.getColor;
 import com.amazar.utils.getItemMinigame;
+import com.useful.ucars.ClosestFace;
 
 public class acCommandExecutor implements CommandExecutor {
 private ac plugin;
@@ -98,6 +101,7 @@ public acCommandExecutor(ac plugin) {
 			ItemStack SURVIVAL = getItemMinigame.getItem(ChatColor.RED+"SURVIVAL", ChatColor.GOLD+"Survive the monsters!", Material.SKULL_ITEM, (short) 4);
 			ItemStack TEAMS = getItemMinigame.getItem(ChatColor.RED+"TEAMS", ChatColor.GOLD+"Team vs Team!", Material.SKULL_ITEM, (short) 3);
 			ItemStack TNTORI = getItemMinigame.getItem(ChatColor.RED+"TNTORI", ChatColor.GOLD+"Knock others off the platform with tnt!", Material.TNT, (short) 0);
+			ItemStack UCARS = getItemMinigame.getItem(ChatColor.RED+"UCARS", ChatColor.GOLD+"Race around the track!", Material.MINECART, (short) 0);
 			Inventory hinv = holder.getInventory();
 			hinv.setItem(0, CTF);
 			hinv.setItem(1, PUSH);
@@ -105,6 +109,7 @@ public acCommandExecutor(ac plugin) {
 			hinv.setItem(3, SURVIVAL);
 			hinv.setItem(4, TEAMS);
 			hinv.setItem(5, TNTORI);
+			hinv.setItem(6, UCARS);
 			player.openInventory(hinv);
 			holder.getBlock().getDrops().clear();
 			orig.update(true);
@@ -171,6 +176,9 @@ return true;
 				else if(game.equalsIgnoreCase("tntori")){
 					type = ArenaType.TNTORI;
 				}
+				else if(game.equalsIgnoreCase("tntori")){
+					type = ArenaType.UCARS;
+				}
 				else{
 					sender.sendMessage(ChatColor.RED+"Invalid minigame. Please do /"+cmd.getLabel()+" games for a list of valid minigames!");
 					return true;
@@ -225,6 +233,8 @@ return true;
 				sender.sendMessage(ChatColor.RED+"SURVIVAL "+ChatColor.GOLD+"- The players must work together to survive attacking mobs until the countdown ends. Players alive at the end win!");
 				sender.sendMessage(ChatColor.RED+"TEAMS "+ChatColor.GOLD+"- The blue team must fight the red team. The winning team wins!");
 				sender.sendMessage(ChatColor.RED+"TNTORI "+ChatColor.GOLD+"- The players must push each other out of the arena using the blast force of tnt!");
+				sender.sendMessage(ChatColor.RED+"UCARS "+ChatColor.GOLD+"- Race around the racetrack!");sender.sendMessage(ChatColor.RED+"UCARS "+ChatColor.GOLD+"- Race around the racetrack!");
+				sender.sendMessage(ChatColor.GOLD+"Now do /games to get started!");
 				return true;
 			}
 			else if(action.equalsIgnoreCase("join")){
@@ -260,6 +270,9 @@ return true;
 				}
 				else if(game.equalsIgnoreCase("tntori")){
 					type = ArenaType.TNTORI;
+				}
+				else if(game.equalsIgnoreCase("ucars")){
+					type = ArenaType.UCARS;
 				}
 				else{
 					sender.sendMessage(ChatColor.RED+"Invalid minigame. Please do /"+cmd.getLabel()+" games for a list of valid minigames!");
@@ -403,8 +416,18 @@ return true;
 					sender.sendMessage(ChatColor.GREEN+"Successfully created a pvp arena! It will need setting up with /arena set");
 				    return true;
 				}
+				else if(type.equalsIgnoreCase("ucars")){
+					UCarsArena arena = new UCarsArena(player.getLocation(), radius, shape, ArenaType.UCARS, playerlimit);
+				    if(plugin.minigamesArenas.arenaExists(name)){
+				    	sender.sendMessage(ChatColor.RED+"Arena already exists!");
+				    	return true;
+				    }
+				    plugin.minigamesArenas.setArena(name, arena);
+					sender.sendMessage(ChatColor.GREEN+"Successfully created a ucars arena! It will need setting up with /arena set");
+				    return true;
+				}
 				else{
-					sender.sendMessage(ChatColor.RED + "Invalid type! Valid ones: Pvp, Tntori, Survival, CTF, Teams, Push");
+					sender.sendMessage(ChatColor.RED + "Invalid type! Valid ones: Pvp, Tntori, Survival, CTF, Teams, Push, UCars");
 					return true;
 				}
 			}
@@ -513,8 +536,11 @@ return true;
 					else if(typeName.equalsIgnoreCase("tntori")){
 						type = ArenaType.TNTORI;
 					}
+					else if(typeName.equalsIgnoreCase("ucars")){
+						type = ArenaType.UCARS;
+					}
 					else{
-						sender.sendMessage(ChatColor.RED+"Invalid type! Valid: ctf, pvp, push, survival, teams, tntori");
+						sender.sendMessage(ChatColor.RED+"Invalid type! Valid: ctf, pvp, push, survival, teams, tntori, ucars");
 						return true;
 					}
 					arena.setType(type);
@@ -585,6 +611,78 @@ return true;
 						sender.sendMessage(ChatColor.GREEN+"The red team flag has been set to where you are standing!");
 						return true;
 					}
+				}
+				else if(arena.getType() == ArenaType.UCARS){
+					UCarsArena gameArena = (UCarsArena) arena;
+					if(setting.equalsIgnoreCase("setGridLocation")){
+						if(args.length < 4){
+							sender.sendMessage(ChatColor.RED+"Usage: /arena set [Name] setGridLocation [Number]");
+							return true;
+						}
+						int gridPos = 0;
+						try {
+							gridPos = Integer.parseInt(args[3]);
+						} catch (NumberFormatException e) {
+							sender.sendMessage(ChatColor.RED+"Usage: /arena set [Name] setGridLocation [Number]");
+return true;
+						}
+						Location gridLoc = player.getLocation();
+						if(!gameArena.validateGridLocationSetRequest(gridPos)){
+							sender.sendMessage(ChatColor.RED+"Set the earlier grid positions first!");
+							return true;
+						}
+						gameArena.setGridPosition(gridPos, gridLoc);
+						gameArena.check();
+						plugin.minigamesArenas.setArena(arenaName, gameArena);
+						sender.sendMessage(ChatColor.GREEN+"Successfully set grid location: "+args[3]);
+						return true;
+					}
+					else if(setting.equalsIgnoreCase("setLineLocation")){
+						if(args.length < 5){
+							sender.sendMessage(ChatColor.RED+"Usage: /arena set [Name] setLineLocation [Direction (N/E/S/W)] [Amount]");
+							return true;
+						}
+						String direction = args[3];
+						BlockFace dir = BlockFace.NORTH;
+						int amount = 0;
+						try {
+							amount = Integer.parseInt(args[4]);
+						} catch (Exception e) {
+							sender.sendMessage(ChatColor.RED+"Usage: /arena set [Name] setLineLocation [Direction (N/E/S/W)] [Amount]");
+							return true;
+						}
+						if(amount < 1){
+							sender.sendMessage(ChatColor.RED+"Usage: /arena set [Name] setLineLocation [Direction (N/E/S/W)] [Amount]");
+							return true;
+						}
+						if(direction.equalsIgnoreCase("n")){
+							dir = BlockFace.NORTH;
+						}
+						else if(direction.equalsIgnoreCase("e")){
+							dir = BlockFace.EAST;
+						}
+						else if(direction.equalsIgnoreCase("s")){
+							dir = BlockFace.SOUTH;
+						}
+						else if(direction.equalsIgnoreCase("w")){
+							dir = BlockFace.WEST;
+						}
+						else{
+							sender.sendMessage(ChatColor.RED+"Usage: /arena set [Name] setLineLocation [Direction (N/E/S/W)] [Amount]");
+							return true;
+						}
+						List<Location> line = new ArrayList<Location>();
+						Block block = player.getLocation().getBlock().getRelative(BlockFace.DOWN);
+						line.add(block.getLocation());
+						for(int i=1;i<=amount;i++){
+							Block toAdd = block.getRelative(dir,i);
+							line.add(toAdd.getLocation());
+						}
+						gameArena.setLineLocation(line);
+						plugin.minigamesArenas.setArena(arenaName, gameArena);
+						player.sendMessage(ChatColor.GREEN+"Successfully set line location!");
+					}
+					//TODO setLaps and add usage and then create the other stuff for this arena and then create the game for it :)
 				}
 				else if(arena.getType() == ArenaType.PUSH){
 					ArenaPush push = (ArenaPush) arena; 

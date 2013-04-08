@@ -2,6 +2,7 @@ name: AmazarCraft
 main: com.amazar.plugin.ac
 version: 1
 depend: [Vault]
+softdepend: [uCars]
 commands:
    who:
       description: This displays who is online on AmazarCraft
