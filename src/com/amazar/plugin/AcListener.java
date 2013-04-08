@@ -33,6 +33,8 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerEggThrowEvent;
 import org.bukkit.event.player.PlayerEvent;
@@ -51,6 +53,7 @@ import org.bukkit.event.player.PlayerShearEntityEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
@@ -345,6 +348,53 @@ public class AcListener implements Listener {
 		}
 		event.setCancelled(true);
 		return;
+	}
+	@EventHandler
+	void mgOpen(InventoryOpenEvent event){
+		Player player = (Player) event.getPlayer();
+		Inventory inv = event.getInventory();
+        if(ChatColor.stripColor(inv.getItem(0).getItemMeta().getDisplayName()).equalsIgnoreCase("CTF") && ChatColor.stripColor(inv.getItem(1).getItemMeta().getDisplayName()).equalsIgnoreCase("PUSH") && ChatColor.stripColor(inv.getItem(2).getItemMeta().getDisplayName()).equalsIgnoreCase("PVP")&&ChatColor.stripColor(inv.getItem(3).getItemMeta().getDisplayName()).equalsIgnoreCase("SURVIVAL")){
+			player.sendMessage(ChatColor.RED+"Minigame selection:");
+        }
+        return;
+	}
+	@EventHandler
+	void mgSelect(InventoryClickEvent event){
+		Player player = (Player) event.getWhoClicked();
+		Inventory inv = event.getInventory();
+        try {
+			if(ChatColor.stripColor(inv.getItem(0).getItemMeta().getDisplayName()).equalsIgnoreCase("CTF") && ChatColor.stripColor(inv.getItem(1).getItemMeta().getDisplayName()).equalsIgnoreCase("PUSH") && ChatColor.stripColor(inv.getItem(2).getItemMeta().getDisplayName()).equalsIgnoreCase("PVP")&&ChatColor.stripColor(inv.getItem(3).getItemMeta().getDisplayName()).equalsIgnoreCase("SURVIVAL")){
+				int slot = event.getSlot();
+				ArenaType type = ArenaType.INAVLID;
+				if(slot == 0){
+					type = ArenaType.CTF;
+				}
+				else if(slot == 1){
+					type = ArenaType.PUSH;
+				}
+				else if(slot == 2){
+					type = ArenaType.PVP;
+				}
+				else if(slot == 3){
+					type = ArenaType.SURVIVAL;
+				}
+				else if(slot == 4){
+					type = ArenaType.TEAMS;
+				}
+				else if(slot == 5){
+					type = ArenaType.TNTORI;
+				}
+				else{
+					event.setCancelled(true);
+					return;
+				}
+				
+				event.setCancelled(true);
+			}
+		} catch (Exception e) {
+			return;
+		}
+        return;
 	}
 	@EventHandler
 	void miniGameHandler(MinigameUpdateEvent event){

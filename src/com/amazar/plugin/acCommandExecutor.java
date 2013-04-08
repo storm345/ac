@@ -3,16 +3,13 @@ package com.amazar.plugin;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.RoundingMode;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,25 +20,43 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
-import org.bukkit.GameMode;
+import org.bukkit.FireworkEffect.Type;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.FireworkEffect.Type;
-import org.bukkit.block.BlockFace;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Dispenser;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
-import org.bukkit.plugin.Plugin;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.util.ChatPaginator;
 import org.bukkit.util.ChatPaginator.ChatPage;
 
-import com.amazar.utils.*;
+import com.amazar.utils.Arena;
+import com.amazar.utils.ArenaCtf;
+import com.amazar.utils.ArenaPush;
+import com.amazar.utils.ArenaPvp;
+import com.amazar.utils.ArenaShape;
+import com.amazar.utils.ArenaSurvival;
+import com.amazar.utils.ArenaTeams;
+import com.amazar.utils.ArenaTntori;
+import com.amazar.utils.ArenaType;
+import com.amazar.utils.ListStore;
+import com.amazar.utils.Minigame;
+import com.amazar.utils.Profile;
+import com.amazar.utils.StringColors;
+import com.amazar.utils.getColor;
+import com.amazar.utils.getItemMinigame;
 
 public class acCommandExecutor implements CommandExecutor {
 private ac plugin;
@@ -66,6 +81,33 @@ public acCommandExecutor(ac plugin) {
 				msg = msg + " " + name + ",";
 			}
 			sender.sendMessage(ChatColor.GOLD + msg);
+			return true;
+		}
+		else if(cmd.getName().equalsIgnoreCase("games")){
+			if(player == null){
+				return true;
+			}
+			BlockState orig = new Location(player.getWorld(), 1, 1, 1).getBlock().getState();
+			Block toSet = new Location(player.getWorld(), 1, 1, 1).getBlock();
+			toSet.setType(Material.DISPENSER);
+			Dispenser holder = (Dispenser) toSet.getState();
+			holder.getInventory().clear();
+			ItemStack CTF = getItemMinigame.getItem(ChatColor.RED+"CTF", ChatColor.GOLD+"Collect the flag!", Material.WOOL, (short) 14);
+			ItemStack PUSH = getItemMinigame.getItem(ChatColor.RED+"PUSH", ChatColor.GOLD+"Push the others out!", Material.PISTON_BASE, (short) 0);
+			ItemStack PVP = getItemMinigame.getItem(ChatColor.RED+"PVP", ChatColor.GOLD+"Player vs Player!", Material.DIAMOND_SWORD, (short) 0);
+			ItemStack SURVIVAL = getItemMinigame.getItem(ChatColor.RED+"SURVIVAL", ChatColor.GOLD+"Survive the monsters!", Material.SKULL_ITEM, (short) 4);
+			ItemStack TEAMS = getItemMinigame.getItem(ChatColor.RED+"TEAMS", ChatColor.GOLD+"Team vs Team!", Material.SKULL_ITEM, (short) 3);
+			ItemStack TNTORI = getItemMinigame.getItem(ChatColor.RED+"TNTORI", ChatColor.GOLD+"Knock others off the platform with tnt!", Material.TNT, (short) 0);
+			Inventory hinv = holder.getInventory();
+			hinv.setItem(0, CTF);
+			hinv.setItem(1, PUSH);
+			hinv.setItem(2, PVP);
+			hinv.setItem(3, SURVIVAL);
+			hinv.setItem(4, TEAMS);
+			hinv.setItem(5, TNTORI);
+			player.openInventory(hinv);
+			holder.getBlock().getDrops().clear();
+			orig.update(true);
 			return true;
 		}
 		else if(cmd.getName().equalsIgnoreCase("minigame")){

@@ -28,6 +28,12 @@ commands:
       permission: ac.minigame
       permission-message: You don't have access to this command <permission>
       default: true
+   games:
+      description: This is the joining, leaving and playing of minigames.
+      usage: /<command>
+      permission: ac.minigame
+      permission-message: You don't have access to this command <permission>
+      default: true
    listArenas:
       description: This lists valid arenas
       usage: /<command> [Page]
