@@ -1108,6 +1108,9 @@ return true;
 				else if(typeName.equalsIgnoreCase("tntori")){
 					type = ArenaType.TNTORI;
 				}
+				else if(typeName.equalsIgnoreCase("ucars")){
+					type = ArenaType.UCARS;
+				}
 				else{
 					sender.sendMessage(ChatColor.RED+"Invalid type! Valid: ctf, pvp, push, survival, teams, tntori");
 					return true;
