@@ -388,7 +388,18 @@ public class AcListener implements Listener {
 					event.setCancelled(true);
 					return;
 				}
-				
+				Location loc = plugin.mgLobbies.getLobby(type);
+				if(loc == null){
+					loc = player.getWorld().getSpawnLocation();
+					player.closeInventory();
+					player.teleport(loc);
+					player.sendMessage(ChatColor.RED+"No game lobby found! Teleported to spawn instead!");
+					event.setCancelled(true);
+					return;
+				}
+				player.closeInventory();
+				player.teleport(loc);
+				player.sendMessage(ChatColor.GOLD+"Teleported to the "+type.toString().toLowerCase()+" lobby!");
 				event.setCancelled(true);
 			}
 		} catch (Exception e) {

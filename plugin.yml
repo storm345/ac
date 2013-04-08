@@ -17,7 +17,7 @@ commands:
       default: op
    arena:
       description: This is the creation and management of arenas
-      usage: /<command> [Create <Name> <Type> <Shape> <Radius> <Playerlimit>], [Remove <Name>], [Set <Name> <Setting> <Value>], [View <Name>]
+      usage: /<command> [Create <Name> <Type> <Shape> <Radius> <Playerlimit>], [Remove <Name>], [Set <Name> <Setting> <Value>], [View <Name>], [Setlobby <Gametype>]
       permission: ac.arena
       permission-message: You don't have access to this command <permission>
       default: op

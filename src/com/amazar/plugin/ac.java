@@ -31,6 +31,8 @@ import com.amazar.utils.Arena;
 import com.amazar.utils.Arenas;
 import com.amazar.utils.GameScheduler;
 import com.amazar.utils.ListStore;
+import com.amazar.utils.Lobbies;
+import com.amazar.utils.LobbyManager;
 import com.amazar.utils.MinigameMethods;
 import com.amazar.utils.SerializableLocation;
 
@@ -136,6 +138,8 @@ public class ac extends JavaPlugin {
     public Arenas minigamesArenas = null;
     public GameScheduler gameScheduler = null;
     public MinigameMethods mgMethods = null;
+    public Lobbies mgLobbies = null;
+    public LobbyManager mgLobbyManager = null;
 public void onEnable(){
 	//Now on github!
 	plugin = this;
@@ -302,6 +306,17 @@ public void onEnable(){
 	}
 	warns = new ListStore(warnsLogFile);
 	warns.load();
+	this.mgLobbies = new Lobbies();
+	File lobbyFile = new File(getDataFolder().getAbsolutePath()+File.separator+"mgLobbies.lobbylist");
+	if(!lobbyFile.exists() || lobbyFile.length() < 1){
+		try {
+			lobbyFile.createNewFile();
+		} catch (Exception e) {
+			getLogger().info("Failed to create lobbyList file!");
+		}
+	}
+	this.mgLobbyManager = new LobbyManager(lobbyFile);
+	this.mgLobbyManager.load();
 	if (!setupEconomy() ) {
         getLogger().severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
         getServer().getPluginManager().disablePlugin(this);
@@ -329,6 +344,7 @@ private boolean setupPermissions() {
     return perms != null;
 }
 public void onDisable(){
+	this.mgLobbyManager.save();
 	getLogger().info("AmazarCraft plugin is disabled");
 }
 }

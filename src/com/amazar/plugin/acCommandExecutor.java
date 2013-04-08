@@ -948,7 +948,6 @@ return true;
 					sender.sendMessage(ChatColor.GOLD+"setRedSpawnpoint - Sets the spawnpoint for the blue player.");
 					sender.sendMessage(ChatColor.GOLD+"setBlueSpawnpoint - Sets the spawnpoint for the blue player.");
 				}
-				//TODO all the valid settings
 					return true;
 				
 			}
@@ -966,6 +965,38 @@ return true;
 				sender.sendMessage(ChatColor.RED + "[Max players:] "+ChatColor.GOLD+arena.getPlayerLimit());
 				sender.sendMessage(ChatColor.RED + "[Shape:] "+ChatColor.GOLD+arena.getShape().toString().toLowerCase());
 				sender.sendMessage(ChatColor.RED + "[Valid (setup):] "+ChatColor.GOLD+arena.isValid());
+			}
+			else if(method.equalsIgnoreCase("setLobby")){
+				if(args.length < 2){
+					return false;
+				}
+				String typeName = args[1];
+				ArenaType type = ArenaType.INAVLID;
+				if(typeName.equalsIgnoreCase("pvp")){
+					type = ArenaType.PVP;
+				}
+				else if(typeName.equalsIgnoreCase("ctf")){
+					type = ArenaType.CTF;
+				}
+				else if(typeName.equalsIgnoreCase("push")){
+					type = ArenaType.PUSH;
+				}
+				else if(typeName.equalsIgnoreCase("survival")){
+					type = ArenaType.SURVIVAL;
+				}
+				else if(typeName.equalsIgnoreCase("teams")){
+					type = ArenaType.TEAMS;
+				}
+				else if(typeName.equalsIgnoreCase("tntori")){
+					type = ArenaType.TNTORI;
+				}
+				else{
+					sender.sendMessage(ChatColor.RED+"Invalid type! Valid: ctf, pvp, push, survival, teams, tntori");
+					return true;
+				}
+				plugin.mgLobbies.setLobby(type, player.getLocation());
+				plugin.mgLobbyManager.save();
+				sender.sendMessage(ChatColor.GREEN+"Successfully set lobby location to where you are!");
 			}
 			else{
 				return false;
