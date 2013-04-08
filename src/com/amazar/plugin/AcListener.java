@@ -134,7 +134,13 @@ public class AcListener implements Listener {
 					}
 				} catch (Exception e) {
 				}
+				Location loc = plugin.mgLobbies.getLobby(game.getGameType());
+				if(loc == null){
 				player.teleport(player.getLocation().getWorld().getSpawnLocation());
+				}
+				else{
+					player.teleport(loc);
+				}
 				if(player.isOnline()){
 					if(!inplayers.contains(playername)){
 						Profile pProfile = new Profile(playername);
