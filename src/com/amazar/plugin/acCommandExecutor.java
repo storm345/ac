@@ -1032,8 +1032,6 @@ return true;
 				else if(arena.getType() == ArenaType.PUSH){
 					sender.sendMessage(ChatColor.GOLD+"setBlueSpawn - Sets where the blue player spawns.");
 					sender.sendMessage(ChatColor.GOLD+"setRedSpawn - Sets where the red player spawns.");
-					sender.sendMessage(ChatColor.GOLD+"doCountdown [true/false] - Sets the countdown on/off.");
-					sender.sendMessage(ChatColor.GOLD+"countdown [Number] - Sets how long the countdown is.");
 					sender.sendMessage(ChatColor.GOLD+"setLives [Lives] - Sets how many lives per player.");
 					sender.sendMessage(ChatColor.GOLD+"setItems id:data id:data etc... - Sets the items given to the player.");
 				}
