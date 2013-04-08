@@ -14,6 +14,7 @@ public class UCarsArena extends Arena {
 	public UCarsArena(Location center, int radius, ArenaShape shape,
 			ArenaType type, int playerLimit) {
 		super(center, radius, shape, type, playerLimit);
+		this.check();
 	}
 	public void check(){
 		this.setPlayerLimit(this.grid.size());
