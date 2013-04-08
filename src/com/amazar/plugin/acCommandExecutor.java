@@ -176,7 +176,7 @@ return true;
 				else if(game.equalsIgnoreCase("tntori")){
 					type = ArenaType.TNTORI;
 				}
-				else if(game.equalsIgnoreCase("tntori")){
+				else if(game.equalsIgnoreCase("ucars")){
 					type = ArenaType.UCARS;
 				}
 				else{
@@ -233,7 +233,7 @@ return true;
 				sender.sendMessage(ChatColor.RED+"SURVIVAL "+ChatColor.GOLD+"- The players must work together to survive attacking mobs until the countdown ends. Players alive at the end win!");
 				sender.sendMessage(ChatColor.RED+"TEAMS "+ChatColor.GOLD+"- The blue team must fight the red team. The winning team wins!");
 				sender.sendMessage(ChatColor.RED+"TNTORI "+ChatColor.GOLD+"- The players must push each other out of the arena using the blast force of tnt!");
-				sender.sendMessage(ChatColor.RED+"UCARS "+ChatColor.GOLD+"- Race around the racetrack!");sender.sendMessage(ChatColor.RED+"UCARS "+ChatColor.GOLD+"- Race around the racetrack!");
+				sender.sendMessage(ChatColor.RED+"UCARS "+ChatColor.GOLD+"- Race around the racetrack!");
 				sender.sendMessage(ChatColor.GOLD+"Now do /games to get started!");
 				return true;
 			}
@@ -682,7 +682,22 @@ return true;
 						plugin.minigamesArenas.setArena(arenaName, gameArena);
 						player.sendMessage(ChatColor.GREEN+"Successfully set line location!");
 					}
-					//TODO setLaps and add usage and then create the other stuff for this arena and then create the game for it :)
+					else if(setting.equalsIgnoreCase("setLaps")){
+						if(args.length < 4){
+							sender.sendMessage(ChatColor.RED+"Usage: /arena set [Name] setlaps [Number]");
+							return true;
+						}
+						int laps = 1;
+						try {
+							laps = Integer.parseInt(args[3]);
+						} catch (Exception e) {
+							sender.sendMessage(ChatColor.RED+"Usage: /arena set [Name] setlaps [Number]");
+							return true;
+						}
+						gameArena.setLaps(laps);
+						plugin.minigamesArenas.setArena(arenaName, gameArena);
+						sender.sendMessage(ChatColor.GREEN+"Successfully set laps!");
+					}
 				}
 				else if(arena.getType() == ArenaType.PUSH){
 					ArenaPush push = (ArenaPush) arena; 
@@ -1038,13 +1053,18 @@ return true;
 					sender.sendMessage(ChatColor.GOLD+"setRedSpawnpoint - Sets the spawnpoint for the red team.");
 				}
 				else if(arena.getType() == ArenaType.TNTORI){
-					sender.sendMessage(ChatColor.GOLD+"setProtect - Sets if the arena is protected(true) or generated(false).");
+					sender.sendMessage(ChatColor.GOLD+"setProtect [true/false] - Sets if the arena is protected(true) or generated(false).");
 					//sender.sendMessage(ChatColor.GOLD+"doCountdown [true/false] - Sets the countdown on/off.");
 					//sender.sendMessage(ChatColor.GOLD+"countdown [Number] - Sets how long the countdown is.");
 					sender.sendMessage(ChatColor.GOLD+"setLives [Lives] - Sets how many lives per player.");
 					sender.sendMessage(ChatColor.GOLD+"setItems id:data id:data etc... - Sets the items given to the player.");
 					sender.sendMessage(ChatColor.GOLD+"setRedSpawnpoint - Sets the spawnpoint for the blue player.");
 					sender.sendMessage(ChatColor.GOLD+"setBlueSpawnpoint - Sets the spawnpoint for the blue player.");
+				}
+				else if(arena.getType() == ArenaType.UCARS){
+					sender.sendMessage(ChatColor.GOLD+"setGridLocation [Position] - Sets the starting grid location [position].");
+					sender.sendMessage(ChatColor.GOLD+"setLineLocation [Direction (N/E/S/W)] [Distance] - Sets the start/finish line to your location to the block to the [dir] in [dist].");
+					sender.sendMessage(ChatColor.GOLD+"setLaps [Laps] - Sets the number of laps in a race.");
 				}
 					return true;
 				

@@ -11,6 +11,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.Scoreboard;
@@ -208,6 +210,25 @@ public class GameScheduler {
 			ArenaSurvival gameArena = (ArenaSurvival) game.getArena();
 			for(String name:players){
 				plugin.getServer().getPlayer(name).teleport(gameArena.getPlayerSpawnpoint());
+			}
+		}
+		else if(type == ArenaType.UCARS){
+			UCarsArena gameArena = (UCarsArena) game.getArena();
+			for(int i=0;i<players.size();i++){
+				Player p = plugin.getServer().getPlayer(players.get(i));
+				if(gameArena.getStartGrid().size() >= i){
+					Location loc = gameArena.getStartGrid().get(i);
+					Minecart car = (Minecart) loc.getWorld().spawnEntity(loc, EntityType.MINECART);
+					p.teleport(gameArena.getStartGrid().get(i));
+					p.eject();
+					car.eject();
+					car.setPassenger(p);
+					//p.teleport(gameArena.getStartGrid().get(i));
+				}
+				else{
+					p.teleport(game.getArena().getCenter());
+				}
+				
 			}
 		}
 		else{
