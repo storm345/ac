@@ -816,8 +816,8 @@ public class AcListener implements Listener {
 				game.end();
 				return;
 			}
-			int rand = 1 + (int)(Math.random() * ((3 - 1) + 1));
-			if(rand <= 2){
+			int rand = 1 + (int)(Math.random() * ((100 - 1) + 1));
+			if(rand <= 30){
 				//spawn a mob
 				int randomType = 1 + (int)(Math.random() * ((100 - 1) + 1)); //between 1 and 100
 				Location loc = gameArena.getEnemySpawnpoint();
