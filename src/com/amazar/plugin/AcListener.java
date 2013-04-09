@@ -168,7 +168,7 @@ public class AcListener implements Listener {
 		}
 		if(game.getGameType() == ArenaType.SURVIVAL){
 			ArenaSurvival gameArena = (ArenaSurvival) game.getArena();
-			gameArena.purgeMobs();
+			plugin.mgMethods.purgeMobs(gameArena);
 		}
 		plugin.gameScheduler.reCalculateQues();
 		return;
