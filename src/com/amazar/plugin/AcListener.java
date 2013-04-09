@@ -119,7 +119,7 @@ public class AcListener implements Listener {
 		List<String> inplayers = game.getInPlayers();
 		String in = "";
 		for(String inp:inplayers){
-			in = in+" "+inp; 
+			in = in+", "+inp; 
 		}
 		for(String playername:players){
 				Player player = plugin.getServer().getPlayer(playername);
@@ -813,7 +813,7 @@ public class AcListener implements Listener {
 				return;
 			}
 			int rand = 1 + (int)(Math.random() * ((3 - 1) + 1));
-			if(rand < 2){
+			if(rand <= 2){
 				//spawn a mob
 				int randomType = 1 + (int)(Math.random() * ((100 - 1) + 1)); //between 1 and 100
 				Location loc = gameArena.getEnemySpawnpoint();
