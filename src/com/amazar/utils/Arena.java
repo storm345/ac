@@ -130,6 +130,9 @@ public ArenaType getType(){
 }
 public Boolean isLocInArena(Location check){
 	Location center = this.center.getLocation(ac.plugin.getServer());
+	if(center.getWorld().getName() != check.getWorld().getName()){
+		return false;
+	}
 	if(this.shape == ArenaShape.CIRCLE){
 		int radius = this.radius;
 		int radiusSquared = radius * radius;

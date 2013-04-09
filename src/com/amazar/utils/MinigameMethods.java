@@ -47,6 +47,9 @@ public class MinigameMethods {
     	String name = null;
     	for(String arenaName:arenaNames){
     	Arena arena = plugin.minigamesArenas.getArena(arenaName);
+    	if(arena.getCenter().getWorld().getName() != loc.getWorld().getName()){
+    		return null;
+    	}
     	if(arena.isLocInArena(loc)){
     		name = arenaName;
     	}

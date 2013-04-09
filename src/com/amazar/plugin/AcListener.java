@@ -19,7 +19,9 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -54,6 +56,7 @@ import org.bukkit.event.player.PlayerShearEntityEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
+import org.bukkit.event.vehicle.VehicleUpdateEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.PermissionAttachment;
@@ -80,6 +83,7 @@ import com.amazar.utils.MinigameUpdateEvent;
 import com.amazar.utils.Profile;
 import com.amazar.utils.StringColors;
 import com.amazar.utils.UCarsArena;
+import com.useful.ucars.uCarsListener;
 
 public class AcListener implements Listener {
 	
@@ -149,6 +153,17 @@ public class AcListener implements Listener {
 				else{
 					player.teleport(loc);
 					player.setBedSpawnLocation(loc, true);
+				}
+				player.getInventory().clear();
+				player.setHealth(0);
+				if(game.getGameType() == ArenaType.UCARS){
+					List<String> inners = new ArrayList<String>();
+					inners.addAll(inplayers);
+					for(String tplayername:inners){
+						if(tplayername != game.getWinner()){
+							inplayers.remove(tplayername);
+						}
+					}
 				}
 				if(player.isOnline()){
 					if(!inplayers.contains(playername)){
@@ -470,9 +485,14 @@ public class AcListener implements Listener {
 		}
 		if(game.getGameType() == ArenaType.UCARS){
 			UCarsArena gameArena = (UCarsArena) game.getArena();
-			for(String pname:players){
-				Player player = plugin.getServer().getPlayer(pname);;
+			for(int i=0;i<game.getPlayers().size();i++){
+				String pname = game.getPlayers().get(i);
+				Player player = plugin.getServer().getPlayer(pname);
+				plugin.gameScheduler.updateGame(game);
 				player.setWalkSpeed((float) 0.2);
+				if(game.lapsLeft.containsKey(pname)){
+					game.lapsLeft.put(pname, gameArena.getLaps());
+				}
 				String[] items = gameArena.getItems();
 				for(String raw:items){
 					if(!(raw.equalsIgnoreCase("0") || raw.equalsIgnoreCase("0:0"))){
@@ -1203,8 +1223,94 @@ public class AcListener implements Listener {
 				return;
 			}
 		}
+		else if(game.getGameType() == ArenaType.UCARS){
+			if(!plugin.isUcarsInstalled){
+				Bukkit.broadcastMessage(ChatColor.RED+"ERROR with UCars minigame! Status=Urgent! Error: Ucars not detected! Fix: Install ucars from http://dev.bukkit.org/server-mods/ucars!");
+				game.end();
+				return;
+			}
+			for(String pname:game.getPlayers()){
+				if(game.ucarsCooldown.containsKey(pname)){
+					int cool = game.ucarsCooldown.get(pname);
+					if(cool < 1){
+						game.ucarsCooldown.remove(pname);
+					}
+					else{
+						cool --;
+						game.ucarsCooldown.put(pname, cool);
+					}
+				}
+			}
+			plugin.gameScheduler.updateGame(game);
+		}
 		return;
 	}
+@EventHandler
+void ucarsMg(VehicleUpdateEvent event){
+	if(!plugin.isUcarsInstalled){
+		return;
+	}
+	Vehicle veh = event.getVehicle();
+	if(!(veh instanceof Minecart)){
+		return;
+	}
+	Entity passenger = veh.getPassenger();
+	if(passenger == null || !(passenger instanceof Player)){
+		return;
+	}
+	Minecart car = (Minecart) veh;
+	Player player = (Player) passenger;
+	uCarsListener methods = new uCarsListener(plugin.ucars);
+	if(!methods.isACar(car)){
+		return;
+	}
+	Minigame game = plugin.mgMethods.inAGame(player.getName());
+	if(game == null){
+		return;
+	}
+	if(game.getGameType() != ArenaType.UCARS){
+		return;
+	}
+	//aaah finally a valid ucars race kart!
+	UCarsArena gameArena = (UCarsArena) game.getArena();
+	List<Location> line = gameArena.getLine();
+	Location under = car.getLocation().getBlock().getRelative(BlockFace.DOWN).getLocation();
+	for(Location loc:line){
+		Location u = under;
+		Location l = loc;
+		double a = 1.1;
+		if(game.ucarsCooldown.containsKey(player.getName())){
+			return;
+		}
+		if(u.getX()<(l.getX()+a) && u.getX()>(l.getX()-a) && u.getZ()<(l.getZ()+a) && u.getZ()>(l.getZ()-a) && u.getY() < (l.getY()+3) && u.getY() > (l.getY()-3)){
+			int laps = gameArena.getLaps();
+			if(game.lapsLeft.containsKey(player.getName())){
+				laps = game.lapsLeft.get(player.getName());
+			}
+			laps--;
+			if(laps < 0){
+				for(String playername:game.getPlayers()){
+					plugin.getServer().getPlayer(playername).sendMessage(ChatColor.YELLOW+player.getName()+" crossed the line!");
+					Entity ent = plugin.getServer().getPlayer(playername).getVehicle();
+					plugin.getServer().getPlayer(playername).eject();
+					if(ent != null){
+						ent.remove();
+					}
+				}
+				game.setWinner(player.getName());
+				game.end();
+				return;
+			}
+			for(String playername:game.getPlayers()){
+				plugin.getServer().getPlayer(playername).sendMessage(ChatColor.YELLOW+player.getName()+" now has "+(laps+1)+" laps left!");
+			}
+			game.lapsLeft.put(player.getName(), laps);
+			game.ucarsCooldown.put(player.getName(), 5);
+			plugin.gameScheduler.updateGame(game);
+		}
+	}
+	return;
+}
 @EventHandler (priority = EventPriority.HIGHEST)
 void playerJoin(PlayerJoinEvent event){
 	Player player = event.getPlayer();
@@ -1273,6 +1379,9 @@ void kills(EntityDeathEvent event){
 	Entity dead = event.getEntity();
 	EntityDamageEvent cause = dead.getLastDamageCause();
 	DamageCause reason = cause.getCause();
+	if(reason == null){
+		return;
+	}
 	if(reason == DamageCause.ENTITY_ATTACK){
 		if(cause instanceof EntityDamageByEntityEvent){
 			EntityDamageByEntityEvent kill = (EntityDamageByEntityEvent) cause;

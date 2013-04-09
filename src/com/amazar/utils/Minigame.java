@@ -23,11 +23,13 @@ public class Minigame {
 	private List<String> blue = new ArrayList<String>();
 	private List<String> red = new ArrayList<String>();
 	private Map<String, ItemStack[]> oldInventories = new HashMap<String,ItemStack[]>();
+	public Map<String, Integer> lapsLeft = new HashMap<String, Integer>();
+	public Map<String, Integer> ucarsCooldown = new HashMap<String, Integer>();
 	private String gameId = "";
 	private Arena arena = null;
 	private String arenaName = "";
 	private String winner = "Unknown";
-	private Boolean running = false;
+	public Boolean running = false;
 	private BukkitTask task = null;
 	private Scoreboard teams = null;
 	private BukkitTask countDown = null;
