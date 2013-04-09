@@ -65,9 +65,11 @@ import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
 import com.amazar.utils.Arena;
+import com.amazar.utils.ArenaCtf;
 import com.amazar.utils.ArenaPush;
 import com.amazar.utils.ArenaPvp;
 import com.amazar.utils.ArenaSurvival;
+import com.amazar.utils.ArenaTeams;
 import com.amazar.utils.ArenaTntori;
 import com.amazar.utils.ArenaType;
 import com.amazar.utils.ItemStackFromId;
@@ -332,6 +334,43 @@ public class AcListener implements Listener {
 			playerOuted.teleport(spectator.add(0,6,0));
 			plugin.gameScheduler.updateGame(game);
 		}
+		else if(game.getGameType() == ArenaType.TEAMS){
+			ArenaTeams gameArena = (ArenaTeams) game.getArena();
+			ChatColor team_color = ChatColor.WHITE;
+			if(game.getBlue().contains(player.getName())){
+				team_color = ChatColor.BLUE;
+			}
+			else if(game.getRed().contains(player.getName())){
+				team_color = ChatColor.RED;
+			}
+			Player playerOuted = event.getEntity();
+			game.playerOut(playerOuted.getName());
+			for(String pname:game.getPlayers()){
+				if(team_color == ChatColor.BLUE){
+					plugin.getServer().getPlayer(pname).sendMessage(team_color+playerOuted.getName()+" is out! Now there are only "+game.getBlue().size()+" players left on the blue team!");
+				}
+				else if(team_color == ChatColor.RED){
+					plugin.getServer().getPlayer(pname).sendMessage(team_color+playerOuted.getName()+" is out! Now there are only "+game.getRed().size()+" players left on the red team!");
+				}
+				else{
+					plugin.getServer().getPlayer(pname).sendMessage(team_color+playerOuted.getName()+" is out! Now there are only "+game.getInPlayers().size()+" players left in the game!");
+				}
+			}
+			Block block = gameArena.getCenter().getBlock().getRelative(BlockFace.UP, 5).getRelative(BlockFace.NORTH, 10);
+			block.setType(Material.GLASS);
+			block.getRelative(BlockFace.NORTH).setType(Material.GLASS);
+			block.getRelative(BlockFace.NORTH_EAST).setType(Material.GLASS);
+			block.getRelative(BlockFace.EAST).setType(Material.GLASS);
+			block.getRelative(BlockFace.SOUTH_EAST).setType(Material.GLASS);
+			block.getRelative(BlockFace.SOUTH).setType(Material.GLASS);
+			block.getRelative(BlockFace.SOUTH_WEST).setType(Material.GLASS);
+			block.getRelative(BlockFace.WEST).setType(Material.GLASS);
+			block.getRelative(BlockFace.NORTH_WEST).setType(Material.GLASS);
+			playerOuted.sendMessage(ChatColor.GOLD+"Spectating... To leave (and miss out on reward points) please do /mg leave");
+			Location spectator = new Location(gameArena.getCenter().getWorld(), gameArena.getCenter().getX(), gameArena.getCenter().getY(), gameArena.getCenter().getZ()).getBlock().getRelative(BlockFace.NORTH, 10).getLocation();
+			playerOuted.teleport(spectator.add(0,6,0));
+			plugin.gameScheduler.updateGame(game);
+		}
 		else if(game.getGameType() == ArenaType.PVP){
 			ArenaPvp gameArena = (ArenaPvp) game.getArena();
 			ChatColor team_color = ChatColor.WHITE;
@@ -388,7 +427,25 @@ public class AcListener implements Listener {
 			}
 			plugin.gameScheduler.updateGame(game);
 		}
-		
+		else if(game.getGameType() == ArenaType.CTF){
+			ArenaCtf gameArena = (ArenaCtf) game.getArena();
+			ChatColor team_color = ChatColor.WHITE;
+			if(game.getBlue().contains(player.getName())){
+				team_color = ChatColor.BLUE;
+			}
+			else if(game.getRed().contains(player.getName())){
+				team_color = ChatColor.RED;
+			}
+			if(team_color == ChatColor.BLUE){
+				player.setBedSpawnLocation(gameArena.getBlueSpawnpoint(), true);
+			}
+			else if(team_color == ChatColor.RED){
+				player.setBedSpawnLocation(gameArena.getRedSpawnpoint(), true);
+			}
+			else{
+				player.setBedSpawnLocation(gameArena.getCenter().getBlock().getRelative(BlockFace.UP).getLocation());
+			}
+		}
 		return;
 	}
 	@EventHandler (priority = EventPriority.HIGHEST)
@@ -496,6 +553,48 @@ public class AcListener implements Listener {
 		}
 		else if(game.getGameType() == ArenaType.PVP){
 			ArenaPvp gameArena = (ArenaPvp) game.getArena();
+			String[] items = gameArena.getItems();
+			for(String raw:items){
+				if(!(raw.equalsIgnoreCase("0") || raw.equalsIgnoreCase("0:0"))){
+					try {
+						ItemStack item = ItemStackFromId.get(raw);
+						for(String pname:players){
+							plugin.getServer().getPlayer(pname).getInventory().addItem(item);
+						}
+					} catch (IllegalArgumentException e) {
+						
+					}	
+				}
+				
+			}
+			for(String pname:players){
+				plugin.getServer().getPlayer(pname).getInventory().addItem(new ItemStack(Material.IRON_SWORD));
+			}
+		}
+		else if(game.getGameType() == ArenaType.TEAMS){
+			ArenaTeams gameArena = (ArenaTeams) game.getArena();
+			gameArena.validatePlayers();
+			String[] items = gameArena.getItems();
+			for(String raw:items){
+				if(!(raw.equalsIgnoreCase("0") || raw.equalsIgnoreCase("0:0"))){
+					try {
+						ItemStack item = ItemStackFromId.get(raw);
+						for(String pname:players){
+							plugin.getServer().getPlayer(pname).getInventory().addItem(item);
+						}
+					} catch (IllegalArgumentException e) {
+						
+					}	
+				}
+				
+			}
+			for(String pname:players){
+				plugin.getServer().getPlayer(pname).getInventory().addItem(new ItemStack(Material.IRON_SWORD));
+			}
+		}
+		else if(game.getGameType() == ArenaType.CTF){
+			ArenaCtf gameArena = (ArenaCtf) game.getArena();
+			gameArena.validatePlayers();
 			String[] items = gameArena.getItems();
 			for(String raw:items){
 				if(!(raw.equalsIgnoreCase("0") || raw.equalsIgnoreCase("0:0"))){
@@ -928,6 +1027,59 @@ public class AcListener implements Listener {
 			}
 			plugin.gameScheduler.updateGame(game);
 		}
+		else if(game.getGameType() == ArenaType.TEAMS){
+			ArenaTeams gameArena = (ArenaTeams) game.getArena();
+			for(String playername:game.getPlayers()){
+				if(!game.getInPlayers().contains(playername)){
+					//They are spectating
+					Player p = plugin.getServer().getPlayer(playername);
+					Location spectator = new Location(arena.getCenter().getWorld(), arena.getCenter().getX(), arena.getCenter().getY(), arena.getCenter().getZ()).getBlock().getRelative(BlockFace.NORTH, 10).getLocation();
+					if(p.getLocation().getY() < (arena.getCenter().getY()+5)){
+						p.teleport(spectator.add(0,6,0));
+					}
+				}
+			}
+			List<String> blue = game.getBlue();
+			List<String> red = game.getRed();
+			for(String playername:game.getInPlayers()){
+				ChatColor team_color = ChatColor.WHITE;
+				if(blue.contains(playername)){
+					team_color = ChatColor.BLUE;
+				}
+				else if(red.contains(playername)){
+					team_color = ChatColor.RED;
+				}
+				Player player = plugin.getServer().getPlayer(playername);
+				if(!gameArena.isLocInArena(player.getLocation())){
+					player.sendMessage(ChatColor.RED+"You may not go outside of the arena during a game. To leave please do /mg leave.");
+					if(team_color == ChatColor.BLUE){
+						player.teleport(gameArena.getBlueSpawnpoint());
+					}
+					else if(team_color == ChatColor.RED){
+						player.teleport(gameArena.getRedSpawnpoint());
+					}
+					else{
+						player.teleport(gameArena.getCenter().getBlock().getRelative(BlockFace.UP).getLocation());
+					}
+				}
+			}
+			//See if game end
+			List<String> blueTeam = game.getBlue();
+			List<String> redTeam = game.getRed();
+			if(blueTeam.size() < 1 || redTeam.size() < 1){
+				if(blueTeam.size() < redTeam.size()){//redteam wins
+					game.setWinner(ChatColor.RED+"The red team");
+				}
+				else if(redTeam.size() < blueTeam.size()){//blueteam wins
+					game.setWinner(ChatColor.BLUE+"The blue team");
+				}
+				else{
+					game.setWinner(ChatColor.WHITE+"Unknown");
+				}
+				game.end();
+				return;
+			}
+		}
 		else if(game.getGameType() == ArenaType.PVP){
 			ArenaPvp gameArena = (ArenaPvp) game.getArena();
 			for(String playername:game.getPlayers()){
@@ -988,6 +1140,67 @@ public class AcListener implements Listener {
 				}
 				game.setWinner(team_color+winner);
 				game.end();
+			}
+		}
+		else if(game.getGameType() == ArenaType.CTF){
+			ArenaCtf gameArena = (ArenaCtf) game.getArena();
+			List<String> blue = game.getBlue();
+			List<String> red = game.getRed();
+			for(String playername:game.getInPlayers()){
+				ChatColor team_color = ChatColor.WHITE;
+				if(blue.contains(playername)){
+					team_color = ChatColor.BLUE;
+				}
+				else if(red.contains(playername)){
+					team_color = ChatColor.RED;
+				}
+				Player player = plugin.getServer().getPlayer(playername);
+				if(team_color == ChatColor.BLUE){
+					Location p = player.getLocation();
+					Location f = gameArena.getBlueFlag();
+					double a = 1.5;
+					if(p.getX() < (f.getX()+a) && p.getX() > (f.getX()-a) && p.getZ() < (f.getZ()+a) && p.getZ() > (f.getZ()-a)){
+						for(String pname:game.getPlayers()){
+							plugin.getServer().getPlayer(pname).sendMessage(team_color+"The blue team member "+player.getName()+" captured the flag!");
+						}
+						game.setWinner(ChatColor.BLUE+"The blue team");
+						game.end();
+						return;
+					}
+				}
+				else if(team_color == ChatColor.RED){
+					Location p = player.getLocation();
+					Location f = gameArena.getRedFlag();
+					double a = 1.5;
+					if(p.getX() < (f.getX()+a) && p.getX() > (f.getX()-a) && p.getZ() < (f.getZ()+a) && p.getZ() > (f.getZ()-a)){
+						for(String pname:game.getPlayers()){
+							plugin.getServer().getPlayer(pname).sendMessage(team_color+"The red team member "+player.getName()+" captured the flag!");
+						}
+						game.setWinner(ChatColor.RED+"The red team");
+						game.end();
+						return;
+					}
+				}
+				if(!gameArena.isLocInArena(player.getLocation())){
+					player.sendMessage(ChatColor.RED+"You may not go outside of the arena during a game. To leave please do /mg leave.");
+					if(team_color == ChatColor.BLUE){
+						player.teleport(gameArena.getBlueSpawnpoint());
+					}
+					else if(team_color == ChatColor.RED){
+						player.teleport(gameArena.getRedSpawnpoint());
+					}
+					else{
+						player.teleport(gameArena.getCenter().getBlock().getRelative(BlockFace.UP).getLocation());
+					}
+				}
+			}
+			//See if game end
+			List<String> blueTeam = game.getBlue();
+			List<String> redTeam = game.getRed();
+			if(blueTeam.size() < 1 || redTeam.size() < 1){
+					game.setWinner(ChatColor.WHITE+"Unknown");
+				game.end();
+				return;
 			}
 		}
 		return;

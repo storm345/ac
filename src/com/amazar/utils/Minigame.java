@@ -91,6 +91,12 @@ public class Minigame {
     	return;
     }
     public void playerOut(String name){
+    	if(this.blue.contains(name)){
+    		this.blue.remove(name);
+    	}
+    	if(this.red.contains(name)){
+    		this.red.remove(name);
+    	}
     	if(this.inplayers.contains(name)){
     	this.inplayers.remove(name);
     	}
