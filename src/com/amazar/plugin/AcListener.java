@@ -66,6 +66,7 @@ import org.bukkit.util.Vector;
 
 import com.amazar.utils.Arena;
 import com.amazar.utils.ArenaPush;
+import com.amazar.utils.ArenaPvp;
 import com.amazar.utils.ArenaSurvival;
 import com.amazar.utils.ArenaTntori;
 import com.amazar.utils.ArenaType;
@@ -331,7 +332,62 @@ public class AcListener implements Listener {
 			playerOuted.teleport(spectator.add(0,6,0));
 			plugin.gameScheduler.updateGame(game);
 		}
-		
+		else if(game.getGameType() == ArenaType.PVP){
+			ArenaPvp gameArena = (ArenaPvp) game.getArena();
+			ChatColor team_color = ChatColor.WHITE;
+			if(game.getBlue().contains(player.getName())){
+				team_color = ChatColor.BLUE;
+			}
+			else if(game.getRed().contains(player.getName())){
+				team_color = ChatColor.RED;
+			}
+			Boolean out = false;
+			int lives = gameArena.getLives();
+			if(game.lives.containsKey(player.getName())){
+				lives = game.lives.get(player.getName());
+			}
+			lives = lives -1;
+			if(lives < 0){
+				out = true;
+			}
+			else{
+			game.lives.put(player.getName(), lives);
+			for(String pname:game.getPlayers()){
+				plugin.getServer().getPlayer(pname).sendMessage(team_color+player.getName()+" died and how has only "+lives+" lives left!");
+			}
+			if(team_color == ChatColor.BLUE){
+				player.setBedSpawnLocation(gameArena.getPlayerBlueSpawn(), true);
+			}
+			else if(team_color == ChatColor.RED){
+				player.setBedSpawnLocation(gameArena.getPlayerRedSpawn(), true);
+			}
+			else{
+				player.setBedSpawnLocation(gameArena.getCenter().getBlock().getRelative(BlockFace.UP).getLocation());
+			}
+			
+			}
+			if(out){
+			Player playerOuted = event.getEntity();
+			game.playerOut(playerOuted.getName());
+			for(String pname:game.getPlayers()){
+				plugin.getServer().getPlayer(pname).sendMessage(team_color+playerOuted.getName()+" is out! Now there are only "+game.getInPlayers().size()+" players left!");
+			}
+			Block block = gameArena.getCenter().getBlock().getRelative(BlockFace.UP, 5).getRelative(BlockFace.NORTH, 10);
+			block.setType(Material.GLASS);
+			block.getRelative(BlockFace.NORTH).setType(Material.GLASS);
+			block.getRelative(BlockFace.NORTH_EAST).setType(Material.GLASS);
+			block.getRelative(BlockFace.EAST).setType(Material.GLASS);
+			block.getRelative(BlockFace.SOUTH_EAST).setType(Material.GLASS);
+			block.getRelative(BlockFace.SOUTH).setType(Material.GLASS);
+			block.getRelative(BlockFace.SOUTH_WEST).setType(Material.GLASS);
+			block.getRelative(BlockFace.WEST).setType(Material.GLASS);
+			block.getRelative(BlockFace.NORTH_WEST).setType(Material.GLASS);
+			playerOuted.sendMessage(ChatColor.GOLD+"Spectating... To leave (and miss out on reward points) please do /mg leave");
+			Location spectator = new Location(gameArena.getCenter().getWorld(), gameArena.getCenter().getX(), gameArena.getCenter().getY(), gameArena.getCenter().getZ()).getBlock().getRelative(BlockFace.NORTH, 10).getLocation();
+			playerOuted.teleport(spectator.add(0,6,0));
+			}
+			plugin.gameScheduler.updateGame(game);
+		}
 		
 		return;
 	}
@@ -353,6 +409,7 @@ public class AcListener implements Listener {
 		}
 		for(String pname:players){
 			plugin.getServer().getPlayer(pname).setGameMode(GameMode.SURVIVAL);
+			plugin.getServer().getPlayer(pname).getInventory().clear();
 		}
 		if(game.getGameType() == ArenaType.UCARS){
 			UCarsArena gameArena = (UCarsArena) game.getArena();
@@ -437,6 +494,26 @@ public class AcListener implements Listener {
 			game.startCountDown();
 			plugin.gameScheduler.updateGame(game);
 		}
+		else if(game.getGameType() == ArenaType.PVP){
+			ArenaPvp gameArena = (ArenaPvp) game.getArena();
+			String[] items = gameArena.getItems();
+			for(String raw:items){
+				if(!(raw.equalsIgnoreCase("0") || raw.equalsIgnoreCase("0:0"))){
+					try {
+						ItemStack item = ItemStackFromId.get(raw);
+						for(String pname:players){
+							plugin.getServer().getPlayer(pname).getInventory().addItem(item);
+						}
+					} catch (IllegalArgumentException e) {
+						
+					}	
+				}
+				
+			}
+			for(String pname:players){
+				plugin.getServer().getPlayer(pname).getInventory().addItem(new ItemStack(Material.IRON_SWORD));
+			}
+		}
 		plugin.gameScheduler.reCalculateQues();
 		return;
 	}
@@ -468,7 +545,7 @@ public class AcListener implements Listener {
 	void mgOpen(InventoryOpenEvent event){
 		Player player = (Player) event.getPlayer();
 		Inventory inv = event.getInventory();
-        if(ChatColor.stripColor(inv.getItem(0).getItemMeta().getDisplayName()).equalsIgnoreCase("CTF") && ChatColor.stripColor(inv.getItem(1).getItemMeta().getDisplayName()).equalsIgnoreCase("PUSH") && ChatColor.stripColor(inv.getItem(2).getItemMeta().getDisplayName()).equalsIgnoreCase("PVP")&&ChatColor.stripColor(inv.getItem(3).getItemMeta().getDisplayName()).equalsIgnoreCase("SURVIVAL")){
+        if(ChatColor.stripColor(inv.getItem(0).getItemMeta().getDisplayName()).equalsIgnoreCase("CTF") && ChatColor.stripColor(inv.getItem(2).getItemMeta().getDisplayName()).equalsIgnoreCase("PUSH") && ChatColor.stripColor(inv.getItem(3).getItemMeta().getDisplayName()).equalsIgnoreCase("PVP")&&ChatColor.stripColor(inv.getItem(4).getItemMeta().getDisplayName()).equalsIgnoreCase("SURVIVAL")){
 			player.sendMessage(ChatColor.RED+"Minigame selection:");
         }
         return;
@@ -478,29 +555,35 @@ public class AcListener implements Listener {
 		Player player = (Player) event.getWhoClicked();
 		Inventory inv = event.getInventory();
         try {
-			if(ChatColor.stripColor(inv.getItem(0).getItemMeta().getDisplayName()).equalsIgnoreCase("CTF") && ChatColor.stripColor(inv.getItem(1).getItemMeta().getDisplayName()).equalsIgnoreCase("PUSH") && ChatColor.stripColor(inv.getItem(2).getItemMeta().getDisplayName()).equalsIgnoreCase("PVP")&&ChatColor.stripColor(inv.getItem(3).getItemMeta().getDisplayName()).equalsIgnoreCase("SURVIVAL")){
+			if(ChatColor.stripColor(inv.getItem(1).getItemMeta().getDisplayName()).equalsIgnoreCase("CTF") && ChatColor.stripColor(inv.getItem(2).getItemMeta().getDisplayName()).equalsIgnoreCase("PUSH") && ChatColor.stripColor(inv.getItem(3).getItemMeta().getDisplayName()).equalsIgnoreCase("PVP")&&ChatColor.stripColor(inv.getItem(4).getItemMeta().getDisplayName()).equalsIgnoreCase("SURVIVAL")){
 				int slot = event.getSlot();
 				ArenaType type = ArenaType.INAVLID;
-				if(slot == 0){
+				if(slot == 1){
 					type = ArenaType.CTF;
 				}
-				else if(slot == 1){
+				else if(slot == 2){
 					type = ArenaType.PUSH;
 				}
-				else if(slot == 2){
+				else if(slot == 3){
 					type = ArenaType.PVP;
 				}
-				else if(slot == 3){
+				else if(slot == 4){
 					type = ArenaType.SURVIVAL;
 				}
-				else if(slot == 4){
+				else if(slot == 5){
 					type = ArenaType.TEAMS;
 				}
-				else if(slot == 5){
+				else if(slot == 6){
 					type = ArenaType.TNTORI;
 				}
-				else if(slot == 6){
+				else if(slot == 7){
 					type = ArenaType.UCARS;
+				}
+				else if(slot == 0){
+					player.closeInventory();
+					player.performCommand("mg games");
+					event.setCancelled(true);
+					return;
 				}
 				else{
 					event.setCancelled(true);
@@ -844,6 +927,68 @@ public class AcListener implements Listener {
 				}
 			}
 			plugin.gameScheduler.updateGame(game);
+		}
+		else if(game.getGameType() == ArenaType.PVP){
+			ArenaPvp gameArena = (ArenaPvp) game.getArena();
+			for(String playername:game.getPlayers()){
+				if(!game.getInPlayers().contains(playername)){
+					//They are spectating
+					Player p = plugin.getServer().getPlayer(playername);
+					Location spectator = new Location(arena.getCenter().getWorld(), arena.getCenter().getX(), arena.getCenter().getY(), arena.getCenter().getZ()).getBlock().getRelative(BlockFace.NORTH, 10).getLocation();
+					if(p.getLocation().getY() < (arena.getCenter().getY()+5)){
+						p.teleport(spectator.add(0,6,0));
+					}
+				}
+			}
+			List<String> blue = game.getBlue();
+			List<String> red = game.getRed();
+			for(String playername:game.getInPlayers()){
+				ChatColor team_color = ChatColor.WHITE;
+				if(blue.contains(playername)){
+					team_color = ChatColor.BLUE;
+				}
+				else if(red.contains(playername)){
+					team_color = ChatColor.RED;
+				}
+				Player player = plugin.getServer().getPlayer(playername);
+				if(!gameArena.isLocInArena(player.getLocation())){
+					player.sendMessage(ChatColor.RED+"You may not go outside of the arena during a game. To leave please do /mg leave.");
+					if(team_color == ChatColor.BLUE){
+						player.teleport(gameArena.getPlayerBlueSpawn());
+					}
+					else if(team_color == ChatColor.RED){
+						player.teleport(gameArena.getPlayerRedSpawn());
+					}
+					else{
+						player.teleport(gameArena.getCenter().getBlock().getRelative(BlockFace.UP).getLocation());
+					}
+				}
+			}
+			if(game.getInPlayers().size() < 1){
+				for(String playername:game.getPlayers()){
+					Player player = plugin.getServer().getPlayer(playername);
+					player.sendMessage(ChatColor.BLUE+"Game end!");
+				}
+				game.setWinner("Unknown");
+				game.end();
+				return;
+			}
+			else if(game.getInPlayers().size() < 2){
+				String winner = game.getInPlayers().get(0);
+				ChatColor team_color = ChatColor.WHITE;
+				if(blue.contains(winner)){
+					team_color = ChatColor.BLUE;
+				}
+				else if(red.contains(winner)){
+					team_color = ChatColor.RED;
+				}
+				for(String playername:game.getPlayers()){
+					Player player = plugin.getServer().getPlayer(playername);
+					player.sendMessage(team_color+"Game end!");
+				}
+				game.setWinner(team_color+winner);
+				game.end();
+			}
 		}
 		return;
 	}

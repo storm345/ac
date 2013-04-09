@@ -26,6 +26,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scoreboard.Team;
 
 import com.amazar.utils.Arena;
 import com.amazar.utils.Arenas;
@@ -319,6 +320,12 @@ public void onEnable(){
 	}
 	this.mgLobbyManager = new LobbyManager(lobbyFile);
 	this.mgLobbyManager.load();
+	Set<Team> teams = plugin.getServer().getScoreboardManager().getMainScoreboard().getTeams();
+	for(Team team:teams){
+		if(team.getName().startsWith("red") || team.getName().startsWith("blue")){
+			team.unregister();
+		}
+	}
 	if (!setupEconomy() ) {
         getLogger().severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
         getServer().getPluginManager().disablePlugin(this);
@@ -356,6 +363,12 @@ private boolean setupPermissions() {
 }
 public void onDisable(){
 	this.mgLobbyManager.save();
+	Set<Team> teams = plugin.getServer().getScoreboardManager().getMainScoreboard().getTeams();
+	for(Team team:teams){
+		if(team.getName().startsWith("red") || team.getName().startsWith("blue")){
+			team.unregister();
+		}
+	}
 	getLogger().info("AmazarCraft plugin is disabled");
 }
 }

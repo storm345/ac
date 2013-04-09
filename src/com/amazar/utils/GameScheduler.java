@@ -125,7 +125,7 @@ public class GameScheduler {
 		List<String> blue = new ArrayList<String>();
 		List<String> red = new ArrayList<String>();
 		Map<String, ItemStack[]> oldInv = new HashMap<String,ItemStack[]>();
-		if(game.getGameType() == ArenaType.CTF || game.getGameType() == ArenaType.PUSH || game.getGameType() == ArenaType.TEAMS || game.getGameType() == ArenaType.TNTORI){
+		if(game.getGameType() == ArenaType.CTF || game.getGameType() == ArenaType.PUSH || game.getGameType() == ArenaType.TEAMS || game.getGameType() == ArenaType.TNTORI || game.getGameType() == ArenaType.PVP){
 			for(String player:players){
 				Player pl = plugin.getServer().getPlayer(player);
 				oldInv.put(player,pl.getInventory().getContents());

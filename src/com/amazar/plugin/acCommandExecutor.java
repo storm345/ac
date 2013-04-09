@@ -41,6 +41,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.scoreboard.Team;
 import org.bukkit.util.ChatPaginator;
 import org.bukkit.util.ChatPaginator.ChatPage;
 
@@ -103,14 +104,16 @@ public acCommandExecutor(ac plugin) {
 			ItemStack TEAMS = getItemMinigame.getItem(ChatColor.RED+"TEAMS", ChatColor.GOLD+"Team vs Team!", Material.SKULL_ITEM, (short) 3);
 			ItemStack TNTORI = getItemMinigame.getItem(ChatColor.RED+"TNTORI", ChatColor.GOLD+"Knock others off the platform with tnt!", Material.TNT, (short) 0);
 			ItemStack UCARS = getItemMinigame.getItem(ChatColor.RED+"UCARS", ChatColor.GOLD+"Race around the track!", Material.MINECART, (short) 0);
+			ItemStack INFO = getItemMinigame.getItem(ChatColor.RED+"MORE INFO", ChatColor.GOLD+"Click for more game info!", Material.APPLE, (short) 0);
 			Inventory hinv = holder.getInventory();
-			hinv.setItem(0, CTF);
-			hinv.setItem(1, PUSH);
-			hinv.setItem(2, PVP);
-			hinv.setItem(3, SURVIVAL);
-			hinv.setItem(4, TEAMS);
-			hinv.setItem(5, TNTORI);
-			hinv.setItem(6, UCARS);
+			hinv.setItem(1, CTF);
+			hinv.setItem(2, PUSH);
+			hinv.setItem(3, PVP);
+			hinv.setItem(4, SURVIVAL);
+			hinv.setItem(5, TEAMS);
+			hinv.setItem(6, TNTORI);
+			hinv.setItem(7, UCARS);
+			hinv.setItem(0, INFO);
 			player.openInventory(hinv);
 			holder.getBlock().getDrops().clear();
 			orig.update(true);
@@ -307,7 +310,13 @@ return true;
 			return false;
 		}
 		else if(cmd.getName().equalsIgnoreCase("test")){
- 
+			Set<Team> teams = plugin.getServer().getScoreboardManager().getMainScoreboard().getTeams();
+			for(Team team:teams){
+				if(team.getName().startsWith("red") || team.getName().startsWith("blue")){
+					team.unregister();
+				}
+			}
+			sender.sendMessage(ChatColor.GREEN+"Successfully purged minigame teams left hanging!");
 			return true;
 		}
 		else if(cmd.getName().equalsIgnoreCase("arena")){
