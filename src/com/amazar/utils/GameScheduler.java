@@ -256,13 +256,22 @@ public class GameScheduler {
 				for(String name:players){
 				Player p=plugin.getServer().getPlayer(name);
 				p.sendMessage(ChatColor.GOLD+""+i);
+				if(game.getGameType() != ArenaType.UCARS && game.getGameType() != ArenaType.INAVLID){
 				p.teleport(locations.get(name));
+				}
+				if(game.getGameType() == ArenaType.UCARS){
+					p.setWalkSpeed(0);
+				}
 				}
 				try {
 					Thread.sleep(1000);
 				} catch (InterruptedException e) {
 				}
 				}
+				for(String name:players){
+					Player p=plugin.getServer().getPlayer(name);
+					p.sendMessage(ChatColor.GOLD+"Go!");
+					}
 				game.start();
 				return;
 			}});

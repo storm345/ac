@@ -6,7 +6,7 @@ import com.amazar.plugin.ac;
 
 public class ArenaSurvival extends Arena {
 
-	private int countDown = 0;
+	private int countDown = 50;
 	private Boolean doCountDown = false;
 	private SerializableLocation playerSpawn;
 	private SerializableLocation enemySpawn;

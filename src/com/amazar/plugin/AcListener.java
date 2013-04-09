@@ -65,6 +65,7 @@ import org.bukkit.util.Vector;
 
 import com.amazar.utils.Arena;
 import com.amazar.utils.ArenaPush;
+import com.amazar.utils.ArenaSurvival;
 import com.amazar.utils.ArenaTntori;
 import com.amazar.utils.ArenaType;
 import com.amazar.utils.ItemStackFromId;
@@ -74,6 +75,7 @@ import com.amazar.utils.MinigameStartEvent;
 import com.amazar.utils.MinigameUpdateEvent;
 import com.amazar.utils.Profile;
 import com.amazar.utils.StringColors;
+import com.amazar.utils.UCarsArena;
 
 public class AcListener implements Listener {
 	
@@ -287,6 +289,7 @@ public class AcListener implements Listener {
 			ArenaTntori gameArena = (ArenaTntori) game.getArena();
 			gameArena.getCenter().getBlock().setType(Material.GLOWSTONE);
 			player.setBedSpawnLocation(gameArena.getCenter().getBlock().getRelative(BlockFace.UP, 2).getLocation(), true);
+			player.getInventory().addItem(new ItemStack(Material.TNT));
 			return;
 		}
 		else if(game.getGameType() == ArenaType.PUSH){
@@ -294,6 +297,28 @@ public class AcListener implements Listener {
 			gameArena.getCenter().getBlock().setType(Material.GLOWSTONE);
 			player.setBedSpawnLocation(gameArena.getCenter().getBlock().getRelative(BlockFace.UP, 2).getLocation(), true);
 			return;
+		}
+		else if(game.getGameType() == ArenaType.SURVIVAL){
+			Player playerOuted = event.getEntity();
+			ArenaSurvival gameArena = (ArenaSurvival) game.getArena();
+			game.playerOut(playerOuted.getName());
+			for(String pname:game.getPlayers()){
+				plugin.getServer().getPlayer(pname).sendMessage(ChatColor.RED+playerOuted.getName()+" is out! Now there are only "+game.getInPlayers().size()+" players left!");
+			}
+			Block block = gameArena.getCenter().getBlock().getRelative(BlockFace.UP, 5).getRelative(BlockFace.NORTH, 10);
+			block.setType(Material.GLASS);
+			block.getRelative(BlockFace.NORTH).setType(Material.GLASS);
+			block.getRelative(BlockFace.NORTH_EAST).setType(Material.GLASS);
+			block.getRelative(BlockFace.EAST).setType(Material.GLASS);
+			block.getRelative(BlockFace.SOUTH_EAST).setType(Material.GLASS);
+			block.getRelative(BlockFace.SOUTH).setType(Material.GLASS);
+			block.getRelative(BlockFace.SOUTH_WEST).setType(Material.GLASS);
+			block.getRelative(BlockFace.WEST).setType(Material.GLASS);
+			block.getRelative(BlockFace.NORTH_WEST).setType(Material.GLASS);
+			playerOuted.sendMessage(ChatColor.GOLD+"Spectating... To leave (and miss out on reward points) please do /mg leave");
+			Location spectator = new Location(gameArena.getCenter().getWorld(), gameArena.getCenter().getX(), gameArena.getCenter().getY(), gameArena.getCenter().getZ()).getBlock().getRelative(BlockFace.NORTH, 10).getLocation();
+			playerOuted.teleport(spectator.add(0,6,0));
+			plugin.gameScheduler.updateGame(game);
 		}
 		
 		
@@ -314,6 +339,27 @@ public class AcListener implements Listener {
 			Player p = plugin.getServer().getPlayer(name);
 			p.setCustomName(ChatColor.RED+p.getName());
 			p.setCustomNameVisible(true);
+		}
+		if(game.getGameType() == ArenaType.UCARS){
+			UCarsArena gameArena = (UCarsArena) game.getArena();
+			for(String pname:players){
+				Player player = plugin.getServer().getPlayer(pname);;
+				player.setWalkSpeed((float) 0.2);
+				String[] items = gameArena.getItems();
+				for(String raw:items){
+					if(!(raw.equalsIgnoreCase("0") || raw.equalsIgnoreCase("0:0"))){
+						try {
+							ItemStack item = ItemStackFromId.get(raw);
+								player.getInventory().addItem(item);
+							
+						} catch (IllegalArgumentException e) {
+							
+						}	
+					}
+					
+				}
+			}
+			
 		}
 		if(game.getGameType() == ArenaType.TNTORI){
 			ArenaTntori gameArena = (ArenaTntori) game.getArena();
@@ -351,6 +397,27 @@ public class AcListener implements Listener {
 				}
 				
 			}
+		}
+		else if(game.getGameType() == ArenaType.SURVIVAL){
+			ArenaSurvival gameArena = (ArenaSurvival) game.getArena();
+			String[] items = gameArena.getItems();
+			for(String raw:items){
+				if(!(raw.equalsIgnoreCase("0") || raw.equalsIgnoreCase("0:0"))){
+					try {
+						ItemStack item = ItemStackFromId.get(raw);
+						for(String pname:players){
+							plugin.getServer().getPlayer(pname).getInventory().addItem(item);
+						}
+					} catch (IllegalArgumentException e) {
+						
+					}	
+				}
+				
+			}
+			if(gameArena.getDoCountdown()){
+			game.setCount(gameArena.getCountdownStartPoint());
+			}
+			plugin.gameScheduler.updateGame(game);
 		}
 		plugin.gameScheduler.reCalculateQues();
 		return;
@@ -464,7 +531,7 @@ public class AcListener implements Listener {
 				Player p = plugin.getServer().getPlayer(pname);
 				if(!inplayers.contains(p.getName())){
 					//They are spectating
-					Location spectator = new Location(arena.getCenter().getWorld(), arena.getCenter().getX(), arena.getCenter().getY(), arena.getCenter().getZ());
+					Location spectator = new Location(arena.getCenter().getWorld(), arena.getCenter().getX(), arena.getCenter().getY(), arena.getCenter().getZ()).getBlock().getRelative(BlockFace.NORTH, 10).getLocation();
 					if(p.getLocation().getY() < (arena.getCenter().getY()+5)){
 						p.teleport(spectator.add(0,6,0));
 					}
@@ -514,7 +581,7 @@ public class AcListener implements Listener {
 					block.getRelative(BlockFace.WEST).setType(Material.GLASS);
 					block.getRelative(BlockFace.NORTH_WEST).setType(Material.GLASS);
 					playerOuted.sendMessage(ChatColor.GOLD+"Spectating... To leave (and miss out on reward points) please do /mg leave");
-					Location spectator = new Location(arena.getCenter().getWorld(), arena.getCenter().getX(), arena.getCenter().getY(), arena.getCenter().getZ());
+					Location spectator = new Location(arena.getCenter().getWorld(), arena.getCenter().getX(), arena.getCenter().getY(), arena.getCenter().getZ()).getBlock().getRelative(BlockFace.NORTH, 10).getLocation();
 					playerOuted.teleport(spectator.add(0,6,0));
 					for(String player:tplayers){
 						Player pl = plugin.getServer().getPlayer(player);
@@ -591,7 +658,7 @@ public class AcListener implements Listener {
 				Player p = plugin.getServer().getPlayer(pname);
 				if(!inplayers.contains(p.getName())){
 					//They are spectating
-					Location spectator = new Location(arena.getCenter().getWorld(), arena.getCenter().getX(), arena.getCenter().getY(), arena.getCenter().getZ());
+					Location spectator = new Location(arena.getCenter().getWorld(), arena.getCenter().getX(), arena.getCenter().getY(), arena.getCenter().getZ()).getBlock().getRelative(BlockFace.NORTH, 10).getLocation();
 					if(p.getLocation().getY() < (arena.getCenter().getY()+5)){
 						p.teleport(spectator.add(0,6,0));
 					}
@@ -641,7 +708,7 @@ public class AcListener implements Listener {
 					block.getRelative(BlockFace.WEST).setType(Material.GLASS);
 					block.getRelative(BlockFace.NORTH_WEST).setType(Material.GLASS);
 					playerOuted.sendMessage(ChatColor.GOLD+"Spectating... To leave (and miss out on reward points) please do /mg leave");
-					Location spectator = new Location(arena.getCenter().getWorld(), arena.getCenter().getX(), arena.getCenter().getY(), arena.getCenter().getZ());
+					Location spectator = new Location(arena.getCenter().getWorld(), arena.getCenter().getX(), arena.getCenter().getY(), arena.getCenter().getZ()).getBlock().getRelative(BlockFace.NORTH, 10).getLocation();
 					playerOuted.teleport(spectator.add(0,6,0));
 					for(String player:tplayers){
 						Player pl = plugin.getServer().getPlayer(player);
@@ -703,6 +770,62 @@ public class AcListener implements Listener {
     				game.end();
             	}
     			
+			}
+		}
+		else if(game.getGameType() == ArenaType.SURVIVAL){
+			ArenaSurvival gameArena = (ArenaSurvival) game.getArena();
+			String arenaName = game.getArenaName();
+			for(String playername:game.getPlayers()){
+				if(!game.getInPlayers().contains(playername)){
+					//They are spectating
+					Player p = plugin.getServer().getPlayer(playername);
+					Location spectator = new Location(arena.getCenter().getWorld(), arena.getCenter().getX(), arena.getCenter().getY(), arena.getCenter().getZ()).getBlock().getRelative(BlockFace.NORTH, 10).getLocation();
+					if(p.getLocation().getY() < (arena.getCenter().getY()+5)){
+						p.teleport(spectator.add(0,6,0));
+					}
+				}
+			}
+			for(String playername:game.getInPlayers()){
+				Player player = plugin.getServer().getPlayer(playername);
+				if(!gameArena.isLocInArena(player.getLocation())){
+					player.sendMessage(ChatColor.RED+"You may not go outside of the arena during a game. To leave please do /mg leave.");
+					player.teleport(gameArena.getPlayerSpawnpoint());
+				}
+			}
+			if(game.getInPlayers().size() < 1){
+				for(String playername:game.getPlayers()){
+					Player player = plugin.getServer().getPlayer(playername);
+					player.sendMessage(ChatColor.RED+"Survival game lost!");
+				}
+				game.setWinner("The enemy");
+				game.end();
+			}
+			int rand = 1 + (int)(Math.random() * ((15 - 1) + 1));
+			if(rand < 2){
+				//spawn a mob
+				int randomType = 1 + (int)(Math.random() * ((100 - 1) + 1)); //between 1 and 100
+				Location loc = gameArena.getEnemySpawnpoint();
+				if(randomType <= 50){ //50% chance
+                   loc.getWorld().spawnEntity(loc, EntityType.ZOMBIE);					
+				}
+				else if(randomType <= 70){ //20% chance
+					 loc.getWorld().spawnEntity(loc, EntityType.SKELETON);	
+				}
+				else if(randomType <= 75){ //5% chance
+					 loc.getWorld().spawnEntity(loc, EntityType.SILVERFISH);	
+				}
+				else if(randomType <= 85){ //10% chance
+					 loc.getWorld().spawnEntity(loc, EntityType.SPIDER);	
+				}
+				else if(randomType <= 86){ //1% chance
+					 loc.getWorld().spawnEntity(loc, EntityType.SLIME);	
+				}
+				else if(randomType <= 90){ //4% chance
+					 loc.getWorld().spawnEntity(loc, EntityType.ENDERMAN);	
+				}
+				else{//10% chance
+					loc.getWorld().spawnEntity(loc, EntityType.PIG_ZOMBIE);	
+				}
 			}
 		}
 		return;

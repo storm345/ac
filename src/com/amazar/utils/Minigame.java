@@ -30,6 +30,8 @@ public class Minigame {
 	private Boolean running = false;
 	private BukkitTask task = null;
 	private Scoreboard teams = null;
+	private BukkitTask countDown = null;
+	private int count = 50;
 	public HashMap<String, Integer> lives = new HashMap<String, Integer>();
 	public Minigame(Arena arena, String arenaName){
 		this.gameId = UniqueString.generate();
@@ -59,6 +61,13 @@ public class Minigame {
 	public void setTeamScoreboard(Scoreboard board){
 		this.teams = board;
 		return;
+	}
+	public void setCount(int count){
+		this.count = count;
+		return;
+	}
+	public int getCount(){
+		return this.count;
 	}
 	public void setBlue(List<String> blue){
 		this.blue = blue;
@@ -92,6 +101,28 @@ public class Minigame {
 			return true;
 		}
 		return false;
+	}
+	public void startCountDown(){
+		if(!(this.getArena().getType() == ArenaType.SURVIVAL)){
+			return;
+		}
+		ArenaSurvival gameArena = (ArenaSurvival) this.getArena();
+		final Minigame game = this;
+		if(gameArena.getDoCountdown()){
+			
+			this.countDown = ac.plugin.getServer().getScheduler().runTaskTimer(ac.plugin, new Runnable(){
+				@Override
+				public void run() {
+					game.setCount((game.getCount() -1));
+					ac.plugin.gameScheduler.updateGame(game);
+					if(game.getCount() < 0){
+						//end the game
+						game.setWinner("The players");
+						game.end();
+					}
+				}}, 20l, 20l);
+		}
+		return;
 	}
 	public void leave(String playername){
 		
@@ -181,6 +212,7 @@ public class Minigame {
     	if(task != null){
     		task.cancel();
     	}
+    	if(this.gameType != ArenaType.UCARS && this.gameType != ArenaType.SURVIVAL){
     	try {
 			Set<OfflinePlayer> bluePlayers = this.teams.getTeam("blue").getPlayers();
 			if(!(bluePlayers == null)){
@@ -201,6 +233,10 @@ public class Minigame {
 		}
     	this.teams.getTeam("blue"+this.gameId).unregister();
     	this.teams.getTeam("red"+this.gameId).unregister();
+    	}
+    	if(this.countDown != null){
+    		this.countDown.cancel();
+    	}
     	ac.plugin.getServer().getPluginManager().callEvent(new MinigameFinishEvent(this));
     }
 }
