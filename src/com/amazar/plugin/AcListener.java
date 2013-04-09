@@ -165,6 +165,10 @@ public class AcListener implements Listener {
 					player.sendMessage(ChatColor.GOLD+game.getWinner() + " won the game!");
 					player.sendMessage(ChatColor.GREEN+"Winner(s): "+in);
 				}
+				player.getInventory().clear();
+				if(game.getOldInventories().containsKey(player.getName())){
+				player.getInventory().setContents(game.getOldInventories().get(player.getName()));
+				}
 		}
 		if(game.getGameType() == ArenaType.SURVIVAL){
 			ArenaSurvival gameArena = (ArenaSurvival) game.getArena();
