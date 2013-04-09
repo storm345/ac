@@ -15,6 +15,7 @@ import org.bukkit.Statistic;
 import org.bukkit.TravelAgent;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.Sign;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
@@ -28,6 +29,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -193,6 +195,16 @@ public class AcListener implements Listener {
 			plugin.mgMethods.purgeMobs(gameArena);
 		}
 		plugin.gameScheduler.reCalculateQues();
+		return;
+	}
+	@EventHandler void mgSigns(SignChangeEvent event){
+		String[] lines = event.getLines();
+		if(ChatColor.stripColor(lines[0]).equalsIgnoreCase("[Minigame]")){
+			lines[0] = ChatColor.GREEN+"[Minigame]";
+			lines[1] = ChatColor.GOLD+lines[1];
+			lines[2] = ChatColor.RED+lines[2];
+			lines[3] = ChatColor.AQUA+lines[3];
+		}
 		return;
 	}
 	@EventHandler void tntAutoLightTori(PlayerInteractEvent event){
