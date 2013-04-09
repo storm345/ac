@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 
 import com.amazar.plugin.ac;
 
@@ -51,4 +53,15 @@ public class MinigameMethods {
     	}
     	return name;
     }
+    public void purgeMobs(Arena arena){
+		Entity ent = arena.getCenter().getWorld().spawnEntity(arena.getCenter(), EntityType.ARROW);
+		List<Entity> ents = ent.getNearbyEntities((arena.getRadius() + 1), (arena.getRadius()+1), (arena.getRadius()+1));
+		for(Entity e:ents){
+			if(e.getType() != EntityType.PLAYER || e.getType() != EntityType.WEATHER){
+				e.remove();
+			}
+		}
+		ent.remove();
+		return;
+	}
 }
