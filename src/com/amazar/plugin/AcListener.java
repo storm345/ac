@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -340,6 +341,9 @@ public class AcListener implements Listener {
 			p.setCustomName(ChatColor.RED+p.getName());
 			p.setCustomNameVisible(true);
 		}
+		for(String pname:players){
+			plugin.getServer().getPlayer(pname).setGameMode(GameMode.SURVIVAL);
+		}
 		if(game.getGameType() == ArenaType.UCARS){
 			UCarsArena gameArena = (UCarsArena) game.getArena();
 			for(String pname:players){
@@ -414,9 +418,13 @@ public class AcListener implements Listener {
 				}
 				
 			}
+			for(String pname:players){
+				plugin.getServer().getPlayer(pname).getInventory().addItem(new ItemStack(Material.IRON_SWORD));
+			}
 			if(gameArena.getDoCountdown()){
 			game.setCount(gameArena.getCountdownStartPoint());
 			}
+			game.startCountDown();
 			plugin.gameScheduler.updateGame(game);
 		}
 		plugin.gameScheduler.reCalculateQues();
@@ -774,7 +782,7 @@ public class AcListener implements Listener {
 		}
 		else if(game.getGameType() == ArenaType.SURVIVAL){
 			ArenaSurvival gameArena = (ArenaSurvival) game.getArena();
-			String arenaName = game.getArenaName();
+			//String arenaName = game.getArenaName();
 			for(String playername:game.getPlayers()){
 				if(!game.getInPlayers().contains(playername)){
 					//They are spectating
@@ -800,7 +808,7 @@ public class AcListener implements Listener {
 				game.setWinner("The enemy");
 				game.end();
 			}
-			int rand = 1 + (int)(Math.random() * ((15 - 1) + 1));
+			int rand = 1 + (int)(Math.random() * ((3 - 1) + 1));
 			if(rand < 2){
 				//spawn a mob
 				int randomType = 1 + (int)(Math.random() * ((100 - 1) + 1)); //between 1 and 100
@@ -827,6 +835,7 @@ public class AcListener implements Listener {
 					loc.getWorld().spawnEntity(loc, EntityType.PIG_ZOMBIE);	
 				}
 			}
+			plugin.gameScheduler.updateGame(game);
 		}
 		return;
 	}

@@ -107,15 +107,22 @@ public class Minigame {
 			return;
 		}
 		ArenaSurvival gameArena = (ArenaSurvival) this.getArena();
+		this.setCount(gameArena.getCountdownStartPoint());
 		final Minigame game = this;
 		if(gameArena.getDoCountdown()){
 			
 			this.countDown = ac.plugin.getServer().getScheduler().runTaskTimer(ac.plugin, new Runnable(){
 				@Override
 				public void run() {
+					for(String player:game.getPlayers()){
+						ac.plugin.getServer().getPlayer(player).sendMessage(ChatColor.BLUE+"Time remaining: "+game.getCount());
+					}
 					game.setCount((game.getCount() -1));
 					ac.plugin.gameScheduler.updateGame(game);
 					if(game.getCount() < 0){
+						for(String player:game.getPlayers()){
+							ac.plugin.getServer().getPlayer(player).sendMessage(ChatColor.BLUE+"Time remaining: "+"End!");
+						}
 						//end the game
 						game.setWinner("The players");
 						game.end();
