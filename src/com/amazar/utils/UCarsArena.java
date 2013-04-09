@@ -11,10 +11,18 @@ public class UCarsArena extends Arena {
     private List<SerializableLocation> grid = new ArrayList<SerializableLocation>();
     private List<SerializableLocation> line = new ArrayList<SerializableLocation>();
     private int laps = 1;
+    private String[] items = {"0"};
 	public UCarsArena(Location center, int radius, ArenaShape shape,
 			ArenaType type, int playerLimit) {
 		super(center, radius, shape, type, playerLimit);
 		this.check();
+	}
+	public void setItems(String[] ids){
+		this.items = ids;
+		return;
+	}
+	public String[] getItems(){
+		return this.items;
 	}
 	public void check(){
 		this.setPlayerLimit(this.grid.size());

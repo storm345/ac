@@ -682,6 +682,7 @@ return true;
 						gameArena.setLineLocation(line);
 						plugin.minigamesArenas.setArena(arenaName, gameArena);
 						player.sendMessage(ChatColor.GREEN+"Successfully set line location!");
+						return true;
 					}
 					else if(setting.equalsIgnoreCase("setLaps")){
 						if(args.length < 4){
@@ -698,6 +699,22 @@ return true;
 						gameArena.setLaps(laps);
 						plugin.minigamesArenas.setArena(arenaName, gameArena);
 						sender.sendMessage(ChatColor.GREEN+"Successfully set laps!");
+						return true;
+					}
+					else if(setting.equalsIgnoreCase("setItems")){
+						if(args.length < 4){
+							sender.sendMessage(ChatColor.RED+"Usage: /arena set setItems id:data id:data etc..");
+							return true;
+						}
+						List<String> raws = new ArrayList<String>();
+						for(int i=3;i<args.length;i++){
+							raws.add(args[i]);
+						}
+						Object[] array = (Object[]) raws.toArray();
+						gameArena.setItems((String[]) array);
+						plugin.minigamesArenas.setArena(arenaName, gameArena);
+						sender.sendMessage(ChatColor.GREEN+"Successfully set items given to players!");
+						return true;
 					}
 				}
 				else if(arena.getType() == ArenaType.PUSH){
@@ -1064,6 +1081,7 @@ return true;
 					sender.sendMessage(ChatColor.GOLD+"setGridLocation [Position] - Sets the starting grid location [position].");
 					sender.sendMessage(ChatColor.GOLD+"setLineLocation [Direction (N/E/S/W)] [Distance] - Sets the start/finish line to your location to the block to the [dir] in [dist].");
 					sender.sendMessage(ChatColor.GOLD+"setLaps [Laps] - Sets the number of laps in a race.");
+					sender.sendMessage(ChatColor.GOLD+"setItems id:data id:data etc... - Sets the items given to the player.");
 				}
 					return true;
 				
