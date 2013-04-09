@@ -1159,7 +1159,7 @@ public class AcListener implements Listener {
 					Location p = player.getLocation();
 					Location f = gameArena.getBlueFlag();
 					double a = 1.5;
-					if(p.getX() < (f.getX()+a) && p.getX() > (f.getX()-a) && p.getZ() < (f.getZ()+a) && p.getZ() > (f.getZ()-a)){
+					if(p.getX() < (f.getX()+a) && p.getX() > (f.getX()-a) && p.getZ() < (f.getZ()+a) && p.getZ() > (f.getZ()-a) && p.getY() < (f.getY()+a) && p.getY() > (f.getY()-a)){
 						for(String pname:game.getPlayers()){
 							plugin.getServer().getPlayer(pname).sendMessage(team_color+"The blue team member "+player.getName()+" captured the flag!");
 						}
