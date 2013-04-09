@@ -374,7 +374,7 @@ return true;
 				    	return true;
 				    }
 				    plugin.minigamesArenas.setArena(name, arena);
-					sender.sendMessage(ChatColor.GREEN+"Successfully created a pvp arena! It will need setting up with /arena set");
+					sender.sendMessage(ChatColor.GREEN+"Successfully created a tntori arena! It will need setting up with /arena set");
 				    return true;
 				}
 				else if(type.equalsIgnoreCase("survival")){
@@ -384,7 +384,7 @@ return true;
 				    	return true;
 				    }
 				    plugin.minigamesArenas.setArena(name, arena);
-					sender.sendMessage(ChatColor.GREEN+"Successfully created a pvp arena! It will need setting up with /arena set");
+					sender.sendMessage(ChatColor.GREEN+"Successfully created a survival arena! It will need setting up with /arena set");
 				    return true;
 				}
 				else if(type.equalsIgnoreCase("ctf")){
@@ -394,7 +394,7 @@ return true;
 				    	return true;
 				    }
 				    plugin.minigamesArenas.setArena(name, arena);
-					sender.sendMessage(ChatColor.GREEN+"Successfully created a pvp arena! It will need setting up with /arena set");
+					sender.sendMessage(ChatColor.GREEN+"Successfully created a ctf arena! It will need setting up with /arena set");
 				    return true;
 				}
 				else if(type.equalsIgnoreCase("team")||type.equalsIgnoreCase("teams")){
@@ -404,7 +404,7 @@ return true;
 				    	return true;
 				    }
 				    plugin.minigamesArenas.setArena(name, arena);
-					sender.sendMessage(ChatColor.GREEN+"Successfully created a pvp arena! It will need setting up with /arena set");
+					sender.sendMessage(ChatColor.GREEN+"Successfully created a teams arena! It will need setting up with /arena set");
 				    return true;
 				}
 				else if(type.equalsIgnoreCase("push")){
@@ -414,7 +414,7 @@ return true;
 				    	return true;
 				    }
 				    plugin.minigamesArenas.setArena(name, arena);
-					sender.sendMessage(ChatColor.GREEN+"Successfully created a pvp arena! It will need setting up with /arena set");
+					sender.sendMessage(ChatColor.GREEN+"Successfully created a push arena! It will need setting up with /arena set");
 				    return true;
 				}
 				else if(type.equalsIgnoreCase("ucars")){
