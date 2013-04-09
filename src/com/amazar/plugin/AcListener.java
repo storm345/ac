@@ -141,9 +141,11 @@ public class AcListener implements Listener {
 				Location loc = plugin.mgLobbies.getLobby(game.getGameType());
 				if(loc == null){
 				player.teleport(player.getLocation().getWorld().getSpawnLocation());
+				player.setBedSpawnLocation(player.getLocation().getWorld().getSpawnLocation(), true);
 				}
 				else{
 					player.teleport(loc);
+					player.setBedSpawnLocation(loc, true);
 				}
 				if(player.isOnline()){
 					if(!inplayers.contains(playername)){
@@ -163,6 +165,10 @@ public class AcListener implements Listener {
 					player.sendMessage(ChatColor.GOLD+game.getWinner() + " won the game!");
 					player.sendMessage(ChatColor.GREEN+"Winner(s): "+in);
 				}
+		}
+		if(game.getGameType() == ArenaType.SURVIVAL){
+			ArenaSurvival gameArena = (ArenaSurvival) game.getArena();
+			gameArena.purgeMobs();
 		}
 		plugin.gameScheduler.reCalculateQues();
 		return;
@@ -618,7 +624,6 @@ public class AcListener implements Listener {
     				}
     				game.setWinner(team_color+"Nobody");
     				game.end();
-    				return;
             	}
             	if(inplayers.size() > 0){
             	Player winner = plugin.getServer().getPlayer(inplayers.get(0));
@@ -649,8 +654,7 @@ public class AcListener implements Listener {
     				}
     				game.setWinner(team_color+"Unknown");
     				game.end();
-            	}
-    			
+            	} 			
 			}
 		}
 		else if(type == ArenaType.PUSH){
@@ -745,7 +749,6 @@ public class AcListener implements Listener {
     				}
     				game.setWinner(team_color+"Nobody");
     				game.end();
-    				return;
             	}
             	if(inplayers.size() > 0){
             	Player winner = plugin.getServer().getPlayer(inplayers.get(0));
@@ -807,6 +810,7 @@ public class AcListener implements Listener {
 				}
 				game.setWinner("The enemy");
 				game.end();
+				return;
 			}
 			int rand = 1 + (int)(Math.random() * ((3 - 1) + 1));
 			if(rand < 2){

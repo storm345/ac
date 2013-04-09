@@ -209,6 +209,8 @@ public class GameScheduler {
 		else if(type == ArenaType.SURVIVAL){
 			ArenaSurvival gameArena = (ArenaSurvival) game.getArena();
 			for(String name:players){
+				plugin.getServer().getPlayer(name).setGameMode(GameMode.SURVIVAL);
+				plugin.getServer().getPlayer(name).getInventory().clear();
 				plugin.getServer().getPlayer(name).teleport(gameArena.getPlayerSpawnpoint());
 			}
 		}
@@ -235,6 +237,10 @@ public class GameScheduler {
 			for(String name:players){
 				plugin.getServer().getPlayer(name).teleport(arena.getCenter());
 			}
+		}
+		for(String name:players){
+			plugin.getServer().getPlayer(name).setGameMode(GameMode.SURVIVAL);
+			plugin.getServer().getPlayer(name).getInventory().clear();
 		}
 		final Map<String, Location> locations = new HashMap<String, Location>();
 		for(String name:players){

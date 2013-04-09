@@ -1,6 +1,10 @@
 package com.amazar.utils;
 
+import java.util.List;
+
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 
 import com.amazar.plugin.ac;
 
@@ -67,5 +71,16 @@ public class ArenaSurvival extends Arena {
 	}
 	public String[] getItems(){
 		return this.items;
+	}
+	public void purgeMobs(){
+		Entity ent = this.getCenter().getWorld().spawnEntity(this.getCenter(), EntityType.ARROW);
+		List<Entity> ents = ent.getNearbyEntities((this.getRadius() + 1), (this.getRadius()+1), (this.getRadius()+1));
+		for(Entity e:ents){
+			if(e.getType() != EntityType.PLAYER || e.getType() != EntityType.WEATHER){
+				e.remove();
+			}
+		}
+		ent.remove();
+		return;
 	}
 }
