@@ -11,10 +11,12 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Sound;
 import org.bukkit.Statistic;
 import org.bukkit.TravelAgent;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -205,6 +207,174 @@ public class AcListener implements Listener {
 			lines[2] = ChatColor.RED+lines[2];
 			lines[3] = ChatColor.AQUA+lines[3];
 		}
+		if(ChatColor.stripColor(lines[0]).equalsIgnoreCase("[Games]")){
+			lines[0] = ChatColor.GREEN+"[Games]";
+			lines[2] = ChatColor.ITALIC + "Right click";
+			lines[3] = ChatColor.ITALIC + "to use";
+		}
+		if(ChatColor.stripColor(lines[1]).equalsIgnoreCase("[Lift Up]")){
+			lines[1] = "[Lift Up]";
+			lines[2] = ChatColor.ITALIC + "Right click";
+			lines[3] = ChatColor.ITALIC + "to use";
+		}
+		if(ChatColor.stripColor(lines[1]).equalsIgnoreCase("[Lift Down]")){
+			lines[1] = "[Lift Down]";
+			lines[2] = ChatColor.ITALIC + "Right click";
+			lines[3] = ChatColor.ITALIC + "to use";
+		}
+		if(ChatColor.stripColor(lines[1]).equalsIgnoreCase("[Lift]")){
+			lines[1] = "[Lift]";
+			lines[2] = ChatColor.ITALIC + "Can only";
+			lines[3] = ChatColor.ITALIC + "recieve";
+		}
+		return;
+	}
+	@EventHandler void signMechs(PlayerInteractEvent event){
+		if(event.getAction() != Action.RIGHT_CLICK_BLOCK){
+			return;
+		}
+		Block block = event.getClickedBlock();
+		BlockState state = block.getState();
+		if(!(state instanceof Sign)){
+			return;
+		}
+		Sign sign = (Sign) state;
+		String[] lines = sign.getLines();
+		Player player = event.getPlayer();
+		if(ChatColor.stripColor(lines[0]).equalsIgnoreCase("[Minigame]")){
+			String action = ChatColor.stripColor(lines[1]);
+			if(action.equalsIgnoreCase("join")){
+				player.performCommand("minigame join "+ChatColor.stripColor(lines[2])+" "+ChatColor.stripColor(lines[3]));
+			}
+			else if(action.equalsIgnoreCase("leave")){
+				player.performCommand("minigame leave");
+			}
+			else if(action.equalsIgnoreCase("list")){
+				player.performCommand("minigame list "+ChatColor.stripColor(lines[2])+" "+ChatColor.stripColor(lines[3]));
+			}
+			else if(action.equalsIgnoreCase("games")){
+				player.performCommand("minigame games");
+			}
+			return;
+		}
+		else if(ChatColor.stripColor(lines[0]).equalsIgnoreCase("[Games]")){
+			player.performCommand("games");
+			return;
+		}
+		else if(ChatColor.stripColor(ChatColor.stripColor(sign.getLine(1))).equalsIgnoreCase("[Lift Up]")){
+	    	    double y = sign.getLocation().getY();
+	    	    double x = sign.getLocation().getX();
+	    	    double z = sign.getLocation().getZ();
+	    	    BlockState lift = null;
+	    	    boolean found = false;
+	    	    for(double i= sign.getLocation().getY(); i < sign.getWorld().getMaxHeight(); i++){
+	    	    	if(!found){
+	    	    	Location check = new Location(sign.getWorld(), x, i, z);
+	    	    	if(check.getBlock().getState() instanceof Sign){
+	    	    		Sign theDest = (Sign)check.getBlock().getState();
+	    	    		if(theDest.getLine(1).contains("Lift") && theDest.getLocation().getY() != sign.getLocation().getY() && theDest.getLocation().getY() != y + 1){
+	    	    		found = true;
+	    	    		lift = check.getBlock().getState();
+	    	    		}
+	    	    	}
+	    	    	}
+	    	    }
+	    	    if(!found){
+	    	    	event.getPlayer().sendMessage(ChatColor.RED + "Could not find a lift.");
+	    	    	return;
+	    	    }
+	    	    Sign dest = (Sign)lift;
+	    	    double dy = dest.getLocation().getY();
+	    	    Location loc = event.getPlayer().getLocation();
+	    	    loc.setY(dy-1);
+	    	    Block destBlock = loc.getBlock();
+	    	    int id = destBlock.getTypeId();
+	    	    if(id != 0 && id != 70 && id != 72){
+	    	    	event.getPlayer().sendMessage(ChatColor.RED + "Destination obstructed");
+	    	    	return;
+	    	    }
+	    	    Location floorLoc = new Location(loc.getWorld(), loc.getX(), loc.getY() - 1, loc.getZ());
+	    	    Block floor = floorLoc.getBlock();
+	    	    int FloorId = floor.getTypeId();
+	    	    if(FloorId == 0){
+	    	    	Location RLoc = dest.getLocation();
+	    	    	RLoc.setY(RLoc.getY() - 1);
+	    	    	if(RLoc.getBlock().getTypeId() != 0 && RLoc.getBlock().getTypeId() != 70 && RLoc.getBlock().getTypeId() != 72){
+	    	    		event.getPlayer().sendMessage(ChatColor.RED + "Destination obstructed");
+	    	    		return;
+	    	    	}
+	    	    	Block RFloor = new Location(RLoc.getWorld(), RLoc.getX(), RLoc.getY()-1, RLoc.getZ()).getBlock();
+	    	    	if(RFloor.getTypeId() == 0){
+	    	    		event.getPlayer().sendMessage(ChatColor.RED + "There is no floor at the destination!");
+	    	    		return;
+	    	    	}
+	    	    	event.getPlayer().sendMessage(ChatColor.GOLD + "Going up a level!");
+		    	    event.getPlayer().teleport(RLoc);
+		    	    event.getPlayer().getWorld().playSound(RLoc, Sound.NOTE_PLING, 1, 1);
+		    	    return;
+	    	    }
+	    	    event.getPlayer().sendMessage(ChatColor.GOLD + "Going up a level!");
+	    	    event.getPlayer().getWorld().playSound(event.getPlayer().getLocation(), Sound.NOTE_PLING, 1, 1);
+	    	    event.getPlayer().teleport(loc);
+	    		return;
+	    }
+	    else if(ChatColor.stripColor(ChatColor.stripColor(sign.getLine(1))).equalsIgnoreCase("[Lift Down]")){
+	    	    double y = sign.getLocation().getY();
+	    	    double x = sign.getLocation().getX();
+	    	    double z = sign.getLocation().getZ();
+	    	    BlockState lift = null;
+	    	    boolean found = false;
+	    	    for(double i= sign.getLocation().getY(); i > 1; i--){
+	    	    	if(!found){
+	    	    	Location check = new Location(sign.getWorld(), x, i, z);
+	    	    	if(check.getBlock().getState() instanceof Sign){
+	    	    		Sign theDest = (Sign)check.getBlock().getState();
+	    	    		if(theDest.getLine(1).contains("Lift") && theDest.getLocation().getY() != sign.getLocation().getY() && theDest.getLocation().getY() != y + 1){
+	    	    		found = true;
+	    	    		lift = check.getBlock().getState();
+	    	    		}
+	    	    	}
+	    	    	}
+	    	    }
+	    	    if(!found){
+	    	    	event.getPlayer().sendMessage(ChatColor.RED + "Could not find a lift.");
+	    	    	return;
+	    	    }
+	    	    Sign dest = (Sign)lift;
+	    	    double dy = dest.getLocation().getY();
+	    	    Location loc = event.getPlayer().getLocation();
+	    	    loc.setY(dy-1);
+	    	    Block destBlock = loc.getBlock();
+	    	    int id = destBlock.getTypeId();
+	    	    if(id != 0 && id != 70 && id != 72){
+	    	    	event.getPlayer().sendMessage(ChatColor.RED + "Destination obstructed");
+	    	    	return;
+	    	    }
+	    	    Location floorLoc = new Location(loc.getWorld(), loc.getX(), loc.getY() -1, loc.getZ());
+	    	    Block floor = floorLoc.getBlock();
+	    	    int FloorId = floor.getTypeId();
+	    	    if(FloorId == 0){
+	    	    	Location RLoc = dest.getLocation();
+	    	    	RLoc.setY(RLoc.getY() - 1);
+	    	    	if(RLoc.getBlock().getTypeId() != 0 && RLoc.getBlock().getTypeId() != 70 && RLoc.getBlock().getTypeId() != 72){
+	    	    		event.getPlayer().sendMessage(ChatColor.RED + "Destination obstructed");
+	    	    		return;
+	    	    	}
+	    	    	Block RFloor = new Location(RLoc.getWorld(), RLoc.getX(), RLoc.getY()-1, RLoc.getZ()).getBlock();
+	    	    	if(RFloor.getTypeId() == 0){
+	    	    		event.getPlayer().sendMessage(ChatColor.RED + "There is no floor at the destination!");
+	    	    		return;
+	    	    	}
+	    	    	event.getPlayer().sendMessage(ChatColor.GOLD + "Going down a level!");
+		    	    event.getPlayer().teleport(RLoc);
+		    	    event.getPlayer().getWorld().playSound(RLoc, Sound.NOTE_PLING, 1, 1);
+		    	    return;
+	    	    }
+	    	    event.getPlayer().sendMessage(ChatColor.GOLD + "Going down a level!");
+	    	    event.getPlayer().getWorld().playSound(event.getPlayer().getLocation(), Sound.NOTE_PLING, 1, 1);
+	    	    event.getPlayer().teleport(loc);
+	    		return;
+	    }
 		return;
 	}
 	@EventHandler void tntAutoLightTori(PlayerInteractEvent event){
