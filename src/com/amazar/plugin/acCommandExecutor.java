@@ -1757,7 +1757,8 @@ return true;
 			int displayed = 0;
 			sender.sendMessage(ChatColor.RED+"Top ten gamers: (Gamer points)");
 			for(int i=0;i<gamers.length && displayed < 10;i++){
-				sender.sendMessage(ChatColor.GOLD+"["+i+"] "+ChatColor.RED+gamers[i].toString()+": "+ChatColor.GOLD+vals.get(gamers[i].toString())+"pts");
+				sender.sendMessage(ChatColor.GOLD+"["+(i+1)+"] "+ChatColor.RED+gamers[i].toString()+": "+ChatColor.GOLD+vals.get(gamers[i].toString())+"pts");
+				displayed++;
 			}
 			return true;
 		}
