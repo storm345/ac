@@ -241,6 +241,9 @@ public class AcListener implements Listener {
 		Sign sign = (Sign) state;
 		String[] lines = sign.getLines();
 		Player player = event.getPlayer();
+		if(player.isSneaking()){
+			return;
+		}
 		if(ChatColor.stripColor(lines[0]).equalsIgnoreCase("[Minigame]")){
 			String action = ChatColor.stripColor(lines[1]);
 			if(action.equalsIgnoreCase("join")){
