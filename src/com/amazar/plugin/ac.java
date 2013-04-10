@@ -26,6 +26,9 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
 import com.amazar.utils.Arena;
@@ -35,6 +38,7 @@ import com.amazar.utils.ListStore;
 import com.amazar.utils.Lobbies;
 import com.amazar.utils.LobbyManager;
 import com.amazar.utils.MinigameMethods;
+import com.amazar.utils.Profile;
 import com.amazar.utils.SerializableLocation;
 
 public class ac extends JavaPlugin {
@@ -143,6 +147,7 @@ public class ac extends JavaPlugin {
     public LobbyManager mgLobbyManager = null;
     public Boolean isUcarsInstalled = false;
     public com.useful.ucars.ucars ucars = null;
+    public Scoreboard leaderboards = null;
 public void onEnable(){
 	//Now on github!
 	plugin = this;
@@ -341,6 +346,14 @@ public void onEnable(){
     	this.ucars = (com.useful.ucars.ucars) getServer().getPluginManager().getPlugin("uCars");
     	getLogger().info("Successfully hooked into ucars!");
     }
+    this.leaderboards = getServer().getScoreboardManager().getMainScoreboard();
+    this.leaderboards.clearSlot(DisplaySlot.SIDEBAR);
+    if(this.leaderboards.getObjective("gamers") == null){
+    	this.leaderboards.registerNewObjective("gamers", "dummy");
+    }
+    this.leaderboards.getObjective("gamers").setDisplayName(ChatColor.GOLD+"Top gamers:");
+    this.leaderboards.getObjective("gamers").setDisplaySlot(DisplaySlot.SIDEBAR);
+    Profile.calculateLeaderboard();
 	getLogger().info("AmazarCraft plugin is enabled :)");	//Tell teh console it is enabled
 }
 private boolean setupEconomy() {

@@ -9,14 +9,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Score;
+import org.bukkit.scoreboard.Scoreboard;
 
 import com.amazar.plugin.ac;
+import com.google.common.collect.Ordering;
 
 public class Profile {
 	private static ac plugin = ac.plugin;
@@ -29,6 +39,7 @@ public class Profile {
 		for(int i=0;i<players.length;i++){
 			if(players[i].getName().equalsIgnoreCase(name)){
 				name = players[i].getName();
+				this.name = name;
 			}
 		}
 		String filename = name+".yml";
@@ -45,6 +56,53 @@ public class Profile {
 			editor.load(profileFile);
 		} catch (Exception e) {
 		}
+	}
+	public String getName(){
+		return this.name;
+	}
+	public static List<Profile> getProfiles(){
+		List<Profile> profiles = new ArrayList<Profile>();
+		OfflinePlayer[] players = ac.plugin.getServer().getOfflinePlayers();
+		for(OfflinePlayer player:players){
+			String name = player.getName();
+			Profile pProfile = new Profile(name);
+            profiles.add(pProfile);
+		}
+	    return profiles;
+	}
+	public static Objective calculateLeaderboard(){
+		SortedMap<String, Integer> stats = getStats();
+		Map<String, Integer> vals = new HashMap<String, Integer>();
+		vals.putAll(stats);
+		Set<String> gamers = stats.keySet();
+		Object gamersarray[] = gamers.toArray();
+		int displayed = 0;
+		for(int i=0;i<gamersarray.length && displayed < 5;i++){
+			String gamer = (String) gamersarray[i];
+			if(ac.plugin.getServer().getOfflinePlayer(gamer) == null){
+			}
+			else{
+				if(vals.get(gamer) != null){
+			ac.plugin.getServer().getScoreboardManager().getMainScoreboard().getObjective("gamers").getScore(plugin.getServer().getOfflinePlayer(gamer)).setScore(vals.get(gamer));
+			displayed++;
+				}
+			}
+		}
+		ac.plugin.getServer().getScoreboardManager().getMainScoreboard().getObjective("gamers").setDisplaySlot(DisplaySlot.SIDEBAR);
+		return ac.plugin.getServer().getScoreboardManager().getMainScoreboard().getObjective("gamers");
+	}
+	public static SortedMap<String, Integer> getStats(){
+		Map<String, Integer> rawstats = new HashMap<String, Integer>();
+		List<Profile> profiles = getProfiles();
+		for(Profile profile:profiles){
+	          String pname = profile.getName();
+	          profile.getRewardPoints();
+	          rawstats.put(pname, profile.getRewardPoints());
+		}
+		ValueComparator com = new ValueComparator(rawstats);
+		SortedMap<String, Integer> stats = new TreeMap<String, Integer>(com);
+		stats.putAll(rawstats);
+		return stats;
 	}
 public static File getProfile(String name){
 	OfflinePlayer[] players = Bukkit.getOfflinePlayers();

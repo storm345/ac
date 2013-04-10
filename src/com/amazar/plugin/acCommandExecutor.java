@@ -1649,14 +1649,14 @@ return true;
 	        sender.sendMessage(ChatColor.RED + "Warns: " + ChatColor.GOLD + warns);
 	        sender.sendMessage(ChatColor.RED + "Last online: " + ChatColor.GOLD + online);
 	        sender.sendMessage(ChatColor.RED + "Clan: " + ChatColor.GOLD + clan);
-	        sender.sendMessage(ChatColor.RED + "Reward Points: " + ChatColor.GOLD + points);
+	        sender.sendMessage(ChatColor.RED + "Gamer points: " + ChatColor.GOLD + points);
 	        sender.sendMessage(ChatColor.RED + "Kills: " + ChatColor.GOLD + kills);
 	        pProfile.save();
 			return true;
 		}
 		else if(cmd.getName().equalsIgnoreCase("spend")){
 			if(!(sender instanceof Player)){
-				sender.sendMessage(ChatColor.RED + "Must be a player to spend reward points!");
+				sender.sendMessage(ChatColor.RED + "Must be a player to spend gamer points!");
 				return true;
 			}
 			if(args.length < 2){
@@ -1691,7 +1691,7 @@ return true;
 				Profile pProfile = new Profile(player.getName());
 				int balance = pProfile.getRewardPoints();
 				if(balance - amount < 0){
-					sender.sendMessage(ChatColor.RED + "Not enough reward points. You have " + ChatColor.GOLD + balance + ChatColor.RED + " reward points");
+					sender.sendMessage(ChatColor.RED + "Not enough gamer points. You have " + ChatColor.GOLD + balance + ChatColor.RED + " gamer points");
 				    return true;
 				}
 				pProfile.addRewardPoint(-amount);
@@ -1699,7 +1699,7 @@ return true;
 				ac.econ.bankDeposit(player.getName(), amount);
 				EconomyResponse newBalance = ac.econ.bankBalance(player.getName());
 				double bal = newBalance.balance;
-				sender.sendMessage(ChatColor.RED + "Successfully transferred " + ChatColor.GOLD + amount + ChatColor.RED + " reward points into " + ChatColor.GOLD + amount + " " + ac.econ.currencyNamePlural() + ChatColor.RED + ". You now have " + ChatColor.GOLD + bal + " " + ac.econ.currencyNamePlural() + ChatColor.RED + " in your account!");
+				sender.sendMessage(ChatColor.RED + "Successfully transferred " + ChatColor.GOLD + amount + ChatColor.RED + " gamer points into " + ChatColor.GOLD + amount + " " + ac.econ.currencyNamePlural() + ChatColor.RED + ". You now have " + ChatColor.GOLD + bal + " " + ac.econ.currencyNamePlural() + ChatColor.RED + " in your account!");
 			}
 			else if(contains){
 				//TODO buy them
@@ -1769,7 +1769,8 @@ return true;
 			Profile pProfile = new Profile(name);
 			pProfile.addRewardPoint(num);
 			pProfile.save();
-			sender.sendMessage(ChatColor.RED + "Allocated " + ChatColor.GOLD + num + ChatColor.RED + " reward points to " + ChatColor.GOLD + name);
+			Profile.calculateLeaderboard();
+			sender.sendMessage(ChatColor.RED + "Allocated " + ChatColor.GOLD + num + ChatColor.RED + " gamer points to " + ChatColor.GOLD + name);
 			return true;
 		}
 	else if (cmd.getName().equalsIgnoreCase("accommands")){ // If the player typed /setlevel then do the following...

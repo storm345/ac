@@ -172,8 +172,8 @@ public class AcListener implements Listener {
 				if(player.isOnline()){
 					if(!inplayers.contains(playername)){
 						Profile pProfile = new Profile(playername);
-						pProfile.addRewardPoint(3);
-						player.sendMessage(ChatColor.RED+"+3 reward points!");
+						pProfile.addRewardPoint(5);
+						player.sendMessage(ChatColor.RED+"+5 gamer points!");
 						player.getInventory().clear();
 						if(game.getOldInventories().containsKey(player.getName())){
 							player.getInventory().setContents(game.getOldInventories().get(player.getName()));
@@ -181,8 +181,8 @@ public class AcListener implements Listener {
 					}
 					else{
 						Profile pProfile = new Profile(playername);
-						pProfile.addRewardPoint(10);
-						player.sendMessage(ChatColor.RED+"+10 reward points!");
+						pProfile.addRewardPoint(25);
+						player.sendMessage(ChatColor.RED+"+25 gamer points!");
 					}
 					player.sendMessage(ChatColor.GOLD+game.getWinner() + " won the game!");
 					player.sendMessage(ChatColor.GREEN+"Winner(s): "+in);
@@ -197,6 +197,7 @@ public class AcListener implements Listener {
 			plugin.mgMethods.purgeMobs(gameArena);
 		}
 		plugin.gameScheduler.reCalculateQues();
+        Profile.calculateLeaderboard();
 		return;
 	}
 	@EventHandler void mgSigns(SignChangeEvent event){
@@ -534,7 +535,7 @@ public class AcListener implements Listener {
 			block.getRelative(BlockFace.SOUTH_WEST).setType(Material.GLASS);
 			block.getRelative(BlockFace.WEST).setType(Material.GLASS);
 			block.getRelative(BlockFace.NORTH_WEST).setType(Material.GLASS);
-			playerOuted.sendMessage(ChatColor.GOLD+"Spectating... To leave (and miss out on reward points) please do /mg leave");
+			playerOuted.sendMessage(ChatColor.GOLD+"Spectating... To leave (and miss out on gamer points) please do /mg leave");
 			Location spectator = new Location(gameArena.getCenter().getWorld(), gameArena.getCenter().getX(), gameArena.getCenter().getY(), gameArena.getCenter().getZ()).getBlock().getRelative(BlockFace.NORTH, 10).getLocation();
 			playerOuted.teleport(spectator.add(0,6,0));
 			plugin.gameScheduler.updateGame(game);
@@ -571,7 +572,7 @@ public class AcListener implements Listener {
 			block.getRelative(BlockFace.SOUTH_WEST).setType(Material.GLASS);
 			block.getRelative(BlockFace.WEST).setType(Material.GLASS);
 			block.getRelative(BlockFace.NORTH_WEST).setType(Material.GLASS);
-			playerOuted.sendMessage(ChatColor.GOLD+"Spectating... To leave (and miss out on reward points) please do /mg leave");
+			playerOuted.sendMessage(ChatColor.GOLD+"Spectating... To leave (and miss out on gamer points) please do /mg leave");
 			Location spectator = new Location(gameArena.getCenter().getWorld(), gameArena.getCenter().getX(), gameArena.getCenter().getY(), gameArena.getCenter().getZ()).getBlock().getRelative(BlockFace.NORTH, 10).getLocation();
 			playerOuted.teleport(spectator.add(0,6,0));
 			plugin.gameScheduler.updateGame(game);
@@ -626,7 +627,7 @@ public class AcListener implements Listener {
 			block.getRelative(BlockFace.SOUTH_WEST).setType(Material.GLASS);
 			block.getRelative(BlockFace.WEST).setType(Material.GLASS);
 			block.getRelative(BlockFace.NORTH_WEST).setType(Material.GLASS);
-			playerOuted.sendMessage(ChatColor.GOLD+"Spectating... To leave (and miss out on reward points) please do /mg leave");
+			playerOuted.sendMessage(ChatColor.GOLD+"Spectating... To leave (and miss out on gamer points) please do /mg leave");
 			Location spectator = new Location(gameArena.getCenter().getWorld(), gameArena.getCenter().getX(), gameArena.getCenter().getY(), gameArena.getCenter().getZ()).getBlock().getRelative(BlockFace.NORTH, 10).getLocation();
 			playerOuted.teleport(spectator.add(0,6,0));
 			}
@@ -990,7 +991,7 @@ public class AcListener implements Listener {
 					block.getRelative(BlockFace.SOUTH_WEST).setType(Material.GLASS);
 					block.getRelative(BlockFace.WEST).setType(Material.GLASS);
 					block.getRelative(BlockFace.NORTH_WEST).setType(Material.GLASS);
-					playerOuted.sendMessage(ChatColor.GOLD+"Spectating... To leave (and miss out on reward points) please do /mg leave");
+					playerOuted.sendMessage(ChatColor.GOLD+"Spectating... To leave (and miss out on gamer points) please do /mg leave");
 					Location spectator = new Location(arena.getCenter().getWorld(), arena.getCenter().getX(), arena.getCenter().getY(), arena.getCenter().getZ()).getBlock().getRelative(BlockFace.NORTH, 10).getLocation();
 					playerOuted.teleport(spectator.add(0,6,0));
 					for(String player:tplayers){
@@ -1115,7 +1116,7 @@ public class AcListener implements Listener {
 					block.getRelative(BlockFace.SOUTH_WEST).setType(Material.GLASS);
 					block.getRelative(BlockFace.WEST).setType(Material.GLASS);
 					block.getRelative(BlockFace.NORTH_WEST).setType(Material.GLASS);
-					playerOuted.sendMessage(ChatColor.GOLD+"Spectating... To leave (and miss out on reward points) please do /mg leave");
+					playerOuted.sendMessage(ChatColor.GOLD+"Spectating... To leave (and miss out on gamer points) please do /mg leave");
 					Location spectator = new Location(arena.getCenter().getWorld(), arena.getCenter().getX(), arena.getCenter().getY(), arena.getCenter().getZ()).getBlock().getRelative(BlockFace.NORTH, 10).getLocation();
 					playerOuted.teleport(spectator.add(0,6,0));
 					for(String player:tplayers){
@@ -1587,7 +1588,7 @@ void kills(EntityDeathEvent event){
 					Profile pProfile = new Profile(p.getName());
 					int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
 					pProfile.addRewardPoint(amount);
-					p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
+					p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " gamer points!");
 				}
 			}
 		}
@@ -1604,6 +1605,7 @@ void playerexit(PlayerQuitEvent event){
 	event.setQuitMessage(msg);
 return;	
 }
+/*
 @EventHandler
 void rewarder(PlayerEggThrowEvent event){
 	Player p = event.getPlayer();
@@ -1612,7 +1614,7 @@ void rewarder(PlayerEggThrowEvent event){
 		Profile pProfile = new Profile(p.getName());
 		int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
 		pProfile.addRewardPoint(amount);
-		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
+		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " gamer points!");
 	}
 	return;
 }
@@ -1624,7 +1626,7 @@ void rewarder2(PlayerExpChangeEvent event){
 		Profile pProfile = new Profile(p.getName());
 		int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
 		pProfile.addRewardPoint(amount);
-		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
+		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " gamer points!");
 	}
 	return;
 }
@@ -1636,7 +1638,7 @@ void rewarder3(PlayerFishEvent event){
 		Profile pProfile = new Profile(p.getName());
 		int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
 		pProfile.addRewardPoint(amount);
-		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
+		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " gamer points!");
 	}
 	return;
 }
@@ -1648,7 +1650,7 @@ void rewarder4(PlayerInteractEntityEvent event){
 		Profile pProfile = new Profile(p.getName());
 		int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
 		pProfile.addRewardPoint(amount);
-		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
+		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " gamer points!");
 	}
 	return;
 }
@@ -1660,7 +1662,7 @@ void rewarder5(PlayerLevelChangeEvent event){
 		Profile pProfile = new Profile(p.getName());
 		int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
 		pProfile.addRewardPoint(amount);
-		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
+		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " gamer points!");
 	}
 	return;
 }
@@ -1672,7 +1674,7 @@ void rewarder7(PlayerTeleportEvent event){
 		Profile pProfile = new Profile(p.getName());
 		int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
 		pProfile.addRewardPoint(amount);
-		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
+		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " gamer points!");
 	}
 	return;
 }
@@ -1684,7 +1686,7 @@ void rewarder8(PlayerRespawnEvent event){
 		Profile pProfile = new Profile(p.getName());
 		int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
 		pProfile.addRewardPoint(amount);
-		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
+		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " gamer points!");
 	}
 	return;
 }
@@ -1696,7 +1698,7 @@ void rewarder9(PlayerShearEntityEvent event){
 		Profile pProfile = new Profile(p.getName());
 		int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
 		pProfile.addRewardPoint(amount);
-		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
+		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " gamer points!");
 	}
 	return;
 }
@@ -1708,7 +1710,7 @@ void rewarder10(PlayerToggleSprintEvent event){
 		Profile pProfile = new Profile(p.getName());
 		int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
 		pProfile.addRewardPoint(amount);
-		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
+		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " gamer points!");
 	}
 	return;
 }
@@ -1720,7 +1722,7 @@ void rewarder11(BlockPlaceEvent event){
 		Profile pProfile = new Profile(p.getName());
 		int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
 		pProfile.addRewardPoint(amount);
-		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
+		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " gamer points!");
 	}
 	return;
 }
@@ -1732,7 +1734,7 @@ void rewarder11(BlockBreakEvent event){
 		Profile pProfile = new Profile(p.getName());
 		int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
 		pProfile.addRewardPoint(amount);
-		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
+		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " gamer points!");
 	}
 	return;
 }
@@ -1744,7 +1746,7 @@ void rewarder12(EnchantItemEvent event){
 		Profile pProfile = new Profile(p.getName());
 		int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
 		pProfile.addRewardPoint(amount);
-		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
+		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " gamer points!");
 	}
 	return;
 }
@@ -1766,7 +1768,7 @@ void rewarder13(EntityDamageByEntityEvent event){
 		Profile pProfile = new Profile(p.getName());
 		int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
 		pProfile.addRewardPoint(amount);
-		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
+		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " gamer points!");
 	}
 	return;
 }
@@ -1781,8 +1783,9 @@ void rewarder14(VehicleEnterEvent event){
 		Profile pProfile = new Profile(p.getName());
 		int amount = 1 + (int)(Math.random() * ((5 - 1) + 1));
 		pProfile.addRewardPoint(amount);
-		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " reward points!");
+		p.sendMessage(ChatColor.DARK_RED + "+" + ChatColor.GOLD + amount + ChatColor.RED + " gamer points!");
 	}
 	return;
 }
+*/
 }
