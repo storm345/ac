@@ -256,13 +256,16 @@ public class AcListener implements Listener {
 			else if(action.equalsIgnoreCase("games")){
 				player.performCommand("minigame games");
 			}
+			event.setCancelled(true);
 			return;
 		}
 		else if(ChatColor.stripColor(lines[0]).equalsIgnoreCase("[Games]")){
 			player.performCommand("games");
+			event.setCancelled(true);
 			return;
 		}
 		else if(ChatColor.stripColor(ChatColor.stripColor(sign.getLine(1))).equalsIgnoreCase("[Lift Up]")){
+			event.setCancelled(true);
 	    	    double y = sign.getLocation().getY();
 	    	    double x = sign.getLocation().getX();
 	    	    double z = sign.getLocation().getZ();
@@ -320,6 +323,7 @@ public class AcListener implements Listener {
 	    		return;
 	    }
 	    else if(ChatColor.stripColor(ChatColor.stripColor(sign.getLine(1))).equalsIgnoreCase("[Lift Down]")){
+	    	event.setCancelled(true);
 	    	    double y = sign.getLocation().getY();
 	    	    double x = sign.getLocation().getX();
 	    	    double z = sign.getLocation().getZ();
