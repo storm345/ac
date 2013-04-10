@@ -245,6 +245,7 @@ public class AcListener implements Listener {
 			String action = ChatColor.stripColor(lines[1]);
 			if(action.equalsIgnoreCase("join")){
 				player.performCommand("minigame join "+ChatColor.stripColor(lines[2])+" "+ChatColor.stripColor(lines[3]));
+				player.sendMessage(ChatColor.GOLD+"To leave do /mg leave!");
 			}
 			else if(action.equalsIgnoreCase("leave")){
 				player.performCommand("minigame leave");
