@@ -82,6 +82,11 @@ public class GameScheduler {
 					public void run() {
 						String aname = arenaName;
 						Arena arena = ac.plugin.minigamesArenas.getArena(aname);
+						if(arena.getHowManyPlayers() < 2){
+							arena.setTransitioning(false);
+							plugin.minigamesArenas.setArena(aname, arena);
+							return;
+						}
 						Minigame game = new Minigame(arena, aname);
 						List<String> aquep = new ArrayList<String>();
 						aquep.addAll(arena.getPlayers());
@@ -92,6 +97,7 @@ public class GameScheduler {
 						arena.setTransitioning(false);
 						plugin.minigamesArenas.setArena(aname, arena);
 						startGame(arena, aname, game);
+						return;
 					}}, 100l);
 				
 			}

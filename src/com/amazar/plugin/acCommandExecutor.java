@@ -282,6 +282,50 @@ return true;
 					sender.sendMessage(ChatColor.RED+"Invalid minigame. Please do /"+cmd.getLabel()+" games for a list of valid minigames!");
 					return true;
 				}
+				if(arenaName.equalsIgnoreCase("auto")){
+					List<String> gameArenas = new ArrayList<String>();
+					List<String> order = new ArrayList<String>();
+					int waitingPlayers = 0;
+					for(String aname:plugin.minigamesArenas.getArenas()){
+						Arena arena = plugin.minigamesArenas.getArena(aname);
+						if(arena.getType() == type && arena.getHowManyPlayers() < arena.getPlayerLimit()){
+							gameArenas.add(aname);
+							if(arena.getHowManyPlayers() > waitingPlayers){
+								waitingPlayers = arena.getHowManyPlayers();
+							}
+						}
+					}
+					int waitNo = 1;
+					List<String> remaining = new ArrayList<String>();
+					remaining.addAll(gameArenas);
+					for(int i=waitNo;i<=waitingPlayers;i++){
+						for(String aname:gameArenas){
+							Arena arena = plugin.minigamesArenas.getArena(aname);
+							if(arena.getHowManyPlayers() == waitNo){
+								order.add(aname);
+								if(remaining.contains(aname)){
+								remaining.remove(aname);
+								}
+							}
+						}
+					}
+					for(String aname:remaining){
+						order.add(aname);
+					}
+					if(order.size() < 1){
+						sender.sendMessage(ChatColor.RED+"No arenas found!");
+						return true;
+					}
+					String name = order.get(0);
+					Arena arena = plugin.minigamesArenas.getArena(name);
+					if(arena.getHowManyPlayers() < 1){
+						int rand = 0 + (int)(Math.random() * ((order.size() - 0) + 0));
+						name = order.get(rand);
+						arena = plugin.minigamesArenas.getArena(name);
+					}
+					plugin.gameScheduler.joinGame(player.getName(), arena, name);
+					return true;
+				}
 				List<String> gameArenas = new ArrayList<String>();
 				for(String aname:plugin.minigamesArenas.getArenas()){
 					Arena arena = plugin.minigamesArenas.getArena(aname);

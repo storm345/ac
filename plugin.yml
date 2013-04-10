@@ -24,7 +24,7 @@ commands:
       default: op
    minigame:
       description: This is the joining, leaving and playing of minigames.
-      usage: /<command> [Leave], [Games], [List <Game> (Page)], [Join <Game> <arena>]
+      usage: /<command> [Leave], [Games], [List <Game> (Page)], [Join <Game> <arena/"auto">]
       aliases: [mg,game,mgame,mini]
       permission: ac.minigame
       permission-message: You don't have access to this command <permission>
