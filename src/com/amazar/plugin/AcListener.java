@@ -1390,7 +1390,12 @@ void playerJoin(PlayerJoinEvent event){
 void kills(EntityDeathEvent event){
 	Entity dead = event.getEntity();
 	EntityDamageEvent cause = dead.getLastDamageCause();
-	DamageCause reason = cause.getCause();
+	DamageCause reason;
+	try {
+		reason = cause.getCause();
+	} catch (Exception e) {
+		return;
+	}
 	if(reason == null){
 		return;
 	}
