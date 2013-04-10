@@ -18,6 +18,7 @@ public class Arena implements Serializable {
 	private ArenaShape shape = ArenaShape.INVALID;
 	private ArenaType type = ArenaType.INAVLID;
 	private int playerLimit = 0;
+	private Boolean transitioning = false;
 	private List<String> players = new ArrayList<String>();
 public Arena(Location center, int radius, ArenaShape shape, ArenaType type, int playerLimit){
 	this.center = ac.plugin.invalidLoc;
@@ -33,6 +34,13 @@ public Arena(Location center, int radius, ArenaShape shape, ArenaType type, int 
 	}
 	this.playerLimit = playerLimit;
 	
+}
+public void setTransitioning(Boolean trans){
+	this.transitioning = trans;
+	return;
+}
+public Boolean getTransitioning(){
+	return this.transitioning;
 }
 public Boolean isValid(){
 	if(this.center.equals(ac.plugin.invalidLoc)){

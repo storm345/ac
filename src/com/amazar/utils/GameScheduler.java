@@ -49,21 +49,7 @@ public class GameScheduler {
 					}
 				}
 				plugin.minigamesArenas.setArena(arenaName, arena);
-				if(!arenaInUse(arenaName) && arena.getHowManyPlayers() > 1){
-					Minigame game = new Minigame(arena, arenaName);
-					List<String> aquep = new ArrayList<String>();
-					aquep.addAll(arena.getPlayers());
-					for(String pname:aquep){
-						if(plugin.getServer().getPlayer(pname).isOnline() && plugin.getServer().getPlayer(pname) != null){
-							game.join(pname);
-							arena.removePlayer(pname);
-						}
-					}
-					plugin.minigamesArenas.setArena(arenaName, arena);
-					startGame(arena, arenaName, game);
-					return true;
-				}
-				
+				this.reCalculateQues();
 				plugin.getServer().getPlayer(playername).sendMessage(ChatColor.GREEN+"In arena que!");
 				return true;
 			}
@@ -83,16 +69,31 @@ public class GameScheduler {
 					arenaque.remove(name);
 				}
 			}
-			if(!arenaInUse(aname) && arena.getHowManyPlayers() > 1){
-				Minigame game = new Minigame(arena, aname);
-				List<String> aquep = new ArrayList<String>();
-				aquep.addAll(arena.getPlayers());
-				for(String name:aquep){
-				game.join(name);
-				arena.removePlayer(name);
-				}
+			if(arena.getTransitioning() == null){
+				arena.setTransitioning(false);
+			}
+			if(!arenaInUse(aname) && arena.getHowManyPlayers() > 1 && !arena.getTransitioning()){
+				arena.setTransitioning(true);
 				plugin.minigamesArenas.setArena(aname, arena);
-				startGame(arena, aname, game);
+				final String arenaName = aname;
+			    plugin.getServer().getScheduler().runTaskLater(plugin, new Runnable(){
+
+					@Override
+					public void run() {
+						String aname = arenaName;
+						Arena arena = ac.plugin.minigamesArenas.getArena(aname);
+						Minigame game = new Minigame(arena, aname);
+						List<String> aquep = new ArrayList<String>();
+						aquep.addAll(arena.getPlayers());
+						for(String name:aquep){
+						game.join(name);
+						arena.removePlayer(name);
+						}
+						arena.setTransitioning(false);
+						plugin.minigamesArenas.setArena(aname, arena);
+						startGame(arena, aname, game);
+					}}, 100l);
+				
 			}
 		}
 		return;
