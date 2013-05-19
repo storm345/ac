@@ -765,8 +765,7 @@ return true;
 						for(int i=3;i<args.length;i++){
 							raws.add(args[i]);
 						}
-						Object[] array = (Object[]) raws.toArray();
-						gameArena.setItems((String[]) array);
+						gameArena.setItems(raws.toArray(new String[0]));
 						plugin.minigamesArenas.setArena(arenaName, gameArena);
 						sender.sendMessage(ChatColor.GREEN+"Successfully set items given to players!");
 						return true;
@@ -847,8 +846,7 @@ return true;
 						for(int i=3;i<args.length;i++){
 							raws.add(args[i]);
 						}
-						Object[] array = (Object[]) raws.toArray();
-						push.setItems((String[]) array);
+						push.setItems(raws.toArray(new String[0]));
 						plugin.minigamesArenas.setArena(arenaName, push);
 						sender.sendMessage(ChatColor.GREEN+"Successfully set items given to players!");
 						return true;
@@ -866,8 +864,7 @@ return true;
 						for(int i=3;i<args.length;i++){
 							raws.add(args[i]);
 						}
-						Object[] array = (Object[]) raws.toArray();
-						teams.setItems((String[]) array);
+						teams.setItems(raws.toArray(new String[0]));
 						plugin.minigamesArenas.setArena(arenaName, teams);
 						sender.sendMessage(ChatColor.GREEN+"Successfully set items given to players!");
 						return true;
@@ -963,8 +960,7 @@ return true;
 						for(int i=3;i<args.length;i++){
 							raws.add(args[i]);
 						}
-						Object[] array = (Object[]) raws.toArray();
-						survival.setItems((String[]) array);
+						survival.setItems(raws.toArray(new String[0]));
 						plugin.minigamesArenas.setArena(arenaName, survival);
 						sender.sendMessage(ChatColor.GREEN+"Successfully set items given to players!");
 						return true;
@@ -1050,8 +1046,7 @@ return true;
 						for(int i=3;i<args.length;i++){
 							raws.add(args[i]);
 						}
-						Object[] array = (Object[]) raws.toArray();
-						tntori.setItems((String[]) array);
+						tntori.setItems(raws.toArray(new String[0]));
 						plugin.minigamesArenas.setArena(arenaName, tntori);
 						sender.sendMessage(ChatColor.GREEN+"Successfully set items given to players!");
 						return true;
