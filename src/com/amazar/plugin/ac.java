@@ -354,7 +354,7 @@ public void onEnable(){
     this.leaderboards.getObjective("gamers").setDisplayName(ChatColor.GOLD+"Top gamers:");
     this.leaderboards.getObjective("gamers").setDisplaySlot(DisplaySlot.SIDEBAR);
     Profile.calculateLeaderboard();
-	getLogger().info("AmazarCraft plugin is enabled :)");	//Tell teh console it is enabled
+	getLogger().info("Server specific plugin is enabled :)");	//Tell teh console it is enabled
 }
 private boolean setupEconomy() {
     if (getServer().getPluginManager().getPlugin("Vault") == null) {
@@ -382,6 +382,6 @@ public void onDisable(){
 			team.unregister();
 		}
 	}
-	getLogger().info("AmazarCraft plugin is disabled");
+	getLogger().info("Server specific plugin is disabled");
 }
 }
